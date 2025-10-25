@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto max-w-2xl py-8">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-plus text-indigo-600"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Quick Schedule with {{ other_user.get_full_name|default:other_user.username }}</h1>
+        </div>
+
+        <form method="post" class="space-y-6" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Hidden field for participant -->
+            <input type="hidden" name="participants" value="{{ other_user.id }}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Meeting Title</label>
+                    <input type="text" name="title" value="Meeting with {{ other_user.get_full_name|default:other_user.username }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Meeting Type</label>
+                    {{ form.meeting_type }}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Description</label>
+                {{ form.description }}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Date & Time</label>
+                    {{ form.scheduled_date }}
+                    {% if form.scheduled_date.errors %}
+                    <div class="text-red-600 text-sm">{{ form.scheduled_date.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                    {{ form.duration_minutes }}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Location/Meeting Link</label>
+                {{ form.location }}
+                <p class="text-sm text-gray-500">Physical address or video call link</p>
+            </div>
+
+            <!-- File Attachment -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Attachment (Optional)</label>
+                <div class="file-upload-wrapper">
+                    <input type="file" name="attachment" id="attachment" 
+                           accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                           class="hidden">
+                    <label for="attachment" class="file-upload-label cursor-pointer">
+                        <i class="fas fa-paperclip mr-2"></i>
+                        <span>Choose file</span>
+                    </label>
+                    <div id="file-name" class="file-name mt-2 text-sm text-gray-600"></div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Related Skill (Optional)</label>
+                {{ form.related_skill }}
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition duration-200">
+                    <i class="fas fa-calendar-check mr-2"></i>Schedule Meeting
+                </button>
+                <a href="{% url 'core:chat_dashboard' %}?user={{ other_user.username }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition duration-200">
+                    Back to Chat
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.file-upload-label {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 20px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+    border-color: #6366f1;
+    background: #f0f4ff;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // File upload display
+    const fileInput = document.getElementById('attachment');
+    const fileNameDisplay = document.getElementById('file-name');
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            fileNameDisplay.textContent = fileName ? `Selected: ${fileName}` : '';
+        });
+    }
+    
+    // Set default scheduled date to tomorrow at 9 AM
+    const scheduledDateInput = document.querySelector('input[name="scheduled_date"]');
+    if (scheduledDateInput && !scheduledDateInput.value) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(9, 0, 0, 0);
+        
+        // Format for datetime-local input
+        const year = tomorrow.getFullYear();
+        const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const day = String(tomorrow.getDate()).padStart(2, '0');
+        const hours = String(tomorrow.getHours()).padStart(2, '0');
+        const minutes = String(tomorrow.getMinutes()).padStart(2, '0');
+        
+        scheduledDateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+});
+</script>
+{% endblock %}                                       

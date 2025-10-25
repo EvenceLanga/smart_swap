@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto max-w-2xl py-8">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-plus text-indigo-600"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Schedule New Meeting</h1>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Meeting Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <div class="text-red-600 text-sm">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Meeting Type</label>
+                    {{ form.meeting_type }}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Description</label>
+                {{ form.description }}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Date & Time</label>
+                    {{ form.scheduled_date }}
+                    {% if form.scheduled_date.errors %}
+                    <div class="text-red-600 text-sm">{{ form.scheduled_date.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                    {{ form.duration_minutes }}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Location/Meeting Link</label>
+                {{ form.location }}
+                <p class="text-sm text-gray-500">Physical address or video call link</p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Participants</label>
+                {{ form.participants }}
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">Related Skill (Optional)</label>
+                {{ form.related_skill }}
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition duration-200">
+                    <i class="fas fa-calendar-check mr-2"></i>Schedule Meeting
+                </button>
+                <a href="{% url 'core:my_meetings' %}" class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition duration-200">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+</style>
+{% endblock %}

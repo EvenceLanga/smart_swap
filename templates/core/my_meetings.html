@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto max-w-6xl py-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">My Meetings</h1>
+            <p class="text-gray-600">Manage your scheduled meetings and sessions</p>
+        </div>
+        <a href="{% url 'core:schedule_meeting' %}" 
+           class="bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-indigo-700 transition duration-200 flex items-center gap-2">
+            <i class="fas fa-plus"></i>
+            Schedule New Meeting
+        </a>
+    </div>
+
+    <!-- Upcoming Meetings -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Meetings</h2>
+        {% if upcoming_meetings %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for meeting in upcoming_meetings %}
+            <div class="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition duration-200">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-semibold text-gray-800 text-lg">{{ meeting.title }}</h3>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                            {{ meeting.get_status_display }}
+                        </span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">{{ meeting.description|truncatewords:10 }}</p>
+                </div>
+                
+                <div class="p-4">
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="fas fa-calendar text-indigo-500"></i>
+                            <span>{{ meeting.scheduled_date|date:"M j, Y" }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="fas fa-clock text-indigo-500"></i>
+                            <span>{{ meeting.scheduled_date|date:"g:i A" }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="fas fa-users text-indigo-500"></i>
+                            <span>{{ meeting.participants.count }} participant{{ meeting.participants.count|pluralize }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <a href="{% url 'core:meeting_detail' meeting_id=meeting.id %}" 
+                           class="flex-1 bg-indigo-600 text-white py-2 px-3 rounded text-sm font-medium hover:bg-indigo-700 transition duration-200 text-center">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Upcoming Meetings</h3>
+            <p class="text-gray-500 mb-4">You don't have any upcoming meetings scheduled.</p>
+            <a href="{% url 'core:schedule_meeting' %}" 
+               class="bg-indigo-600 text-white py-2 px-6 rounded-lg font-medium hover:bg-indigo-700 transition duration-200 inline-flex items-center gap-2">
+                <i class="fas fa-plus"></i>
+                Schedule Your First Meeting
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Past Meetings -->
+    <div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Past Meetings</h2>
+        {% if past_meetings %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meeting</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for meeting in past_meetings %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div>
+                                <div class="font-medium text-gray-900">{{ meeting.title }}</div>
+                                <div class="text-sm text-gray-500">{{ meeting.description|truncatewords:5 }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ meeting.scheduled_date|date:"M j, Y g:i A" }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ meeting.get_meeting_type_display }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if meeting.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif meeting.status == 'cancelled' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ meeting.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium">
+                            <a href="{% url 'core:meeting_detail' meeting_id=meeting.id %}" 
+                               class="text-indigo-600 hover:text-indigo-900">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Past Meetings</h3>
+            <p class="text-gray-500">Your past meetings will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

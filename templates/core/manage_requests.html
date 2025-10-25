@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+/* Your existing CSS styles here */
+.admin-section {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 30px auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.admin-section h2 {
+  color: #1f2937;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.status-filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.status-filter-btn:hover {
+  background: #f8fafc;
+  border-color: #d1d5db;
+}
+
+.status-filter-btn.active {
+  background: #004080;
+  color: white;
+  border-color: #004080;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 14px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table th {
+  background: #004080;
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  color: #374151;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover {
+  background: #f8fafc;
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.data-table tbody tr:nth-child(even):hover {
+  background: #f3f4f6;
+}
+
+.btn-edit {
+  background: #28a745;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40,167,69,0.3);
+  text-decoration: none;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220,53,69,0.3);
+  text-decoration: none;
+  color: white;
+}
+
+.empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px 20px;
+  font-style: italic;
+  background: #f9fafb;
+  border-radius: 0 0 8px 8px;
+}
+
+.empty td {
+  border: none !important;
+  font-size: 16px;
+}
+
+/* Status badges */
+.status-pending { 
+  color: #fd7e14; 
+  font-weight: 600;
+  background: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.status-approved { 
+  color: #28a745; 
+  font-weight: 600;
+  background: #d4edda;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.status-rejected { 
+  color: #dc3545; 
+  font-weight: 600;
+  background: #f8d7da;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.status-completed { 
+  color: #007bff; 
+  font-weight: 600;
+  background: #d1ecf1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .admin-section {
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .data-table {
+    font-size: 12px;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 8px 12px;
+  }
+  
+  .btn-edit,
+  .btn-delete {
+    padding: 4px 8px;
+    font-size: 11px;
+    margin-right: 4px;
+  }
+}
+</style>
+
+<div class="admin-section">
+  <h2>🔁 Manage Skill Requests</h2>
+
+  <!-- Status Filters -->
+  <div class="status-filters">
+    <a href="{% url 'core:manage_requests' %}" class="status-filter-btn {% if not current_status %}active{% endif %}">All</a>
+    <a href="{% url 'core:manage_requests' %}?status=PENDING" class="status-filter-btn {% if current_status == 'PENDING' %}active{% endif %}">Pending</a>
+    <a href="{% url 'core:manage_requests' %}?status=APPROVED" class="status-filter-btn {% if current_status == 'APPROVED' %}active{% endif %}">Approved</a>
+    <a href="{% url 'core:manage_requests' %}?status=REJECTED" class="status-filter-btn {% if current_status == 'REJECTED' %}active{% endif %}">Rejected</a>
+    <a href="{% url 'core:manage_requests' %}?status=COMPLETED" class="status-filter-btn {% if current_status == 'COMPLETED' %}active{% endif %}">Completed</a>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Skill</th>
+        <th>Requester</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Scheduled For</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for request in requests %}
+      <tr>
+        <td><strong>#{{ request.id }}</strong></td>
+        <td><strong>{{ request.skill.title }}</strong></td>
+        <td>{{ request.requester.username }}</td>
+        <td>{{ request.owner.username }}</td>
+        <td>
+          <span class="status-{{ request.status|lower }}">{{ request.status }}</span>
+        </td>
+        <td>{{ request.created_at|date:"Y-m-d H:i" }}</td>
+        <td>
+          {% if request.scheduled_for %}
+            {{ request.scheduled_for|date:"Y-m-d H:i" }}
+          {% else %}
+            <span style="color: #6b7280; font-size: 12px;">Not scheduled</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if request.status == 'PENDING' %}
+            <a href="{% url 'core:approve_request' request.id %}" class="btn-edit" onclick="return confirm('Approve this request?')">Approve</a>
+            <a href="{% url 'core:reject_request' request.id %}" class="btn-delete" onclick="return confirm('Reject this request?')">Reject</a>
+          {% else %}
+            <span style="color: #6b7280; font-size: 12px;">No actions</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="empty">No skill requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

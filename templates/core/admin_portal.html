@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="admin-portal">
+  <h2>⚙️ Manage Platform Data</h2>
+
+  <div class="admin-sections">
+    <a href="{% url 'core:manage_users' %}" class="btn-manage">Manage Users</a>
+    <a href="{% url 'core:manage_skills' %}" class="btn-manage">Manage Skills</a>
+    <a href="{% url 'core:manage_requests' %}" class="btn-manage">Manage Requests</a>
+    <a href="{% url 'core:manage_reviews' %}" class="btn-manage">Manage Reviews</a>
+    <a href="{% url 'core:manage_reports' %}" class="btn-manage">Manage Reports</a>
+  </div>
+</div>
+
+<style>
+.admin-portal {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 30px auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.admin-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+.btn-manage {
+  display: block;
+  text-align: center;
+  background: #004080;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.btn-manage:hover {
+  background: #0073e6;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,5 @@
+After installing dependencies and before running the server for the first time, run:
+  python manage.py makemigrations
+  python manage.py migrate
+Then create a superuser:
+  python manage.py createsuperuser

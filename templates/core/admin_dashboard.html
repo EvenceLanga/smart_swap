@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="admin-dashboard">
+  <h2>📊 Platform Overview</h2>
+
+  <div class="stats">
+    <a href="{% url 'core:manage_users' %}" class="card">
+      <h3>{{ total_users }}</h3>
+      <p>Registered Users</p>
+    </a>
+
+    <a href="{% url 'core:manage_skills' %}" class="card">
+      <h3>{{ total_skills }}</h3>
+      <p>Skills Added</p>
+    </a>
+
+    <a href="{% url 'core:manage_requests' %}" class="card">
+      <h3>{{ total_requests }}</h3>
+      <p>Skill Swap Requests</p>
+    </a>
+
+    <a href="{% url 'core:manage_requests' %}?status=COMPLETED" class="card">
+      <h3>{{ completed_swaps }}</h3>
+      <p>Completed Swaps</p>
+    </a>
+
+    <a href="{% url 'core:manage_meetings' %}" class="card">
+      <h3>{{ total_meetings }}</h3>
+      <p>Total Meetings</p>
+    </a>
+
+    <a href="{% url 'core:manage_reviews' %}" class="card">
+      <h3>{{ avg_rating|floatformat:1 }}</h3>
+      <p>Average Rating</p>
+    </a>
+  </div>
+
+  <h3>🔥 Top Skill Categories</h3>
+  <ul>
+    {% for c in popular_categories %}
+      <li><strong>{{ c.category }}</strong> — {{ c.total }} skills</li>
+    {% empty %}
+      <li>No skills added yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<style>
+.admin-dashboard {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: 30px auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+.card {
+  background: #004080;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.card:hover {
+  background: #0066cc;
+  transform: translateY(-3px);
+}
+.card h3 {
+  font-size: 2rem;
+  margin: 0;
+}
+h3{
+  color: white;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>👤 Manage Users</h2>
+<table class="data-table">
+  <tr>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Course</th>
+    <th>Year</th>
+    <th>Actions</th>
+  </tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.username }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.profile.course }}</td>
+    <td>{{ u.profile.year }}</td>
+    <td>
+      <a href="#">Edit</a> | 
+      <a href="#">Delete</a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="5">No users found.</td></tr>
+  {% endfor %}
+</table>
+
+<style>
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+.data-table th {
+  background: #004080;
+  color: white;
+}
+</style>
+{% endblock %}

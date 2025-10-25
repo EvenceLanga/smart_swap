@@ -1,0 +1,1919 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Audio Call Interface (Hidden by default) -->
+    <div id="audio-call-interface" class="call-interface hidden">
+        <div class="call-header">
+            <div class="call-partner-info">
+                <div class="partner-avatar">
+                    <div class="default-avatar large">
+                        {% if active_user %}{{ active_user.first_name|default:active_user.username|first|upper }}{% endif %}
+                    </div>
+                </div>
+                <div class="partner-details">
+                    <h3 id="call-partner-name">{% if active_user %}{{ active_user.get_full_name|default:active_user.username }}{% endif %}</h3>
+                    <p id="call-status">Calling...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="call-timer" id="call-timer">00:00</div>
+        
+        <div class="call-controls">
+            <button class="call-btn mute-btn" onclick="toggleMute()" title="Mute">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="call-btn end-call-btn" onclick="endCall()" title="End Call">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+            <button class="call-btn speaker-btn" onclick="toggleSpeaker()" title="Speaker">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+        
+        <audio id="remote-audio" autoplay></audio>
+    </div>
+
+    <!-- Rest of your existing chat container remains the same -->
+    <div class="chat-sidebar">
+        <!-- Your existing sidebar code -->
+        <!-- Search Section -->
+        <div class="sidebar-section">
+            <div class="search-header">
+                <div class="header-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Search Users</h3>
+            </div>
+            <div class="search-box" style="position: relative;">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="q" id="user-search" placeholder="Search users..." 
+                        onkeyup="searchUsers(this.value)">
+                </div>
+                <div id="search-results" class="search-results"></div>
+            </div>
+        </div>
+
+        <!-- Conversations List -->
+        <div class="sidebar-section">
+            <div class="conversations-header">
+                <div class="header-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>Conversations</h3>
+                <div class="header-actions">
+                    <button class="refresh-btn" onclick="refreshConversations()" title="Refresh conversations">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search within conversations -->
+            <div class="conversation-search">
+                <input type="text" id="conversation-search" placeholder="Search conversations..." 
+                       onkeyup="filterConversations()">
+                <i class="fas fa-search"></i>
+            </div>
+            
+            <div class="conversations-list" id="conversations-list">
+                {% for user_data in user_data %}
+                <div class="conversation-item {% if active_user == user_data.user %}active{% endif %}" 
+                     data-username="{{ user_data.user.username }}"
+                     data-last-message="{{ user_data.last_message.content|default:''|lower }}"
+                     data-user-name="{{ user_data.user.first_name }} {{ user_data.user.last_name }} {{ user_data.user.username }}">
+                    <a href="?user={{ user_data.user.username }}" 
+                       class="conversation-link"
+                       onclick="markAsRead('{{ user_data.user.username }}')">
+                        <div class="user-avatar">
+                            <div class="default-avatar">
+                                {{ user_data.user.first_name|default:user_data.user.username|first|upper }}
+                            </div>
+                            {% if user_data.unread_count > 0 %}
+                            <span class="unread-badge" id="unread-{{ user_data.user.username }}">{{ user_data.unread_count }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="user-info">
+                            <div class="user-main">
+                                <strong class="user-name">
+                                    {% if user_data.user.get_full_name %}
+                                        {{ user_data.user.get_full_name }}
+                                    {% else %}
+                                        {{ user_data.user.username }}
+                                    {% endif %}
+                                </strong>
+                                <span class="message-time" id="time-{{ user_data.user.username }}">
+                                    {% if user_data.last_message %}
+                                        {{ user_data.last_message.sent_at|date:"g:i A" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="message-preview">
+                                <p class="last-message" id="lastmsg-{{ user_data.user.username }}">
+                                    {% if user_data.last_message %}
+                                        {% if user_data.last_message.from_user == request.user %}
+                                            <span class="message-sender-you">You: </span>
+                                        {% endif %}
+                                        {{ user_data.last_message.content|truncatechars:40 }}
+                                    {% else %}
+                                        <span class="no-message">Start a conversation</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="no-conversations">
+                    <i class="fas fa-comment-slash"></i>
+                    <p>No conversations yet</p>
+                    <p class="no-conversations-hint">Start chatting by searching for users above!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="sidebar-section">
+            <div class="calendar-header">
+                <div class="header-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Schedule</h3>
+            </div>
+            <div class="calendar-widget">
+                <div id="mini-calendar" class="calendar-display">
+                    <!-- Dynamic content will be inserted by JavaScript -->
+                </div>
+                <div class="schedule-actions">
+                    {% if active_user %}
+                    <a href="{% url 'core:quick_schedule' username=active_user.username %}" class="btn schedule-btn">
+                        <i class="fas fa-plus"></i> Schedule with {{ active_user.first_name|default:active_user.username }}
+                    </a>
+                    {% else %}
+                    <a href="{% url 'core:schedule_meeting' %}" class="btn schedule-btn">
+                        <i class="fas fa-plus"></i> New Meeting
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'core:meeting_calendar' %}" class="btn btn-outline calendar-view-btn">
+                        <i class="fas fa-calendar-week"></i> View Calendar
+                    </a>
+                </div>
+                
+                <!-- Upcoming Meetings List -->
+                <div class="upcoming-meetings">
+                    <h4>Upcoming Meetings</h4>
+                    <div id="upcoming-meetings-list">
+                        {% for meeting in upcoming_meetings %}
+                        <div class="meeting-item">
+                            <div class="meeting-time">{{ meeting.scheduled_date|date:"g:i A" }}</div>
+                            <div class="meeting-details">
+                                <div class="meeting-title">{{ meeting.title|truncatewords:3 }}</div>
+                                <div class="meeting-with">
+                                    {% if meeting.organizer == request.user %}
+                                        {% if meeting.participants.exists %}
+                                            {% with participant=meeting.participants.first %}
+                                                with {{ participant.first_name|default:participant.username }}
+                                            {% endwith %}
+                                        {% else %}
+                                            Solo meeting
+                                        {% endif %}
+                                    {% else %}
+                                        with {{ meeting.organizer.first_name|default:meeting.organizer.username }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="no-meetings">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No upcoming meetings</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+        {% if active_user %}
+        <!-- Active Chat Header -->
+        <div class="chat-header">
+            <div class="chat-partner">
+                <div class="partner-avatar">
+                    <div class="default-avatar large">
+                        {{ active_user.first_name|default:active_user.username|first|upper }}
+                    </div>
+                    <span class="status-dot online"></span>
+                </div>
+                <div class="partner-info">
+                    <strong class="partner-name">
+                        {% if active_user.get_full_name %}
+                            {{ active_user.get_full_name }}
+                        {% else %}
+                            {{ active_user.username }}
+                        {% endif %}
+                    </strong>
+                    <span class="online-status">Online</span>
+                </div>
+            </div>
+            <div class="chat-actions">
+                <button class="btn btn-icon" title="Video call" onclick="startVideoCall('{{ active_user.username }}')">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="btn btn-icon" title="Audio call" onclick="startAudioCall('{{ active_user.username }}')">
+                    <i class="fas fa-phone"></i>
+                </button>
+                <a href="{% url 'core:quick_schedule' username=active_user.username %}" class="btn btn-icon" title="Schedule meeting">
+                    <i class="fas fa-calendar-plus"></i>
+                </a>
+                <a href="{% url 'core:chat_dashboard' %}" class="btn btn-icon" title="Close conversation">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-container" id="messages-container">
+            {% for message in active_messages %}
+            <div class="message {% if message.from_user == request.user %}message-sent{% else %}message-received{% endif %}">
+                {% if message.from_user != request.user %}
+                <div class="message-avatar">
+                    <div class="default-avatar small">
+                        {{ message.from_user.first_name|default:message.from_user.username|first|upper }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="message-content-wrapper">
+                    {% if message.from_user != request.user %}
+                    <div class="message-sender-name">
+                        {{ message.from_user.first_name|default:message.from_user.username }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="message-bubble">
+                        <div class="message-text">
+                            {{ message.content|linebreaksbr }}
+                        </div>
+                        
+                        <div class="message-meta">
+                            <span class="message-time">
+                                {{ message.sent_at|date:"g:i A" }}
+                            </span>
+                            {% if message.from_user == request.user %}
+                                {% if message.is_read %}
+                                    <i class="fas fa-check-double read-indicator read" title="Read"></i>
+                                {% else %}
+                                    <i class="fas fa-check read-indicator sent" title="Sent"></i>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-messages">
+                <div class="no-messages-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>No messages yet</h3>
+                <p>Start the conversation by sending a message!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input -->
+        <div class="message-input-container">
+            <!-- File Preview Area -->
+            <div id="file-preview-area"></div>
+            
+            <form method="post" action="{% url 'core:send_chat_message' %}" enctype="multipart/form-data" class="message-form" id="message-form">
+                {% csrf_token %}
+                <input type="hidden" name="to_user" value="{{ active_user.id }}">
+                <div class="input-group">
+                    <button type="button" class="btn btn-icon attachment-btn" title="Add attachment" onclick="document.getElementById('file-input').click()">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input type="file" name="attachment" style="display: none;" id="file-input" onchange="handleFileSelect(this)">
+                    
+                    <div class="message-input-wrapper">
+                        <input type="text" name="content" placeholder="Type your message..." required id="message-input" autocomplete="off">
+                    </div>
+                    
+                    <button type="button" class="btn btn-icon emoji-btn" title="Add emoji" onclick="toggleEmojiPicker()">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary send-btn" title="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <!-- Welcome Screen -->
+        <div class="welcome-screen">
+            <div class="welcome-content">
+                <div class="welcome-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h2>Welcome to Messages</h2>
+                <p>Select a conversation from the sidebar or search for users to start chatting</p>
+                <div class="welcome-features">
+                    <div class="feature">
+                        <i class="fas fa-search"></i>
+                        <span>Search users</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-phone"></i>
+                        <span>Audio calls</span>
+                    </div>
+                    <a href="{% url 'core:schedule_meeting' %}" class="feature-link">
+                        <div class="feature">
+                            <i class="fas fa-calendar"></i>
+                            <span>Schedule meetings</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add this CSS for the call interface -->
+<style>
+/* Call Interface Styles */
+.call-interface {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 400px;
+    max-width: 90vw;
+    padding: 30px;
+    text-align: center;
+}
+
+.call-interface.hidden {
+    display: none;
+}
+
+.call-header {
+    margin-bottom: 30px;
+}
+
+.call-partner-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.partner-details h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+}
+
+.partner-details p {
+    margin: 5px 0 0 0;
+    color: var(--text-secondary);
+}
+
+.call-timer {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+}
+
+.call-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.call-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mute-btn {
+    background: #f8f9fa;
+    color: var(--text-primary);
+}
+
+.mute-btn.muted {
+    background: #e74c3c;
+    color: white;
+}
+
+.end-call-btn {
+    background: #e74c3c;
+    color: white;
+    transform: scale(1.1);
+}
+
+.speaker-btn {
+    background: #f8f9fa;
+    color: var(--text-primary);
+}
+
+.speaker-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.call-btn:hover {
+    transform: scale(1.1);
+}
+
+.end-call-btn:hover {
+    background: #c0392b;
+    transform: scale(1.15);
+}
+
+/* Overlay for call interface */
+.call-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    display: none;
+}
+
+.call-overlay.active {
+    display: block;
+}
+</style>
+<style>
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --secondary-color: #f8f9fa;
+    --accent-color: #27ae60;
+    --danger-color: #e74c3c;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --text-light: #bdc3c7;
+    --border-color: #bdc3c7;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+}
+
+.chat-container {
+    display: flex;
+    height: 90vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    margin: 20px;
+    overflow: hidden;
+}
+
+.chat-sidebar {
+    width: 350px;
+    background: var(--secondary-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
+
+.search-header, .conversations-header, .calendar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.header-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.header-actions {
+    margin-left: auto;
+}
+
+.refresh-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+    color: var(--primary-color);
+    background: #f8f9fa;
+}
+
+.refresh-btn.refreshing {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.search-input-wrapper, .conversation-search {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.search-input-wrapper i, .conversation-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+}
+
+#user-search, #conversation-search {
+    width: 100%;
+    padding: 10px 12px 10px 35px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Updated Search Results Styles - No Profile Pictures */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+    padding: 8px;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.search-result-item:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.search-result-username {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.search-result-email {
+    color: var(--text-light);
+    font-size: 11px;
+}
+
+.search-result-actions {
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.message-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.message-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.no-results {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.no-results i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.search-loading {
+    padding: 12px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.search-loading::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: spin 1s linear infinite;
+}
+
+.search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 0 12px 12px 0;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+#user-search {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+#user-search:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    z-index: 1;
+}
+
+.conversations-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.conversation-item:hover {
+    background: white;
+    box-shadow: var(--shadow);
+}
+
+.conversation-item.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.conversation-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+}
+
+.user-avatar {
+    position: relative;
+    margin-right: 12px;
+}
+
+.default-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.default-avatar.small {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+}
+
+.default-avatar.large {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+}
+
+.unread-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-dot.online {
+    background: var(--accent-color);
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.user-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.message-time {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.conversation-item.active .message-time {
+    color: rgba(255,255,255,0.8);
+}
+
+.last-message {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conversation-item.active .last-message {
+    color: rgba(255,255,255,0.9);
+}
+
+.message-sender-you {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.conversation-item.active .message-sender-you {
+    color: rgba(255,255,255,0.9);
+}
+
+.no-conversations, .no-messages {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+}
+
+.no-conversations i, .no-messages-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.no-conversations-hint {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.calendar-display {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-nav {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.calendar-month {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.calendar-date {
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--primary-color);
+    margin: 8px 0;
+}
+
+.calendar-day {
+    font-size: 14px;
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.today-event-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: var(--secondary-color);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.today-event-item i {
+    color: var(--primary-color);
+}
+
+.schedule-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-align: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-icon {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+}
+
+.btn-icon:hover {
+    background: #f3f4f6;
+}
+
+.schedule-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.schedule-btn:hover {
+    background: var(--primary-dark);
+}
+
+.upcoming-meetings h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.meeting-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.meeting-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: var(--secondary-color);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.meeting-details {
+    flex: 1;
+}
+
+.meeting-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.meeting-with {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.no-meetings {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+}
+
+.no-meetings i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+.chat-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-partner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.partner-avatar {
+    position: relative;
+}
+
+.partner-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.partner-name {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.online-status {
+    font-size: 14px;
+    color: var(--accent-color);
+}
+
+.chat-actions {
+    display: flex;
+    gap: 8px;
+}
+/* Messages Area */
+.messages-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 70%;
+}
+
+/* Messages you SEND - align to RIGHT */
+.message-sent {
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+/* Messages you RECEIVE - align to LEFT */
+.message-received {
+    align-self: flex-start;
+    margin-right: auto;
+}
+
+.message-content-wrapper {
+    flex: 1;
+}
+
+.message-sender-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    margin-left: 8px;
+}
+
+.message-bubble {
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 100%;
+    box-shadow: var(--shadow);
+}
+
+/* Your sent messages - blue background on right */
+.message-sent .message-bubble {
+    background: var(--primary-color);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Received messages - white background on left */
+.message-received .message-bubble {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: 4px;
+}
+
+.message-text {
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.read-indicator {
+    font-size: 10px;
+}
+
+.read-indicator.read {
+    color: var(--accent-color);
+}
+
+.read-indicator.sent {
+    color: rgba(255,255,255,0.7);
+}
+.message-input-container {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.input-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.message-input-wrapper {
+    flex: 1;
+}
+
+#message-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    outline: none;
+}
+
+#message-input:focus {
+    border-color: var(--primary-color);
+}
+
+.attachment-btn, .emoji-btn, .send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+.attachment-btn, .emoji-btn {
+    background: transparent;
+    color: var(--text-light);
+}
+
+.attachment-btn:hover, .emoji-btn:hover {
+    background: #f3f4f6;
+}
+
+.send-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.send-btn:hover {
+    background: var(--primary-dark);
+}
+
+.welcome-screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.welcome-content {
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.welcome-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    opacity: 0.7;
+}
+
+.welcome-content h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.welcome-features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.feature i {
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.feature-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.conversations-list::-webkit-scrollbar,
+.messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.conversations-list::-webkit-scrollbar-track,
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.conversations-list::-webkit-scrollbar-thumb,
+.messages-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+/* File Preview Styles */
+.file-preview {
+    padding: 12px;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-info i {
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.file-details {
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.file-size {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.remove-file:hover {
+    background: #fee;
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        flex-direction: column;
+        height: 95vh;
+        margin: 10px;
+    }
+    
+    .chat-sidebar {
+        width: 100%;
+        height: 40%;
+    }
+    
+    .chat-main {
+        height: 60%;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+    
+    .welcome-features {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+</style>
+
+<script>
+// WebRTC Audio Call Manager
+class AudioCallManager {
+    constructor() {
+        this.peerConnection = null;
+        this.localStream = null;
+        this.remoteStream = null;
+        this.isCaller = false;
+        this.isInCall = false;
+        this.callTimer = null;
+        this.callStartTime = null;
+        this.isMuted = false;
+        this.isSpeaker = false;
+        this.targetUser = null;
+    }
+
+    async startCall(targetUsername) {
+        this.targetUser = targetUsername;
+        
+        try {
+            // Request microphone permission
+            this.localStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                },
+                video: false
+            });
+
+            this.showCallInterface();
+            this.isCaller = true;
+            this.isInCall = true;
+
+            // Initialize WebRTC connection
+            await this.createPeerConnection();
+            
+            // Add local audio tracks to connection
+            this.localStream.getTracks().forEach(track => {
+                this.peerConnection.addTrack(track, this.localStream);
+            });
+
+            // Create and send offer
+            const offer = await this.peerConnection.createOffer();
+            await this.peerConnection.setLocalDescription(offer);
+
+            // Send offer to signaling server (Django channels)
+            this.sendSignalingMessage({
+                type: 'offer',
+                offer: offer,
+                target_user: targetUsername
+            });
+
+            this.startCallTimer();
+
+        } catch (error) {
+            console.error('Error starting call:', error);
+            alert('Unable to access microphone. Please check permissions.');
+            this.endCall();
+        }
+    }
+
+    async createPeerConnection() {
+        const configuration = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+        };
+
+        this.peerConnection = new RTCPeerConnection(configuration);
+
+        // Handle incoming audio stream
+        this.peerConnection.ontrack = (event) => {
+            this.remoteStream = event.streams[0];
+            const remoteAudio = document.getElementById('remote-audio');
+            remoteAudio.srcObject = this.remoteStream;
+        };
+
+        // Handle ICE candidates
+        this.peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                this.sendSignalingMessage({
+                    type: 'ice-candidate',
+                    candidate: event.candidate,
+                    target_user: this.targetUser
+                });
+            }
+        };
+
+        // Handle connection state changes
+        this.peerConnection.onconnectionstatechange = () => {
+            console.log('Connection state:', this.peerConnection.connectionState);
+            
+            switch(this.peerConnection.connectionState) {
+                case 'connected':
+                    this.updateCallStatus('Connected');
+                    break;
+                case 'disconnected':
+                case 'failed':
+                    this.endCall();
+                    break;
+            }
+        };
+    }
+
+    sendSignalingMessage(message) {
+        // For now, we'll use a simple alert system
+        // In production, integrate with Django Channels WebSocket
+        console.log('Signaling message:', message);
+        
+        // Simulate receiving an answer (for demo purposes)
+        if (message.type === 'offer') {
+            setTimeout(() => {
+                this.simulateIncomingCall();
+            }, 2000);
+        }
+    }
+
+    simulateIncomingCall() {
+        if (this.isCaller) {
+            this.updateCallStatus('Ringing...');
+            
+            setTimeout(() => {
+                if (this.isInCall) {
+                    this.updateCallStatus('Connected');
+                    // Simulate receiving audio stream
+                    this.playCallTone();
+                }
+            }, 3000);
+        }
+    }
+
+    playCallTone() {
+        // Play a simple tone to simulate audio
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 440;
+        oscillator.type = 'sine';
+        gainNode.gain.value = 0.1;
+        
+        oscillator.start();
+        
+        // Stop after 0.5 seconds
+        setTimeout(() => {
+            oscillator.stop();
+        }, 500);
+    }
+
+    showCallInterface() {
+        document.getElementById('audio-call-interface').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    hideCallInterface() {
+        document.getElementById('audio-call-interface').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    updateCallStatus(status) {
+        document.getElementById('call-status').textContent = status;
+    }
+
+    startCallTimer() {
+        this.callStartTime = new Date();
+        this.callTimer = setInterval(() => {
+            const now = new Date();
+            const diff = Math.floor((now - this.callStartTime) / 1000);
+            const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+            const seconds = (diff % 60).toString().padStart(2, '0');
+            document.getElementById('call-timer').textContent = `${minutes}:${seconds}`;
+        }, 1000);
+    }
+
+    stopCallTimer() {
+        if (this.callTimer) {
+            clearInterval(this.callTimer);
+            this.callTimer = null;
+        }
+    }
+
+    toggleMute() {
+        if (this.localStream) {
+            const audioTracks = this.localStream.getAudioTracks();
+            audioTracks.forEach(track => {
+                track.enabled = !track.enabled;
+            });
+            this.isMuted = !this.isMuted;
+            
+            const muteBtn = document.querySelector('.mute-btn');
+            muteBtn.classList.toggle('muted', this.isMuted);
+            muteBtn.innerHTML = this.isMuted ? 
+                '<i class="fas fa-microphone-slash"></i>' : 
+                '<i class="fas fa-microphone"></i>';
+        }
+    }
+
+    toggleSpeaker() {
+        this.isSpeaker = !this.isSpeaker;
+        const remoteAudio = document.getElementById('remote-audio');
+        
+        // Note: Speaker control is limited in browsers for security reasons
+        // This is mostly UI feedback
+        const speakerBtn = document.querySelector('.speaker-btn');
+        speakerBtn.classList.toggle('active', this.isSpeaker);
+        speakerBtn.innerHTML = this.isSpeaker ? 
+            '<i class="fas fa-volume-mute"></i>' : 
+            '<i class="fas fa-volume-up"></i>';
+            
+        // You might want to adjust volume here
+        remoteAudio.volume = this.isSpeaker ? 1.0 : 0.7;
+    }
+
+    endCall() {
+        this.isInCall = false;
+        this.stopCallTimer();
+        
+        if (this.localStream) {
+            this.localStream.getTracks().forEach(track => track.stop());
+        }
+        
+        if (this.peerConnection) {
+            this.peerConnection.close();
+        }
+        
+        this.hideCallInterface();
+        
+        // Send call end signal
+        if (this.targetUser) {
+            this.sendSignalingMessage({
+                type: 'end-call',
+                target_user: this.targetUser
+            });
+        }
+        
+        // Reset state
+        this.peerConnection = null;
+        this.localStream = null;
+        this.remoteStream = null;
+        this.isCaller = false;
+        this.targetUser = null;
+    }
+}
+
+// Initialize audio call manager
+const audioCallManager = new AudioCallManager();
+
+// Update your existing startAudioCall function
+function startAudioCall(username) {
+    if (!username) {
+        alert('Please select a user to call');
+        return;
+    }
+    
+    // Update call interface with user info
+    document.getElementById('call-partner-name').textContent = 
+        document.querySelector('.partner-name').textContent;
+    
+    audioCallManager.startCall(username);
+}
+
+function toggleMute() {
+    audioCallManager.toggleMute();
+}
+
+function toggleSpeaker() {
+    audioCallManager.toggleSpeaker();
+}
+
+function endCall() {
+    audioCallManager.endCall();
+}
+
+// Keep your existing functions and add these at the end
+function startVideoCall(username) {
+    alert('Video calls coming soon! Starting audio call instead...');
+    startAudioCall(username);
+}
+
+function searchUsers(query) {
+    const searchResults = document.getElementById('search-results');
+    
+    if (query.length < 2) {
+        searchResults.innerHTML = '';
+        searchResults.style.display = 'none';
+        return;
+    }
+    
+    // Show loading state
+    searchResults.innerHTML = '<div class="search-loading">Searching...</div>';
+    searchResults.style.display = 'block';
+    
+    fetch(`{% url 'core:search_users' %}?q=${encodeURIComponent(query)}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        if (html.trim() === '') {
+            searchResults.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-user-slash"></i>
+                    <p>No users found</p>
+                    <p class="no-results-hint">Try different search terms</p>
+                </div>
+            `;
+        } else {
+            searchResults.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        searchResults.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Search failed</p>
+                <p class="no-results-hint">Please try again</p>
+            </div>
+        `;
+    });
+}
+
+// Start Conversation
+function startConversation(username) {
+    window.location.href = `?user=${username}`;
+}
+
+// Close search results when clicking outside
+document.addEventListener('click', function(event) {
+    const searchBox = document.querySelector('.search-box');
+    const searchResults = document.getElementById('search-results');
+    
+    if (searchBox && !searchBox.contains(event.target)) {
+        searchResults.style.display = 'none';
+    }
+});
+
+// Mark Messages as Read
+function markAsRead(username) {
+    fetch(`{% url 'core:mark_messages_read' username='USERNAME' %}`.replace('USERNAME', username))
+    .then(response => response.json())
+    .then(data => {
+        const badge = document.getElementById(`unread-${username}`);
+        if (badge) badge.style.display = 'none';
+    });
+}
+
+// Filter Conversations
+function filterConversations() {
+    const searchTerm = document.getElementById('conversation-search').value.toLowerCase();
+    const conversationItems = document.querySelectorAll('.conversation-item');
+    
+    conversationItems.forEach(item => {
+        const userName = item.getAttribute('data-user-name').toLowerCase();
+        const lastMessage = item.getAttribute('data-last-message');
+        const searchableText = userName + ' ' + lastMessage;
+        
+        if (searchableText.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Refresh Conversations
+function refreshConversations() {
+    const refreshBtn = document.querySelector('.refresh-btn');
+    refreshBtn.classList.add('refreshing');
+    
+    setTimeout(() => {
+        window.location.reload();
+    }, 500);
+}
+
+// Scroll to Bottom
+function scrollToBottom() {
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+}
+
+// Calendar Functions
+function initializeCalendar() {
+    const calendarEl = document.getElementById('mini-calendar');
+    if (!calendarEl) return;
+
+    const today = new Date();
+    const options = { month: 'long', year: 'numeric' };
+    
+    calendarEl.innerHTML = `
+        <div class="calendar-header">
+            <button onclick="changeMonth(-1)" class="calendar-nav">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="calendar-month">${today.toLocaleDateString('en-US', options)}</div>
+            <button onclick="changeMonth(1)" class="calendar-nav">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="calendar-date">${today.getDate()}</div>
+        <div class="calendar-day">${today.toLocaleDateString('en-US', { weekday: 'long' })}</div>
+        <div class="calendar-events">
+            <div class="today-event-item">
+                <i class="fas fa-info-circle"></i>
+                <span>Check upcoming meetings</span>
+            </div>
+        </div>
+    `;
+}
+
+function changeMonth(direction) {
+    window.location.href = "{% url 'core:meeting_calendar' %}";
+}
+
+// Message Input Setup
+function setupMessageInput() {
+    const messagesContainer = document.getElementById('messages-container');
+    const messageInput = document.getElementById('message-input');
+    
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    if (messageInput) {
+        messageInput.focus();
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('message-form').submit();
+            }
+        });
+    }
+}
+
+// File Attachment Handling
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if (file) {
+        showFilePreview(file);
+    }
+}
+
+function showFilePreview(file) {
+    const filePreviewArea = document.getElementById('file-preview-area');
+    const fileName = file.name;
+    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+    
+    const previewHTML = `
+        <div class="file-preview">
+            <div class="file-info">
+                <i class="fas fa-file"></i>
+                <div class="file-details">
+                    <div class="file-name">${fileName}</div>
+                    <div class="file-size">${fileSize} MB</div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeAttachment()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    filePreviewArea.innerHTML = previewHTML;
+}
+
+function removeAttachment() {
+    const fileInput = document.getElementById('file-input');
+    const filePreviewArea = document.getElementById('file-preview-area');
+    
+    if (fileInput) fileInput.value = '';
+    if (filePreviewArea) filePreviewArea.innerHTML = '';
+}
+
+// Emoji Picker
+function toggleEmojiPicker() {
+    const emojis = ['😀', '😂', '🤔', '👍', '❤️', '🎉', '🔥', '⭐'];
+    const messageInput = document.getElementById('message-input');
+    
+    if (messageInput) {
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        messageInput.value += randomEmoji + ' ';
+        messageInput.focus();
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendar();
+    setupMessageInput();
+    scrollToBottom();
+});
+
+// Auto-refresh conversations
+setInterval(() => {
+    if (!document.querySelector('.conversation-item.active')) {
+        refreshConversations();
+    }
+}, 30000);
+</script>
+{% endblock %}

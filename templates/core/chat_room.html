@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Chat with {{ other_user.username }}</h2>
+
+<div id="chat-log" style="border:1px solid #ccc; height:300px; overflow-y:auto; padding:10px;">
+  {% for msg in messages %}
+    <p><strong>{{ msg.from_user.username }}</strong>: {{ msg.content }}</p>
+    {% if msg.attachment %}
+      <a href="{{ msg.attachment.url }}" target="_blank">📎 Attachment</a>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<form id="file-form" enctype="multipart/form-data" method="post">
+  {% csrf_token %}
+  <input type="file" id="file-input" name="attachment">
+</form>
+
+<input id="chat-message-input" type="text" placeholder="Type a reply...">
+<button id="chat-message-submit">Send</button>
+
+<hr>
+<button id="video-call-btn">🎥 Start Video Call</button>
+<button id="screen-share-btn">🖥️ Share Screen</button>
+
+<div style="display:flex;gap:10px;margin-top:10px;">
+  <video id="localVideo" autoplay muted playsinline width="300"></video>
+  <video id="remoteVideo" autoplay playsinline width="300"></video>
+</div>
+
+<script>
+  const roomName = "{{ room_name }}";
+  const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/' + roomName + '/');
+
+  chatSocket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      document.querySelector('#chat-log').innerHTML += `<p><strong>${data.sender}:</strong> ${data.message}</p>`;
+  };
+
+  document.querySelector('#chat-message-submit').onclick = function() {
+      const input = document.querySelector('#chat-message-input');
+      chatSocket.send(JSON.stringify({'message': input.value}));
+      input.value = '';
+  };
+
+  // WebRTC setup
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  let localStream, peerConnection;
+
+  document.getElementById('video-call-btn').onclick = async () => {
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localVideo.srcObject = localStream;
+  };
+
+  document.getElementById('screen-share-btn').onclick = async () => {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      localVideo.srcObject = screenStream;
+  };
+</script>
+{% endblock %}

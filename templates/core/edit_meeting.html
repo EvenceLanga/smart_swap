@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🗓️ Edit Meeting: {{ meeting.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <label>Title:</label>
+  <input type="text" name="title" value="{{ meeting.title }}"><br>
+  <label>Type:</label>
+  <input type="text" name="meeting_type" value="{{ meeting.meeting_type }}"><br>
+  <label>Status:</label>
+  <input type="text" name="status" value="{{ meeting.status }}"><br>
+  <label>Date:</label>
+  <input type="datetime-local" name="scheduled_date" value="{{ meeting.scheduled_date|date:'Y-m-d\\TH:i' }}"><br>
+  <button type="submit" class="btn-edit">Save</button>
+</form>
+<a href="{% url 'core:manage_meetings' %}" class="btn-cancel">Cancel</a>
+{% endblock %}

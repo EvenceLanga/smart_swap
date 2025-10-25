@@ -1,0 +1,51 @@
+.admin-section {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 1100px;
+  margin: 30px auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.data-table th {
+  background: #004080;
+  color: white;
+}
+
+.btn-edit {
+  background: #007bff;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.btn-edit:hover, .btn-delete:hover {
+  opacity: 0.85;
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+}
+

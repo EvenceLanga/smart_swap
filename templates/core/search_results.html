@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Search Results for "{{ query }}"</h2>
+  <ul>
+    {% for skill in results %}
+      <li><a href="{% url 'core:skill_detail' skill.id %}">{{ skill.title }}</a> (⭐ {{ skill.average_rating }}/5)</li>
+    {% empty %}
+      <li>No skills found.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

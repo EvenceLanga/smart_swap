@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Edit Your Review</h2>
+  <form method="post">
+    {% csrf_token %}
+    <p>
+      <label for="rating">Rating (1–5):</label>
+      <input type="number" name="rating" min="1" max="5" value="{{ review.rating }}" required>
+    </p>
+    <p>
+      <label for="comment">Comment:</label>
+      <textarea name="comment" rows="4" required>{{ review.comment }}</textarea>
+    </p>
+    <button type="submit">Update Review</button>
+  </form>
+  <p><a href="{% url 'core:skill_detail' review.skill.id %}">Back to Skill</a></p>
+{% endblock %}

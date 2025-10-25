@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>✏️ Edit User: {{ user.username }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <label>Username:</label>
+  <input type="text" name="username" value="{{ user.username }}"><br>
+  <label>Email:</label>
+  <input type="email" name="email" value="{{ user.email }}"><br>
+  <button type="submit" class="btn-edit">Save Changes</button>
+</form>
+<a href="{% url 'core:manage_users' %}" class="btn-cancel">Cancel</a>
+{% endblock %}

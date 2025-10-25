@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Your Inbox</h2>
+
+<div class="chat-container">
+  {% for msg in messages %}
+    <div class="message {% if msg.from_user == user %}sent{% else %}received{% endif %}">
+      <a href="{% url 'core:conversation' msg.from_user.username %}">
+        <strong>{{ msg.from_user.email }}</strong>
+      </a>:
+
+      <p>{{ msg.content }}</p>
+
+      {% if msg.attachment %}
+        <p><a href="{{ msg.attachment.url }}" target="_blank">📎 Download Attachment</a></p>
+      {% endif %}
+
+      <small>{{ msg.sent_at|date:"Y-m-d H:i" }}</small>
+    </div>
+  {% empty %}
+    <p>No messages yet.</p>
+  {% endfor %}
+</div>
+
+<hr>
+
+<h3>Reply</h3>
+<form method="POST" enctype="multipart/form-data" action="{% url 'core:reply_message' %}">
+  {% csrf_token %}
+  {% if messages|length > 0 %}
+    <input type="hidden" name="to_user_id" value="{{ messages.last.from_user.id }}">
+  {% else %}
+    <input type="hidden" name="to_user_id" value="">
+  {% endif %}
+
+  <div class="reply-box">
+    <textarea name="content" placeholder="Type your reply..." required></textarea>
+    <div class="reply-actions">
+      <label for="attachment" class="attach-label">📎</label>
+      <input type="file" id="attachment" name="attachment" style="display:none;">
+      <button type="submit">Send</button>
+    </div>
+  </div>
+</form>
+
+
+<style>
+  .chat-container {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-width: 800px;
+  }
+
+  .message {
+    padding: 10px;
+    border-radius: 8px;
+    margin: 8px 0;
+    max-width: 70%;
+  }
+
+  .message.sent {
+    background: #d1e7ff;
+    align-self: flex-end;
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .message.received {
+    background: #ffffff;
+    border: 1px solid #ccc;
+  }
+
+  .reply-box {
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+  }
+
+  .reply-box textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .reply-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .reply-actions button {
+    background: #004080;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .reply-actions button:hover {
+    background: #0066cc;
+  }
+
+  .attach-label {
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+</style>
+
+{% endblock %}

@@ -1,0 +1,602 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SkillSwap</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ===== Global Styles ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+      color: #2d3748;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===== Modern Navbar ===== */
+    header {
+      background: linear-gradient(135deg,blue 0%, #764ba2 100%);
+      color: white;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .navbar-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    /* ===== Logo/Brand ===== */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.8rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .brand a:hover {
+      transform: translateY(-2px);
+      text-shadow: 0 4px 12px rgba(255,255,255,0.3);
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+      background: rgba(255,255,255,0.2);
+      padding: 8px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ===== Navigation Links ===== */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px 18px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-link:hover::before {
+      left: 100%;
+    }
+
+    .nav-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .nav-link.active {
+      background: rgba(255,255,255,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .nav-icon {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* ===== Badge ===== */
+    .badge {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(255,107,107,0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* ===== Search Bar ===== */
+    .search-container {
+      position: relative;
+      margin: 0 20px;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.15);
+      border-radius: 25px;
+      padding: 8px 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      transform: translateY(-1px);
+    }
+
+    .search-bar input {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      outline: none;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+
+    .search-bar input::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .search-bar button {
+      background: transparent;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-bar button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    /* ===== User Menu ===== */
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      border: 2px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      padding: 10px 0;
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: #2d3748;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .dropdown-item:hover {
+      background: #f7fafc;
+      color: #667eea;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 8px 0;
+    }
+
+    /* ===== Mobile Menu ===== */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .menu-toggle span {
+      background: white;
+      height: 3px;
+      width: 25px;
+      margin: 3px 0;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    .menu-toggle.open span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .menu-toggle.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* ===== Message Styles ===== */
+    .message {
+      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+      border-left: 4px solid #667eea;
+      padding: 16px 20px;
+      margin: 20px auto;
+      border-radius: 12px;
+      max-width: 900px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      font-weight: 500;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      background: linear-gradient(135deg, #2d3748, #4a5568);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 60px;
+    }
+
+    footer p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* ===== Mobile Responsive ===== */
+    @media (max-width: 1024px) {
+      .navbar-container {
+        padding: 0 15px;
+        height: 65px;
+      }
+
+      .nav-links {
+        gap: 5px;
+      }
+
+      .nav-link {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+      }
+
+      .search-container {
+        margin: 0 15px;
+        max-width: 300px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar-container {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 15px;
+      }
+
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        border-radius: 0 0 20px 20px;
+        gap: 10px;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .search-container {
+        order: 3;
+        margin: 15px 0 0;
+        max-width: 100%;
+        width: 100%;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .user-menu {
+        margin-left: auto;
+      }
+
+      .brand a {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar-container {
+        padding: 12px;
+      }
+
+      .brand a {
+        font-size: 1.4rem;
+      }
+
+      .logo-icon {
+        font-size: 1.6rem;
+        padding: 6px;
+      }
+
+      .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      min-height: calc(100vh - 140px);
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="navbar-container">
+      <!-- Brand/Logo -->
+      <div class="brand">
+        <a href="{% url 'core:dashboard' %}">
+          <span class="logo-icon">🔄</span>
+          Smart Swap
+        </a>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <form class="search-bar" method="get" action="{% url 'core:search_skills' %}">
+          <input type="text" name="q" placeholder="Search skills..." required>
+          <button type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-links" id="navbar">
+        {% if user.is_authenticated %}
+          <a href="{% url 'core:dashboard' %}" class="nav-link">
+            <span class="nav-icon">📊</span>
+            Dashboard
+          </a>
+          <a href="{% url 'core:skill_list' %}" class="nav-link">
+            <span class="nav-icon">🛠️</span>
+            All Skills
+          </a>
+          <a href="{% url 'core:create_skill' %}" class="nav-link">
+            <span class="nav-icon">➕</span>
+            Add Skill
+          </a>
+          <a href="{% url 'core:chat_dashboard' %}" class="nav-link">
+            <span class="nav-icon">💬</span>
+            Inbox
+            {% if unread_count and unread_count > 0 %}
+              <span class="badge">{{ unread_count }}</span>
+            {% endif %}
+          </a>
+          
+          {% if user.is_staff %}
+            <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
+              <span class="nav-icon">⚡</span>
+              Admin
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'core:login' %}" class="nav-link">
+            <span class="nav-icon">🔑</span>
+            Login
+          </a>
+          <a href="{% url 'core:register' %}" class="nav-link">
+            <span class="nav-icon">👤</span>
+            Register
+          </a>
+        {% endif %}
+      </nav>
+
+      <!-- User Menu -->
+      {% if user.is_authenticated %}
+      <div class="user-menu">
+        <div class="user-avatar" id="user-menu-toggle">
+          {{ user.first_name|default:user.username|first|upper }}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Mobile Menu Toggle -->
+      <div class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- User Dropdown Menu -->
+    {% if user.is_authenticated %}
+    <div class="dropdown-menu" id="user-dropdown">
+      <a href="{% url 'core:view_profile' user.username %}" class="dropdown-item">
+        <i class="fas fa-user"></i>
+        My Profile
+      </a>
+      <a href="{% url 'core:notifications' %}" class="dropdown-item">
+        <i class="fas fa-bell"></i>
+        Notifications
+      </a>
+      <div class="dropdown-divider"></div>
+      <a href="{% url 'core:logout' %}" class="dropdown-item">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </a>
+    </div>
+    {% endif %}
+  </header>
+
+  <main>
+    {% for message in messages %}
+      <p class="message">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>SkillSwap &copy; {{ now|date:"Y" }} | Empowering People Through Shared Skills</p>
+  </footer>
+
+  <script>
+    // ===== Mobile Menu Toggle =====
+    const menuToggle = document.getElementById('menu-toggle');
+    const navbar = document.getElementById('navbar');
+
+    menuToggle.addEventListener('click', () => {
+      navbar.classList.toggle('active');
+      menuToggle.classList.toggle('open');
+    });
+
+    // ===== User Dropdown Toggle =====
+    const userMenuToggle = document.getElementById('user-menu-toggle');
+    const userDropdown = document.getElementById('user-dropdown');
+
+    if (userMenuToggle && userDropdown) {
+      userMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('show');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', () => {
+        userDropdown.classList.remove('show');
+      });
+
+      // Prevent dropdown from closing when clicking inside
+      userDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
+
+    // ===== Close mobile menu when clicking on a link =====
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navbar.classList.remove('active');
+        menuToggle.classList.remove('open');
+      });
+    });
+
+    // ===== Add active class to current page =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.href.includes(currentPath)) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

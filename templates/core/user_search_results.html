@@ -1,0 +1,30 @@
+{% load static %}
+
+{% for user in users %}
+<div class="search-result-item">
+    <div class="search-result-info">
+        <div class="search-result-name">
+            {% if user.first_name or user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </div>
+        <div class="search-result-username">@{{ user.username }}</div>
+        {% if user.email %}
+        <div class="search-result-email">{{ user.email }}</div>
+        {% endif %}
+    </div>
+    <div class="search-result-actions">
+        <button type="button" class="message-btn" onclick="startConversation('{{ user.username }}')">
+            Message
+        </button>
+    </div>
+</div>
+{% empty %}
+<div class="no-results">
+    <i class="fas fa-user-slash"></i>
+    <p>No users found</p>
+    <p class="no-results-hint">Try different search terms</p>
+</div>
+{% endfor %}

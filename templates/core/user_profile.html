@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>{{ profile_user.username }}'s Profile</h2>
+  <p>{{ profile_user.email }}</p>
+  <h3>Skills</h3>
+
+  {% if user.is_authenticated and user != profile_user %}
+    <a href="{% url 'core:send_message' %}?to={{ profile_user.id }}" class="btn">Send Message</a>
+  {% endif %}
+
+  <ul>
+    {% for s in skills %}
+      <li><a href="{% url 'core:skill_detail' s.id %}">{{ s.title }}</a> (⭐ {{ s.average_rating }}/5)</li>
+    {% empty %}
+      <li>No skills yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

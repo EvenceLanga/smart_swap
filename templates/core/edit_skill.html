@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>✏️ Edit Skill: {{ skill.title }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn-edit">Save Changes</button>
+</form>
+
+<a href="{% url 'core:manage_skills' %}" class="btn-cancel">Cancel</a>
+
+<style>
+.btn-edit {
+  background: #004080;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.btn-cancel {
+  background: gray;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+</style>
+{% endblock %}

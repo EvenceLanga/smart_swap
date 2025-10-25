@@ -1,0 +1,754 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+.skill-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.skill-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.skill-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.skill-owner {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 15px;
+}
+
+.skill-meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.meta-item {
+  background: rgba(255,255,255,0.2);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.skill-description {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.skill-stats {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  border: 1px solid #e9ecef;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #004080;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.approval-rate {
+  text-align: center;
+  padding: 10px;
+  background: #e8f5e8;
+  border-radius: 6px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.request-section {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.btn-request {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-request:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+.alert {
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.alert-info {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.alert-success {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.alert-warning {
+  background: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffe0b2;
+}
+
+.alert-danger {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.reviews-section {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.review-form {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+.review-item {
+  border-bottom: 1px solid #e9ecef;
+  padding: 20px 0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.review-rating {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.review-time {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.review-actions {
+  margin-top: 10px;
+}
+
+.review-actions a {
+  margin-right: 15px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.btn-edit {
+  color: #007bff;
+}
+
+.btn-delete {
+  color: #dc3545;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.rating-input {
+  width: 80px;
+}
+
+.btn-submit {
+  background: #28a745;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #218838;
+}
+
+.text-muted {
+  color: #6c757d !important;
+  font-style: italic;
+}
+
+.no-reviews {
+  text-align: center;
+  color: #6c757d;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.star-rating {
+  color: #ffc107;
+  font-size: 1.1rem;
+}
+
+.session-status {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  font-weight: 600;
+}
+
+.status-in-progress {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  border: 2px solid #ffd43b;
+}
+
+.status-completed {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  color: #155724;
+  border: 2px solid #28a745;
+}
+
+.session-participants {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.participant {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.session-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.btn-session {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.btn-start {
+  background: #ffc107;
+  color: #856404;
+}
+
+.btn-complete {
+  background: #28a745;
+  color: white;
+}
+
+.btn-start:hover {
+  background: #e0a800;
+  transform: translateY(-2px);
+  color: #856404;
+}
+
+.btn-complete:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  color: white;
+}
+
+.current-session {
+  background: #e7f3ff;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.session-timeline {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  color: #666;
+}
+
+.timeline-item i {
+  width: 20px;
+  text-align: center;
+}
+
+.activity-level {
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.level-new {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.level-low {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.level-medium {
+  background: #fff8e1;
+  color: #ffa000;
+}
+
+.level-high {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.success-stories {
+  text-align: center;
+  padding: 10px;
+  background: #e8f5e8;
+  border-radius: 6px;
+  margin: 10px 0;
+  color: #2e7d32;
+  font-weight: 500;
+}
+</style>
+
+<div class="skill-detail">
+  <!-- Skill Header -->
+  <div class="skill-header">
+    <h2>{{ skill.title }}</h2>
+    <div class="skill-owner">By {{ skill.owner.get_full_name|default:skill.owner.username }}</div>
+    <div class="skill-meta">
+      <span class="meta-item">📅 {{ skill.created_at|date:"F j, Y, g:i a" }}</span>
+      <span class="meta-item">📁 {{ skill.category }}</span>
+      <span class="meta-item">🎯 {{ skill.level }}</span>
+      <span class="meta-item">⏰ {{ skill.availability }}</span>
+    </div>
+  </div>
+
+  <!-- Current Active Session (if any) -->
+  {% for active_session in active_sessions %}
+  <div class="current-session">
+    <div class="session-status status-in-progress">
+      <h4>🔄 Session In Progress</h4>
+      <p>This skill is currently being taught to {{ active_session.requester.get_full_name|default:active_session.requester.username }}</p>
+      
+      <div class="session-participants">
+        <div class="participant">
+          <span>👨‍🏫 Teacher:</span>
+          <strong>{{ active_session.owner.get_full_name|default:active_session.owner.username }}</strong>
+        </div>
+        <div class="participant">
+          <span>👨‍🎓 Learner:</span>
+          <strong>{{ active_session.requester.get_full_name|default:active_session.requester.username }}</strong>
+        </div>
+      </div>
+      
+      <div class="session-timeline">
+        <div class="timeline-item">
+          <i>📅</i>
+          <span>Requested: {{ active_session.created_at|date:"M j, Y" }}</span>
+        </div>
+        <div class="timeline-item">
+          <i>✅</i>
+          <span>Approved: {{ active_session.started_at|date:"M j, Y"|default:"Not set" }}</span>
+        </div>
+        <div class="timeline-item">
+          <i>🔄</i>
+          <span>Started: {{ active_session.started_at|date:"M j, Y" }}</span>
+        </div>
+      </div>
+
+      <!-- Session Actions -->
+      {% if user == active_session.owner or user == active_session.requester %}
+      <div class="session-actions">
+        <a href="{% url 'core:complete_skill_session' active_session.id %}" 
+           class="btn-session btn-complete"
+           onclick="return confirm('Mark this skill session as completed?')">
+          ✅ Mark as Completed
+        </a>
+        <a href="{% url 'core:chat_dashboard' %}?user={% if user == active_session.owner %}{{ active_session.requester.username }}{% else %}{{ active_session.owner.username }}{% endif %}" 
+           class="btn-session" 
+           style="background: #007bff; color: white;">
+          💬 Message Partner
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Skill Description -->
+  <div class="skill-description">
+    <h3>About This Skill</h3>
+    <p>{{ skill.description|linebreaks }}</p>
+  </div>
+
+  <!-- Skill Statistics -->
+  <div class="skill-stats">
+    <h4>📊 Skill Activity</h4>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-number">{{ total_requests }}</span>
+        <span class="stat-label">Total Requests</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ approved_requests }}</span>
+        <span class="stat-label">Approved</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ in_progress_requests }}</span>
+        <span class="stat-label">In Progress</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{{ completed_requests }}</span>
+        <span class="stat-label">Completed</span>
+      </div>
+    </div>
+    
+    {% if active_sessions %}
+    <div class="alert alert-warning">
+      <strong>⚠️ Active Session:</strong> This skill is currently being taught to {{ active_sessions.0.requester.username }}. 
+      New requests may be delayed until this session completes.
+    </div>
+    {% endif %}
+    
+    {% if approval_rate > 0 %}
+    <div class="approval-rate">
+      <strong>Approval Rate:</strong> {{ approval_rate }}%
+    </div>
+    {% endif %}
+    
+    <!-- Activity Level Indicator -->
+    <div class="activity-level 
+      {% if total_requests == 0 %}level-new
+      {% elif total_requests < 5 %}level-low
+      {% elif total_requests < 15 %}level-medium
+      {% else %}level-high{% endif %}">
+      
+      {% if total_requests == 0 %}
+        New - No requests yet
+      {% elif total_requests < 5 %}
+        Low Activity
+      {% elif total_requests < 15 %}
+        Active
+      {% else %}
+        Very Active
+      {% endif %}
+      
+      <small>({{ total_requests }} total requests)</small>
+    </div>
+    
+    {% if completed_requests > 0 %}
+    <div class="success-stories">
+      <span class="success-count">🎉 {{ completed_requests }} successful exchanges</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Request Section -->
+  <div class="request-section">
+    {% if user.is_authenticated %}
+      {% if user != skill.owner %}
+        <!-- Check if there's an active session -->
+        {% if active_sessions %}
+          <div class="alert alert-info">
+            <h4>⏳ Skill Currently in Session</h4>
+            <p>This skill is currently being taught to {{ active_sessions.0.requester.username }}.</p>
+            <p>You can still request this skill, but the session may start after the current one completes.</p>
+          </div>
+        {% endif %}
+
+        <!-- Check if user has already requested this skill -->
+        {% with existing_request=None %}
+          {% for req in user.requests_made.all %}
+            {% if req.skill.id == skill.id %}
+              <div class="alert 
+                {% if req.status == 'PENDING' %}alert-warning
+                {% elif req.status == 'APPROVED' %}alert-success
+                {% elif req.status == 'REJECTED' %}alert-danger
+                {% elif req.status == 'IN_PROGRESS' %}alert-warning
+                {% elif req.status == 'COMPLETED' %}alert-info
+                {% else %}alert-info{% endif %}">
+                
+                {% if req.status == 'PENDING' %}
+                  <h4>⏳ Request Pending</h4>
+                  <p>You have requested to learn this skill. Waiting for approval from {{ skill.owner.username }}.</p>
+                {% elif req.status == 'APPROVED' %}
+                  <h4>✅ Request Approved!</h4>
+                  <p>Your request has been approved! Waiting for the session to start.</p>
+                {% elif req.status == 'IN_PROGRESS' %}
+                  <h4>🔄 Session In Progress</h4>
+                  <p>You are currently learning this skill from {{ skill.owner.username }}!</p>
+                  <div class="session-actions">
+                    <a href="{% url 'core:complete_skill_session' req.id %}" 
+                       class="btn-session btn-complete"
+                       onclick="return confirm('Mark this skill session as completed?')">
+                      ✅ Mark as Completed
+                    </a>
+                    <a href="{% url 'core:chat_dashboard' %}?user={{ skill.owner.username }}" 
+                       class="btn-session" 
+                       style="background: #007bff; color: white;">
+                      💬 Message Teacher
+                    </a>
+                  </div>
+                {% elif req.status == 'COMPLETED' %}
+                  <h4>🎉 Skill Completed!</h4>
+                  <p>Congratulations! You have successfully completed learning this skill.</p>
+                  <p><small>Completed on: {{ req.completed_at|date:"F j, Y"|default:"Date not set" }}</small></p>
+                {% elif req.status == 'REJECTED' %}
+                  <h4>❌ Request Rejected</h4>
+                  <p>Your request to learn this skill was not approved by {{ skill.owner.username }}.</p>
+                {% else %}
+                  <h4>📝 Request Submitted</h4>
+                  <p>You have already requested to learn this skill.</p>
+                {% endif %}
+                
+                <small>Requested on: {{ req.created_at|date:"F j, Y" }}</small>
+              </div>
+              {% with existing_request=req %}{% endwith %}
+            {% endif %}
+          {% endfor %}
+          
+          <!-- If no existing request found, show request button -->
+          {% if not existing_request %}
+            <h3>Interested in Learning This Skill?</h3>
+            <p>Request to learn from {{ skill.owner.get_full_name|default:skill.owner.username }}</p>
+            <a href="{% url 'core:request_skill' skill.id %}" class="btn-request">
+              📨 Request to Learn This Skill
+            </a>
+          {% endif %}
+        {% endwith %}
+      {% else %}
+        <div class="alert alert-info">
+          <h4>👋 This is Your Skill</h4>
+          <p>You are the owner of this skill listing. Others can request to learn from you.</p>
+          <p><strong>You have received {{ total_requests }} requests for this skill.</strong></p>
+          
+          {% if active_sessions %}
+            <div style="margin-top: 15px;">
+              <h5>🎯 Currently Teaching:</h5>
+              {% for session in active_sessions %}
+                <div class="participant" style="justify-content: start; margin: 5px 0;">
+                  <span>👨‍🎓</span>
+                  <strong>{{ session.requester.get_full_name|default:session.requester.username }}</strong>
+                  <a href="{% url 'core:complete_skill_session' session.id %}" 
+                     class="btn-session btn-complete"
+                     style="margin-left: auto; padding: 4px 12px; font-size: 0.9rem;"
+                     onclick="return confirm('Mark this skill session as completed?')">
+                    ✅ Complete
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+          
+          <!-- Show approved requests waiting to start -->
+          {% for req in skill.requests.all %}
+            {% if req.status == 'APPROVED' %}
+              {% if forloop.first %}
+                <div style="margin-top: 15px;">
+                  <h5>✅ Approved Requests Waiting to Start:</h5>
+              {% endif %}
+              <div class="participant" style="justify-content: start; margin: 5px 0;">
+                <span>👨‍🎓</span>
+                <strong>{{ req.requester.get_full_name|default:req.requester.username }}</strong>
+                <a href="{% url 'core:start_skill_session' req.id %}" 
+                   class="btn-session btn-start"
+                   style="margin-left: auto; padding: 4px 12px; font-size: 0.9rem;"
+                   onclick="return confirm('Start skill session with {{ req.requester.username }}?')">
+                  🚀 Start
+                </a>
+              </div>
+              {% if forloop.last %}
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="alert alert-warning">
+        <h4>🔒 Login Required</h4>
+        <p>Please <a href="{% url 'core:login' %}">login</a> to request this skill.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="reviews-section">
+    <h3>🌟 Reviews & Feedback</h3>
+    
+    {% if reviews %}
+      <div class="reviews-list">
+        {% for review in reviews %}
+          <div class="review-item">
+            <div class="review-header">
+              <div>
+                <span class="reviewer-name">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+                <span class="review-rating">
+                  {% with ''|center:review.rating as range %}
+                    {% for _ in range %}⭐{% endfor %}
+                  {% endwith %}
+                  ({{ review.rating }}/5)
+                </span>
+              </div>
+              <span class="review-time">{{ review.created_at|date:"F j, Y, g:i a" }}</span>
+            </div>
+            <p class="review-comment">{{ review.comment|linebreaks }}</p>
+            
+            {% if review.reviewer == user %}
+              <div class="review-actions">
+                <a href="{% url 'core:edit_review' review.id %}" class="btn-edit">✏️ Edit</a>
+                <a href="{% url 'core:delete_review' review.id %}" class="btn-delete">🗑️ Delete</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="no-reviews">
+        <p>No reviews yet. Be the first to share your experience!</p>
+      </div>
+    {% endif %}
+
+    <!-- Review Form -->
+    {% if user.is_authenticated and user != skill.owner %}
+      <div class="review-form">
+        <h4>Share Your Experience</h4>
+        <form method="post" action="{% url 'core:add_review' skill.id %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="rating">Your Rating (1-5 stars):</label>
+            <input type="number" name="rating" min="1" max="5" required class="form-control rating-input" placeholder="5">
+          </div>
+          <div class="form-group">
+            <label for="comment">Your Review:</label>
+            <textarea name="comment" rows="4" required class="form-control" placeholder="Share your learning experience with this skill..."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Submit Review</button>
+        </form>
+      </div>
+    {% elif user.is_authenticated and user == skill.owner %}
+      <div class="alert alert-info">
+        <p>You cannot review your own skill.</p>
+      </div>
+    {% else %}
+      <div class="alert alert-warning">
+        <p>Please <a href="{% url 'core:login' %}">login</a> to leave a review.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
