@@ -1,45 +1,343 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>📅 Manage Meetings</h2>
-<table class="data-table">
-  <tr>
-    <th>Title</th>
-    <th>Organizer</th>
-    <th>Type</th>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Actions</th>
-  </tr>
-  {% for m in meetings %}
-  <tr>
-    <td>{{ m.title }}</td>
-    <td>{{ m.organizer.username }}</td>
-    <td>{{ m.meeting_type }}</td>
-    <td>{{ m.scheduled_date|date:"Y-m-d H:i" }}</td>
-    <td>{{ m.status }}</td>
-    <td>
-      <a href="{% url 'core:edit_meeting' m.id %}" class="btn-edit">Edit</a>
-      <a href="{% url 'core:delete_meeting' m.id %}" class="btn-delete" onclick="return confirm('Delete this skill?')">Delete</a>
-    </td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="6">No meetings scheduled.</td></tr>
-  {% endfor %}
-</table>
 
 <style>
-.data-table {
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.meetings-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+
+.meetings-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  min-width: 600px;
 }
-.data-table th, .data-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+
+.meetings-table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
-.data-table th {
-  background: #004080;
+
+.meetings-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+}
+
+.meetings-table tr:last-child td {
+  border-bottom: none;
+}
+
+.meetings-table tr:hover {
+  background: #f8f9fa;
+}
+
+.meeting-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-edit {
+  background: #28a745;
   color: white;
 }
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-edit:hover, .btn-delete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 20px;
+    text-align: center;
+    flex-direction: column;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .header-actions {
+    justify-content: center;
+  }
+  
+  .meetings-section {
+    padding: 20px 15px;
+    margin: 0 -15px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .meetings-table {
+    font-size: 0.9rem;
+    min-width: 700px;
+  }
+  
+  .meetings-table th,
+  .meetings-table td {
+    padding: 12px 8px;
+  }
+  
+  .meeting-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .btn-edit, .btn-delete {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .btn-back {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .meetings-table {
+    font-size: 0.85rem;
+    min-width: 650px;
+  }
+  
+  .meetings-table th,
+  .meetings-table td {
+    padding: 10px 6px;
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.table-scroll-hint {
+  display: none;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .table-scroll-hint {
+    display: block;
+  }
+}
 </style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h2>📅 Manage Meetings</h2>
+    <div class="header-actions">
+      <a href="{% url 'core:admin_dashboard' %}" class="btn-back">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Meetings Section -->
+  <div class="meetings-section">
+    <div class="table-scroll-hint">
+      💡 Scroll horizontally to view all table columns
+    </div>
+    
+    <div class="table-container">
+      <table class="meetings-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Organizer</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in meetings %}
+          <tr>
+            <td><strong>{{ m.title }}</strong></td>
+            <td>{{ m.organizer.username }}</td>
+            <td>{{ m.meeting_type }}</td>
+            <td>{{ m.scheduled_date|date:"Y-m-d H:i" }}</td>
+            <td>
+              <span class="status-badge status-{{ m.status|lower }}">{{ m.status }}</span>
+            </td>
+            <td>
+              <div class="meeting-actions">
+                <a href="{% url 'core:edit_meeting' m.id %}" class="btn-edit">Edit</a>
+                <a href="{% url 'core:delete_meeting' m.id %}" class="btn-delete" onclick="return confirm('Delete this meeting?')">Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <i>📅</i>
+                <p>No meetings scheduled</p>
+                <p>When meetings are created, they'll appear here</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

@@ -1,43 +1,312 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>👤 Manage Users</h2>
-<table class="data-table">
-  <tr>
-    <th>Username</th>
-    <th>Email</th>
-    <th>Course</th>
-    <th>Year</th>
-    <th>Actions</th>
-  </tr>
-  {% for u in users %}
-  <tr>
-    <td>{{ u.username }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ u.profile.course }}</td>
-    <td>{{ u.profile.year }}</td>
-    <td>
-      <a href="#">Edit</a> | 
-      <a href="#">Delete</a>
-    </td>
-  </tr>
-  {% empty %}
-  <tr><td colspan="5">No users found.</td></tr>
-  {% endfor %}
-</table>
 
 <style>
-.data-table {
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.btn-back {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.users-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+
+.users-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  min-width: 700px;
 }
-.data-table th, .data-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+
+.users-table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
-.data-table th {
-  background: #004080;
+
+.users-table td {
+  padding: 15px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+}
+
+.users-table tr:last-child td {
+  border-bottom: none;
+}
+
+.users-table tr:hover {
+  background: #f8f9fa;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-edit {
+  background: #28a745;
   color: white;
 }
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-edit:hover, .btn-delete:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.no-data {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 20px;
+    text-align: center;
+    flex-direction: column;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .header-actions {
+    justify-content: center;
+  }
+  
+  .users-section {
+    padding: 20px 15px;
+    margin: 0 -15px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .users-table {
+    font-size: 0.9rem;
+    min-width: 600px;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 12px 8px;
+  }
+  
+  .user-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .btn-back {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .users-table {
+    font-size: 0.85rem;
+    min-width: 550px;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.table-scroll-hint {
+  display: none;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .table-scroll-hint {
+    display: block;
+  }
+}
 </style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h2>👤 Manage Users</h2>
+    <div class="header-actions">
+      <a href="{% url 'core:admin_dashboard' %}" class="btn-back">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Users Section -->
+  <div class="users-section">
+    <div class="table-scroll-hint">
+      💡 Scroll horizontally to view all table columns
+    </div>
+
+    <div class="table-container">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Year</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.email }}</td>
+            <td>
+              {% if u.profile.course %}
+                {{ u.profile.course }}
+              {% else %}
+                <span class="no-data">Not set</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.profile.year %}
+                {{ u.profile.year }}
+              {% else %}
+                <span class="no-data">Not set</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="user-actions">
+                <a href="#" class="btn-edit">Edit</a>
+                <a href="#" class="btn-delete" onclick="return confirm('Delete this user?')">Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i>👤</i>
+                <p>No users found</p>
+                <p>When users register, they'll appear here</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
