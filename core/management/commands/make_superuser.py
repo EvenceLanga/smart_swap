@@ -5,7 +5,7 @@ class Command(BaseCommand):
     help = 'Promote a user to superuser'
 
     def handle(self, *args, **kwargs):
-        user = User.objects.get(username='evencemohaulanga')  # replace with the actual username
+        user = User.objects.get(username='evencemohaulanga') 
         user.is_staff = True
         user.is_superuser = True
         user.save()

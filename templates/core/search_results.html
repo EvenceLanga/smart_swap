@@ -1,11 +1,368 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Search Results for "{{ query }}"</h2>
-  <ul>
-    {% for skill in results %}
-      <li><a href="{% url 'core:skill_detail' skill.id %}">{{ skill.title }}</a> (⭐ {{ skill.average_rating }}/5)</li>
-    {% empty %}
-      <li>No skills found.</li>
-    {% endfor %}
-  </ul>
+
+<style>
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.search-info {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.results-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+}
+
+.section-header {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #f8f9fa;
+  padding-bottom: 15px;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.skill-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-color: #667eea;
+}
+
+.skill-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: block;
+  text-decoration: none;
+}
+
+.skill-title:hover {
+  color: #667eea;
+}
+
+.skill-owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.skill-meta {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.skill-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffc107;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.skill-description {
+  color: #6c757d;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin-bottom: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.skill-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-view {
+  background: #667eea;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-view:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+  grid-column: 1 / -1;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.search-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.suggestion-tag {
+  background: white;
+  color: #667eea;
+  padding: 8px 16px;
+  border: 2px solid #667eea;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.suggestion-tag:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.results-count {
+  background: #e9ecef;
+  color: #495057;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 25px 20px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .results-section {
+    padding: 20px;
+  }
+  
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .skill-card {
+    padding: 20px;
+  }
+  
+  .skill-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .search-suggestions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .suggestion-tag {
+    width: 200px;
+    text-align: center;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h2>🔍 Search Results</h2>
+    <div class="search-info">
+      for "{{ query }}"
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results-section">
+    <div class="section-header">
+      <span>📋 Found Skills</span>
+      {% if results %}
+        <span class="results-count">{{ results|length }} result{{ results|length|pluralize }}</span>
+      {% endif %}
+    </div>
+
+    {% if results %}
+      <div class="results-grid">
+        {% for skill in results %}
+          <div class="skill-card">
+            <a href="{% url 'core:skill_detail' skill.id %}" class="skill-title">
+              {{ skill.title }}
+            </a>
+            
+            <div class="skill-owner">
+              <i>👤</i>
+              <span>by {{ skill.owner.username }}</span>
+            </div>
+            
+            {% if skill.average_rating %}
+              <div class="skill-rating">
+                ⭐ {{ skill.average_rating }}/5
+              </div>
+            {% endif %}
+            
+            {% if skill.description %}
+              <div class="skill-description">
+                {{ skill.description|truncatewords:20 }}
+              </div>
+            {% endif %}
+            
+            <div class="skill-meta">
+              {% if skill.category %}
+                <span class="meta-tag">📁 {{ skill.category }}</span>
+              {% endif %}
+              {% if skill.level %}
+                <span class="meta-tag">🎯 {{ skill.level }}</span>
+              {% endif %}
+              {% if skill.availability %}
+                <span class="meta-tag">⏰ {{ skill.availability }}</span>
+              {% endif %}
+            </div>
+            
+            <div class="skill-actions">
+              <a href="{% url 'core:skill_detail' skill.id %}" class="btn-view">
+                👀 View Details
+              </a>
+              {% if user.is_authenticated and user != skill.owner %}
+                <a href="{% url 'core:request_skill' skill.id %}" class="btn-view" style="background: #28a745;">
+                  📨 Request Skill
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i>🔍</i>
+        <h3>No Skills Found</h3>
+        <p>We couldn't find any skills matching "{{ query }}"</p>
+        
+        <div class="search-suggestions">
+          <p style="width: 100%; margin-bottom: 15px; color: #6c757d;">Try searching for:</p>
+          <a href="{% url 'core:skill_list' %}?q=programming" class="suggestion-tag">Programming</a>
+          <a href="{% url 'core:skill_list' %}?q=design" class="suggestion-tag">Design</a>
+          <a href="{% url 'core:skill_list' %}?q=language" class="suggestion-tag">Language</a>
+          <a href="{% url 'core:skill_list' %}?q=music" class="suggestion-tag">Music</a>
+          <a href="{% url 'core:skill_list' %}?q=cooking" class="suggestion-tag">Cooking</a>
+        </div>
+        
+        <div style="margin-top: 30px;">
+          <a href="{% url 'core:skill_list' %}" class="btn-view" style="font-size: 1.1rem; padding: 12px 24px;">
+            📚 Browse All Skills
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}
