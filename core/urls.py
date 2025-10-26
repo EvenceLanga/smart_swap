@@ -73,8 +73,7 @@ urlpatterns = [
     path('management/requests/', views.manage_requests, name='manage_requests'),
     path('management/reviews/', views.manage_reviews, name='manage_reviews'),
     path('management/meetings/', views.manage_meetings, name='manage_meetings'),
-    path('management/reports/', views.manage_reports, name='manage_reports'),
-    
+     
     # User Management Actions
     path('management/users/<int:user_id>/edit/', views.edit_user, name='edit_user'),
     path('management/users/<int:user_id>/delete/', views.delete_user, name='delete_user'),

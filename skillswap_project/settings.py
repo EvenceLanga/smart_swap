@@ -63,6 +63,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'skillswap_project.wsgi.application'
 
+# Database (SQLite for quick start)
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL', 'postgresql://smartswap_user:jB1Rq9DudqrSm1arY07k1NrwTQUAAXKE@dpg-d3urhs75r7bs73fojhqg-a/smartswap'),
