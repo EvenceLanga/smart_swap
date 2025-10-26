@@ -6,7 +6,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # 🧑‍💻 List all usernames you want to promote
-        usernames = ['evencemohaulanga', 'Busiswe_Buthelez']
+        usernames = ['evencemohaulanga', 'Busiswe_Buthelezi']
 
         for username in usernames:
             try:
