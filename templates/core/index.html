@@ -1,20 +1,293 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Latest Skills</h2>
-  <ul>
-  {% for s in skills %}
-    <li>
-      {% if user.is_authenticated %}
-        <a href="{% url 'core:skill_detail' s.id %}">{{ s.title }}</a>
-      {% else %}
-        <a href="{% url 'core:login' %}?next={% url 'core:skill_detail' s.id %}">
-          {{ s.title }}
-        </a>
-      {% endif %}
-      by {{ s.owner.username }}
-    </li>
-  {% empty %}
-    <li>No skills yet.</li>
-  {% endfor %}
-  </ul>
+
+<style>
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.skills-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+}
+
+.section-header {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.skill-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-color: #667eea;
+}
+
+.skill-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  display: block;
+  text-decoration: none;
+}
+
+.skill-title:hover {
+  color: #667eea;
+}
+
+.skill-owner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.skill-meta {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.meta-tag {
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.skill-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-view {
+  background: #667eea;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-view:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+  color: white;
+}
+
+.btn-login {
+  background: #28a745;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-login:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+  grid-column: 1 / -1;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 25px 20px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 2rem;
+  }
+  
+  .skills-section {
+    padding: 20px;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .skill-card {
+    padding: 20px;
+  }
+  
+  .skill-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .skill-actions {
+    flex-direction: column;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h2>🚀 Latest Skills</h2>
+  </div>
+
+  <!-- Skills Section -->
+  <div class="skills-section">
+    <div class="section-header">🛠️ Recently Added Skills</div>
+
+    {% if skills %}
+      <div class="skills-grid">
+        {% for s in skills %}
+          <div class="skill-card">
+            {% if user.is_authenticated %}
+              <a href="{% url 'core:skill_detail' s.id %}" class="skill-title">
+                {{ s.title }}
+              </a>
+            {% else %}
+              <a href="{% url 'core:login' %}?next={% url 'core:skill_detail' s.id %}" class="skill-title">
+                {{ s.title }}
+              </a>
+            {% endif %}
+            
+            <div class="skill-owner">
+              <i>👤</i>
+              <span>by {{ s.owner.username }}</span>
+            </div>
+            
+            <div class="skill-meta">
+              {% if s.category %}
+                <span class="meta-tag">📁 {{ s.category }}</span>
+              {% endif %}
+              {% if s.level %}
+                <span class="meta-tag">🎯 {{ s.level }}</span>
+              {% endif %}
+              {% if s.created_at %}
+                <span class="meta-tag">📅 {{ s.created_at|date:"M j" }}</span>
+              {% endif %}
+            </div>
+            
+            <div class="skill-actions">
+              {% if user.is_authenticated %}
+                <a href="{% url 'core:skill_detail' s.id %}" class="btn-view">
+                  👀 View Details
+                </a>
+              {% else %}
+                <a href="{% url 'core:login' %}?next={% url 'core:skill_detail' s.id %}" class="btn-login">
+                  🔐 Login to View
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i>🛠️</i>
+        <p>No skills available yet</p>
+        <p>Be the first to share your skills with the community!</p>
+        {% if user.is_authenticated %}
+          <a href="{% url 'core:create_skill' %}" class="btn-view" style="margin-top: 15px;">
+            ➕ Add Your First Skill
+          </a>
+        {% else %}
+          <a href="{% url 'core:register' %}" class="btn-login" style="margin-top: 15px;">
+            🚀 Join Now
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}

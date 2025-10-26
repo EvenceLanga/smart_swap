@@ -2,100 +2,411 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto max-w-2xl py-8">
-    <div class="bg-white rounded-xl shadow-lg p-6">
-        <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <i class="fas fa-calendar-plus text-indigo-600"></i>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-800">Schedule New Meeting</h1>
-        </div>
-
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Meeting Title</label>
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                    <div class="text-red-600 text-sm">{{ form.title.errors }}</div>
-                    {% endif %}
-                </div>
-                
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Meeting Type</label>
-                    {{ form.meeting_type }}
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Description</label>
-                {{ form.description }}
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Date & Time</label>
-                    {{ form.scheduled_date }}
-                    {% if form.scheduled_date.errors %}
-                    <div class="text-red-600 text-sm">{{ form.scheduled_date.errors }}</div>
-                    {% endif %}
-                </div>
-                
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
-                    {{ form.duration_minutes }}
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Location/Meeting Link</label>
-                {{ form.location }}
-                <p class="text-sm text-gray-500">Physical address or video call link</p>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Participants</label>
-                {{ form.participants }}
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Related Skill (Optional)</label>
-                {{ form.related_skill }}
-            </div>
-
-            <div class="flex gap-4 pt-4">
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition duration-200">
-                    <i class="fas fa-calendar-check mr-2"></i>Schedule Meeting
-                </button>
-                <a href="{% url 'core:my_meetings' %}" class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition duration-200">
-                    Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
 
 <style>
-input, select, textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.2s;
+.dashboard-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+.form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
+.form-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.form-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.form-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.form-content {
+  text-align: left;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  font-family: inherit;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-help {
+  color: #6c757d;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.form-errors {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  color: white;
+}
+
+/* Style the select2 multiple select */
+.select2-container--default .select2-selection--multiple {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: #f8f9fa;
+  min-height: 44px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Style form fields to match our design */
+input[type="text"],
+input[type="datetime-local"],
+input[type="number"],
+select,
 textarea {
-    resize: vertical;
-    min-height: 100px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  font-family: inherit;
+}
+
+input[type="text"]:focus,
+input[type="datetime-local"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .form-card {
+    padding: 30px 20px;
+  }
+  
+  .form-header {
+    padding: 25px 20px;
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .form-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .form-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-input, .form-select, .form-textarea {
+    padding: 10px 14px;
+  }
+}
+
+/* Custom styling for form fields to override any existing styles */
+.form-content input,
+.form-content select,
+.form-content textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-content input:focus,
+.form-content select:focus,
+.form-content textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 </style>
+
+<div class="dashboard-container">
+  <div class="form-card">
+    <!-- Form Header -->
+    <div class="form-header">
+      <div class="form-icon">
+        📅
+      </div>
+      <h1>Schedule New Meeting</h1>
+    </div>
+    
+    <form method="post" class="form-content">
+      {% csrf_token %}
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.title.id_for_label }}">
+            📝 Meeting Title
+          </label>
+          {{ form.title }}
+          {% if form.title.errors %}
+            <div class="form-errors">
+              {% for error in form.title.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group">
+          <label for="{{ form.meeting_type.id_for_label }}">
+            📋 Meeting Type
+          </label>
+          {{ form.meeting_type }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">
+          📄 Description
+        </label>
+        {{ form.description }}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="{{ form.scheduled_date.id_for_label }}">
+            🗓️ Date & Time
+          </label>
+          {{ form.scheduled_date }}
+          {% if form.scheduled_date.errors %}
+            <div class="form-errors">
+              {% for error in form.scheduled_date.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="form-group">
+          <label for="{{ form.duration_minutes.id_for_label }}">
+            ⏰ Duration (minutes)
+          </label>
+          {{ form.duration_minutes }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.location.id_for_label }}">
+          📍 Location/Meeting Link
+        </label>
+        {{ form.location }}
+        <div class="form-help">
+          Physical address or video call link
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.participants.id_for_label }}">
+          👥 Participants
+        </label>
+        {{ form.participants }}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.related_skill.id_for_label }}">
+          🛠️ Related Skill (Optional)
+        </label>
+        {{ form.related_skill }}
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          ✅ Schedule Meeting
+        </button>
+        <a href="{% url 'core:my_meetings' %}" class="btn-secondary">
+          ← Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add some JavaScript to enhance the form -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add focus styles to all form elements
+  const formElements = document.querySelectorAll('input, select, textarea');
+  
+  formElements.forEach(element => {
+    element.addEventListener('focus', function() {
+      this.style.borderColor = '#667eea';
+      this.style.backgroundColor = 'white';
+      this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+    });
+    
+    element.addEventListener('blur', function() {
+      this.style.borderColor = '#e9ecef';
+      this.style.backgroundColor = '#f8f9fa';
+      this.style.boxShadow = 'none';
+    });
+  });
+  
+  // Add current datetime as min value for scheduled_date
+  const scheduledDateInput = document.querySelector('input[type="datetime-local"]');
+  if (scheduledDateInput) {
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    scheduledDateInput.min = localDateTime;
+  }
+});
+</script>
+
 {% endblock %}

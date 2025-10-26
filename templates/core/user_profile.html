@@ -1,18 +1,252 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>{{ profile_user.username }}'s Profile</h2>
-  <p>{{ profile_user.email }}</p>
-  <h3>Skills</h3>
 
-  {% if user.is_authenticated and user != profile_user %}
-    <a href="{% url 'core:send_message' %}?to={{ profile_user.id }}" class="btn">Send Message</a>
-  {% endif %}
+<style>
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  <ul>
-    {% for s in skills %}
-      <li><a href="{% url 'core:skill_detail' s.id %}">{{ s.title }}</a> (⭐ {{ s.average_rating }}/5)</li>
-    {% empty %}
-      <li>No skills yet.</li>
-    {% endfor %}
-  </ul>
+.profile-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.profile-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.profile-email {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-message {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 25px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-message:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.skills-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #f8f9fa;
+  padding-bottom: 15px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.skill-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-color: #667eea;
+}
+
+.skill-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  display: block;
+  text-decoration: none;
+}
+
+.skill-title:hover {
+  color: #667eea;
+}
+
+.skill-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #ffc107;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+  grid-column: 1 / -1;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 15px;
+  }
+  
+  .profile-header {
+    padding: 30px 20px;
+  }
+  
+  .profile-header h2 {
+    font-size: 2rem;
+  }
+  
+  .profile-email {
+    font-size: 1.1rem;
+  }
+  
+  .skills-section {
+    padding: 20px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-message {
+    width: 200px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .section-header h3 {
+    font-size: 1.5rem;
+  }
+  
+  .skill-card {
+    padding: 15px;
+  }
+}
+</style>
+
+<div class="profile-container">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <h2>👤 {{ profile_user.username }}'s Profile</h2>
+    <div class="profile-email">📧 {{ profile_user.email }}</div>
+    
+    {% if user.is_authenticated and user != profile_user %}
+    <div class="profile-actions">
+      <a href="{% url 'core:send_message' %}?to={{ profile_user.id }}" class="btn-message">
+        💬 Send Message
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Skills Section -->
+  <div class="skills-section">
+    <div class="section-header">
+      <h3>🛠️ Skills</h3>
+    </div>
+
+    {% if skills %}
+      <div class="skills-grid">
+        {% for s in skills %}
+          <div class="skill-card">
+            <a href="{% url 'core:skill_detail' s.id %}" class="skill-title">
+              {{ s.title }}
+            </a>
+            <div class="skill-rating">
+              ⭐ {{ s.average_rating|default:"0" }}/5
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i>🛠️</i>
+        <p>No skills yet</p>
+        <p>{{ profile_user.username }} hasn't added any skills yet</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}

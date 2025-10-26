@@ -409,7 +409,60 @@
         font-size: 1.6rem;
       }
     }
+    /* ===== Enhanced Badge Styles ===== */
+.nav-link {
+  position: relative;
+  padding-right: 35px !important; /* Make space for badge */
+}
 
+.badge {
+  background: linear-gradient(135deg, #ff4757, #ff3742);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+  animation: pulse 2s infinite;
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: 2px solid white;
+  line-height: 1;
+}
+
+/* Different badge colors for different types */
+.nav-link[href*="skill_list"] .badge {
+  background: linear-gradient(135deg, #ffa502, #ff7e00);
+}
+
+.nav-link[href*="my_meetings"] .badge {
+  background: linear-gradient(135deg, #3742fa, #5352ed);
+}
+
+.nav-link[href*="skill_requests"] .badge {
+  background: linear-gradient(135deg, #2ed573, #1dd1a1);
+}
+
+.nav-link[href*="chat"] .badge {
+  background: linear-gradient(135deg, #ff4757, #ff3742);
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+  }
+  50% { 
+    transform: scale(1.1); 
+    box-shadow: 0 3px 12px rgba(255, 71, 87, 0.6);
+  }
+}
     @media (max-width: 480px) {
       .navbar-container {
         padding: 12px;
@@ -460,46 +513,71 @@
         </form>
       </div>
 
-      <!-- Navigation Links -->
-      <nav class="nav-links" id="navbar">
-        {% if user.is_authenticated %}
-          <a href="{% url 'core:dashboard' %}" class="nav-link">
-            <span class="nav-icon">📊</span>
-            Dashboard
-          </a>
-          <a href="{% url 'core:skill_list' %}" class="nav-link">
-            <span class="nav-icon">🛠️</span>
-            All Skills
-          </a>
-          <a href="{% url 'core:create_skill' %}" class="nav-link">
-            <span class="nav-icon">➕</span>
-            Add Skill
-          </a>
-          <a href="{% url 'core:chat_dashboard' %}" class="nav-link">
-            <span class="nav-icon">💬</span>
-            Inbox
-            {% if unread_count and unread_count > 0 %}
-              <span class="badge">{{ unread_count }}</span>
-            {% endif %}
-          </a>
-          
-          {% if user.is_staff %}
-            <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
-              <span class="nav-icon">⚡</span>
-              Admin
-            </a>
-          {% endif %}
-        {% else %}
-          <a href="{% url 'core:login' %}" class="nav-link">
-            <span class="nav-icon">🔑</span>
-            Login
-          </a>
-          <a href="{% url 'core:register' %}" class="nav-link">
-            <span class="nav-icon">👤</span>
-            Register
-          </a>
-        {% endif %}
-      </nav>
+      <!-- Updated Navigation Links -->
+<nav class="nav-links" id="navbar">
+  {% if user.is_authenticated %}
+    <a href="{% url 'core:dashboard' %}" class="nav-link">
+      <span class="nav-icon">📊</span>
+      Dashboard
+      {% if total_notifications > 0 %}
+        <span class="badge">{{ total_notifications }}</span>
+      {% endif %}
+    </a>
+    
+    <a href="{% url 'core:skill_list' %}" class="nav-link">
+      <span class="nav-icon">🛠️</span>
+      All Skills
+      {% if new_skills_count > 0 %}
+        <span class="badge">{{ new_skills_count }}</span>
+      {% endif %}
+    </a>
+    
+    <a href="{% url 'core:create_skill' %}" class="nav-link">
+      <span class="nav-icon">➕</span>
+      Add Skill
+    </a>
+    
+    <a href="{% url 'core:my_meetings' %}" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-calendar-days"></i></span>
+      My Meetings
+      {% if meeting_notifications_count > 0 %}
+        <span class="badge">{{ meeting_notifications_count }}</span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'core:skill_requests' %}" class="nav-link">
+      <span class="nav-icon">📥</span>
+      Requests
+      {% if skill_requests_count > 0 %}
+        <span class="badge">{{ skill_requests_count }}</span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'core:chat_dashboard' %}" class="nav-link">
+      <span class="nav-icon">💬</span>
+      Inbox
+      {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+      {% endif %}
+    </a>
+    
+    {% if user.is_staff %}
+      <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
+        <span class="nav-icon">⚡</span>
+        Admin
+      </a>
+    {% endif %}
+  {% else %}
+    <a href="{% url 'core:login' %}" class="nav-link">
+      <span class="nav-icon">🔑</span>
+      Login
+    </a>
+    <a href="{% url 'core:register' %}" class="nav-link">
+      <span class="nav-icon">👤</span>
+      Register
+    </a>
+  {% endif %}
+</nav>
 
       <!-- User Menu -->
       {% if user.is_authenticated %}

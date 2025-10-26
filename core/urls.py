@@ -21,6 +21,7 @@ urlpatterns = [
     path('skills/', views.skill_list, name='skill_list'),
     path('skills/create/', views.create_skill, name='create_skill'),
     path('skills/<int:skill_id>/', views.skill_detail, name='skill_detail'),
+    path('skill-requests/', views.skill_requests, name='skill_requests'),
     path('skills/<int:skill_id>/request/', views.request_skill, name='request_skill'),
     path('skills/<int:skill_id>/review/', views.add_review, name='add_review'),
     path('search/', views.search_skills, name='search_skills'),

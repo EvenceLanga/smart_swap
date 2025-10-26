@@ -2,185 +2,596 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto max-w-4xl py-8">
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <!-- Meeting Header -->
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-2xl font-bold mb-2">{{ meeting.title }}</h1>
-                    <div class="flex items-center gap-4 text-indigo-100">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-calendar"></i>
-                            <span>{{ meeting.scheduled_date|date:"F j, Y" }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-clock"></i>
-                            <span>{{ meeting.scheduled_date|date:"g:i A" }}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-stopwatch"></i>
-                            <span>{{ meeting.duration_minutes }} minutes</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white text-indigo-600 px-3 py-1 rounded-full text-sm font-semibold">
-                    {{ meeting.get_status_display }}
-                </div>
+
+<style>
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.meeting-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.meeting-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px;
+  margin-bottom: 0;
+}
+
+.meeting-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.meeting-title {
+  margin: 0 0 15px 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.meeting-meta {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.status-badge {
+  background: white;
+  color: #667eea;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.meeting-content {
+  padding: 30px;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content-section {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 25px;
+  border-left: 4px solid #667eea;
+}
+
+.section-title {
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-content {
+  color: #555;
+  line-height: 1.6;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.detail-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  color: #555;
+  font-size: 1rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 25px;
+  border-left: 4px solid #667eea;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.user-username {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.participant-avatar {
+  width: 40px;
+  height: 40px;
+  background: #28a745;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-confirm {
+  background: #28a745;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  color: white;
+}
+
+.btn-cancel {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  color: white;
+}
+
+.btn-complete {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-complete:hover {
+  background: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+  color: white;
+}
+
+.btn-message {
+  background: #667eea;
+  color: white;
+}
+
+.btn-message:hover {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  color: white;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-2px);
+  color: white;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+  color: white;
+}
+
+.meeting-footer {
+  background: #f8f9fa;
+  padding: 20px 30px;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.footer-info {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.skill-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.skill-link:hover {
+  color: #5a6fd8;
+  text-decoration: underline;
+}
+
+.empty-participants {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 968px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .meeting-header {
+    padding: 30px 20px;
+  }
+  
+  .meeting-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .meeting-title {
+    font-size: 1.8rem;
+  }
+  
+  .meeting-meta {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .meeting-content {
+    padding: 20px;
+  }
+  
+  .meeting-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .footer-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meeting-title {
+    font-size: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .user-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-actions {
+    flex-direction: column;
+  }
+  
+  .action-btn {
+    width: 100%;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <div class="meeting-card">
+    <!-- Meeting Header -->
+    <div class="meeting-header">
+      <div class="meeting-header-content">
+        <div>
+          <h1 class="meeting-title">📅 {{ meeting.title }}</h1>
+          <div class="meeting-meta">
+            <div class="meta-item">
+              <i>📅</i>
+              <span>{{ meeting.scheduled_date|date:"F j, Y" }}</span>
             </div>
-        </div>
-
-        <!-- Meeting Content -->
-        <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Description -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">Description</h3>
-                        <p class="text-gray-600">{{ meeting.description|default:"No description provided." }}</p>
-                    </div>
-
-                    <!-- Meeting Details -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-800 mb-2">Meeting Type</h3>
-                            <p class="text-gray-600">{{ meeting.get_meeting_type_display }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h3 class="font-semibold text-gray-800 mb-2">Location</h3>
-                            <p class="text-gray-600">{{ meeting.location|default:"Not specified" }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Related Skill -->
-                    {% if meeting.related_skill %}
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">Related Skill</h3>
-                        <a href="{% url 'core:skill_detail' skill_id=meeting.related_skill.id %}" 
-                           class="text-indigo-600 hover:text-indigo-800 font-medium">
-                            {{ meeting.related_skill.title }}
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Sidebar -->
-                <div class="space-y-6">
-                    <!-- Organizer -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Organizer</h3>
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                                <span class="font-semibold text-indigo-600">
-                                    {{ meeting.organizer.first_name|default:meeting.organizer.username|first|upper }}
-                                </span>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-800">
-                                    {{ meeting.organizer.first_name }} {{ meeting.organizer.last_name }}
-                                </p>
-                                <p class="text-sm text-gray-500">@{{ meeting.organizer.username }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Participants -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Participants</h3>
-                        <div class="space-y-3">
-                            {% for participant in meeting.participants.all %}
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                    <span class="text-xs font-semibold text-green-600">
-                                        {{ participant.first_name|default:participant.username|first|upper }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-800">
-                                        {{ participant.first_name }} {{ participant.last_name }}
-                                    </p>
-                                    <p class="text-xs text-gray-500">@{{ participant.username }}</p>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <p class="text-sm text-gray-500">No participants yet</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Actions</h3>
-                        <div class="space-y-2">
-                            {% if meeting.organizer == request.user %}
-                                <!-- Organizer Actions -->
-                                {% if meeting.status == 'scheduled' %}
-                                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='confirmed' %}" 
-                                   class="w-full bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-700 transition duration-200 block text-center">
-                                    Confirm Meeting
-                                </a>
-                                {% endif %}
-                                
-                                {% if meeting.status == 'scheduled' or meeting.status == 'confirmed' %}
-                                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='cancelled' %}" 
-                                   class="w-full bg-red-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-700 transition duration-200 block text-center">
-                                    Cancel Meeting
-                                </a>
-                                {% endif %}
-                                
-                                {% if meeting.status == 'confirmed' %}
-                                    {% if meeting.scheduled_date <= now %}
-                                    <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='completed' %}" 
-                                       class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-200 block text-center">
-                                        Mark Completed
-                                    </a>
-                                    {% endif %}
-                                {% endif %}
-                            {% else %}
-                                <!-- Participant Actions -->
-                                {% if meeting.status == 'scheduled' %}
-                                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='confirmed' %}" 
-                                   class="w-full bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-700 transition duration-200 block text-center">
-                                    Accept Invitation
-                                </a>
-                                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='cancelled' %}" 
-                                   class="w-full bg-red-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-red-700 transition duration-200 block text-center">
-                                    Decline
-                                </a>
-                                {% endif %}
-                            {% endif %}
-                            
-                            <a href="{% url 'core:chat_dashboard' %}?user={{ meeting.organizer.username }}" 
-                               class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-200 block text-center">
-                                Message Organizer
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div class="meta-item">
+              <i>⏰</i>
+              <span>{{ meeting.scheduled_date|date:"g:i A" }}</span>
             </div>
-        </div>
-
-        <!-- Meeting Footer -->
-        <div class="bg-gray-50 px-6 py-4 border-t">
-            <div class="flex justify-between items-center">
-                <div class="text-sm text-gray-500">
-                    Created {{ meeting.created_at|timesince }} ago
-                </div>
-                <div class="flex gap-2">
-                    <a href="{% url 'core:my_meetings' %}" 
-                       class="bg-gray-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-600 transition duration-200">
-                        Back to Meetings
-                    </a>
-                    {% if meeting.organizer == request.user %}
-                    <a href="#" 
-                       class="bg-indigo-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-200">
-                        Edit Meeting
-                    </a>
-                    {% endif %}
-                </div>
+            <div class="meta-item">
+              <i>🕒</i>
+              <span>{{ meeting.duration_minutes }} minutes</span>
             </div>
+          </div>
         </div>
+        <div class="status-badge">
+          {{ meeting.get_status_display }}
+        </div>
+      </div>
     </div>
+
+    <!-- Meeting Content -->
+    <div class="meeting-content">
+      <div class="content-grid">
+        <!-- Main Content -->
+        <div class="main-content">
+          <!-- Description -->
+          <div class="content-section">
+            <h3 class="section-title">📄 Description</h3>
+            <div class="section-content">
+              {{ meeting.description|default:"No description provided." }}
+            </div>
+          </div>
+
+          <!-- Meeting Details -->
+          <div class="content-section">
+            <h3 class="section-title">📋 Meeting Details</h3>
+            <div class="details-grid">
+              <div class="detail-item">
+                <div class="detail-label">Meeting Type</div>
+                <div class="detail-value">{{ meeting.get_meeting_type_display }}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Location</div>
+                <div class="detail-value">{{ meeting.location|default:"Not specified" }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Skill -->
+          {% if meeting.related_skill %}
+          <div class="content-section">
+            <h3 class="section-title">🛠️ Related Skill</h3>
+            <div class="section-content">
+              <a href="{% url 'core:skill_detail' skill_id=meeting.related_skill.id %}" class="skill-link">
+                🔗 {{ meeting.related_skill.title }}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Organizer -->
+          <div class="sidebar-card">
+            <h3 class="section-title">👤 Organizer</h3>
+            <div class="user-card">
+              <div class="user-avatar">
+                {{ meeting.organizer.first_name|default:meeting.organizer.username|first|upper }}
+              </div>
+              <div class="user-info">
+                <div class="user-name">
+                  {{ meeting.organizer.first_name }} {{ meeting.organizer.last_name }}
+                </div>
+                <div class="user-username">@{{ meeting.organizer.username }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Participants -->
+          <div class="sidebar-card">
+            <h3 class="section-title">👥 Participants</h3>
+            <div class="participants-list">
+              {% for participant in meeting.participants.all %}
+              <div class="participant-item">
+                <div class="participant-avatar">
+                  {{ participant.first_name|default:participant.username|first|upper }}
+                </div>
+                <div class="user-info">
+                  <div class="user-name">
+                    {{ participant.first_name }} {{ participant.last_name }}
+                  </div>
+                  <div class="user-username">@{{ participant.username }}</div>
+                </div>
+              </div>
+              {% empty %}
+              <div class="empty-participants">
+                No participants yet
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="sidebar-card">
+            <h3 class="section-title">⚡ Actions</h3>
+            <div class="actions-grid">
+              {% if meeting.organizer == request.user %}
+                <!-- Organizer Actions -->
+                {% if meeting.status == 'scheduled' %}
+                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='confirmed' %}" 
+                   class="action-btn btn-confirm">
+                  ✅ Confirm Meeting
+                </a>
+                {% endif %}
+                
+                {% if meeting.status == 'scheduled' or meeting.status == 'confirmed' %}
+                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='cancelled' %}" 
+                   class="action-btn btn-cancel">
+                  ❌ Cancel Meeting
+                </a>
+                {% endif %}
+                
+                {% if meeting.status == 'confirmed' %}
+                  {% if meeting.scheduled_date <= now %}
+                  <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='completed' %}" 
+                     class="action-btn btn-complete">
+                    🎯 Mark Completed
+                  </a>
+                  {% endif %}
+                {% endif %}
+              {% else %}
+                <!-- Participant Actions -->
+                {% if meeting.status == 'scheduled' %}
+                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='confirmed' %}" 
+                   class="action-btn btn-confirm">
+                  ✅ Accept Invitation
+                </a>
+                <a href="{% url 'core:update_meeting_status' meeting_id=meeting.id status='cancelled' %}" 
+                   class="action-btn btn-cancel">
+                  ❌ Decline
+                </a>
+                {% endif %}
+              {% endif %}
+              
+              <a href="{% url 'core:chat_dashboard' %}?user={{ meeting.organizer.username }}" 
+                 class="action-btn btn-message">
+                💬 Message Organizer
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Meeting Footer -->
+    <div class="meeting-footer">
+      <div class="footer-info">
+        Created {{ meeting.created_at|timesince }} ago
+      </div>
+      <div class="footer-actions">
+        <a href="{% url 'core:my_meetings' %}" class="action-btn btn-secondary">
+          ← Back to Meetings
+        </a>
+        {% if meeting.organizer == request.user %}
+        <a href="#" class="action-btn btn-primary">
+          ✏️ Edit Meeting
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.requests-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.requests-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.section-header {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #f8f9fa;
+  padding-bottom: 15px;
+}
+
+.request-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+}
+
+.request-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  border-color: #667eea;
+}
+
+.request-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.request-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-in-progress {
+  background: #cce7ff;
+  color: #004085;
+}
+
+.status-completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.request-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-accept, .btn-reject, .btn-view {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-accept {
+  background: #28a745;
+  color: white;
+}
+
+.btn-reject {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-view {
+  background: #667eea;
+  color: white;
+}
+
+.btn-accept:hover, .btn-reject:hover, .btn-view:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 968px) {
+  .requests-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 25px 20px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 2rem;
+  }
+  
+  .requests-section {
+    padding: 20px;
+  }
+  
+  .section-header {
+    font-size: 1.3rem;
+  }
+  
+  .request-actions {
+    flex-direction: column;
+  }
+  
+  .btn-accept, .btn-reject, .btn-view {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .request-card {
+    padding: 15px;
+  }
+  
+  .request-title {
+    font-size: 1.1rem;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h2>🔁 My Skill Requests</h2>
+  </div>
+
+  <div class="requests-grid">
+    <!-- Requests I've Made -->
+    <div class="requests-section">
+      <div class="section-header">
+        <span>📤 Requests I've Sent</span>
+      </div>
+
+      {% if requests_made %}
+        {% for request in requests_made %}
+          <div class="request-card">
+            <div class="request-title">
+              {{ request.skill.title }}
+            </div>
+            <div class="request-meta">
+              <div class="meta-item">
+                <span>📊 Status:</span>
+                <span class="status-badge status-{{ request.status|lower }}">
+                  {{ request.status }}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span>👤 Teacher:</span>
+                <span>{{ request.skill.owner.username }}</span>
+              </div>
+              <div class="meta-item">
+                <span>📅 Requested:</span>
+                <span>{{ request.created_at|date:"M j, Y" }}</span>
+              </div>
+            </div>
+            <div class="request-actions">
+              <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
+                👀 View Skill
+              </a>
+              {% if request.status == 'IN_PROGRESS' %}
+                <a href="{% url 'core:complete_skill_session' request.id %}" class="btn-accept"
+                   onclick="return confirm('Mark this skill session as completed?')">
+                  ✅ Complete Session
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i>📤</i>
+          <p>No requests sent yet</p>
+          <p>Browse skills and send requests to start learning!</p>
+          <a href="{% url 'core:skill_list' %}" class="btn-view" style="margin-top: 15px;">
+            🔍 Browse Skills
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Requests I've Received -->
+    <div class="requests-section">
+      <div class="section-header">
+        <span>📥 Requests I've Received</span>
+      </div>
+
+      {% if requests_received %}
+        {% for request in requests_received %}
+          <div class="request-card">
+            <div class="request-title">
+              {{ request.skill.title }}
+            </div>
+            <div class="request-meta">
+              <div class="meta-item">
+                <span>📊 Status:</span>
+                <span class="status-badge status-{{ request.status|lower }}">
+                  {{ request.status }}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span>👤 From:</span>
+                <span>{{ request.requester.username }}</span>
+              </div>
+              <div class="meta-item">
+                <span>📅 Received:</span>
+                <span>{{ request.created_at|date:"M j, Y" }}</span>
+              </div>
+            </div>
+            
+            {% if request.status == 'PENDING' %}
+              <div class="request-actions">
+                <a href="{% url 'core:accept_request' request.id %}" class="btn-accept"
+                   onclick="return confirm('Accept this skill request from {{ request.requester.username }}?')">
+                  ✅ Accept
+                </a>
+                <a href="{% url 'core:reject_request' request.id %}" class="btn-reject"
+                   onclick="return confirm('Reject this skill request from {{ request.requester.username }}?')">
+                  ❌ Reject
+                </a>
+                <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
+                  👀 View Skill
+                </a>
+              </div>
+            {% elif request.status == 'APPROVED' %}
+              <div class="request-actions">
+                <a href="{% url 'core:start_skill_session' request.id %}" class="btn-accept"
+                   onclick="return confirm('Start skill session with {{ request.requester.username }}?')">
+                  🚀 Start Session
+                </a>
+                <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
+                  👀 View Skill
+                </a>
+              </div>
+            {% elif request.status == 'IN_PROGRESS' %}
+              <div class="request-actions">
+                <a href="{% url 'core:complete_skill_session' request.id %}" class="btn-accept"
+                   onclick="return confirm('Mark this skill session as completed?')">
+                  ✅ Complete Session
+                </a>
+                <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
+                  👀 View Skill
+                </a>
+              </div>
+            {% else %}
+              <div class="request-actions">
+                <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
+                  👀 View Skill
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i>📥</i>
+          <p>No requests received yet</p>
+          <p>When users request your skills, they'll appear here</p>
+          <a href="{% url 'core:create_skill' %}" class="btn-view" style="margin-top: 15px;">
+            ➕ Add More Skills
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
