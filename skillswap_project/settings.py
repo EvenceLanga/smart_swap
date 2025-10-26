@@ -1,3 +1,4 @@
+import dj_database_url
 import os
 from pathlib import Path
 
@@ -54,7 +55,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.unread_message_count',
+                'core.context_processors.notification_counts',
             ],
         },
     },
@@ -62,12 +63,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'skillswap_project.wsgi.application'
 
-# Database (SQLite for quick start)
+# Database (PostgreSQL for Render)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'postgresql://smartswap_user:jB1Rq9DudqrSm1arY07k1NrwTQUAAXKE@dpg-d3urhs75r7bs73fojhqg-a/smartswap'),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
