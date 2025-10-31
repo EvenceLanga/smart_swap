@@ -37,6 +37,23 @@ CHANNEL_LAYERS = {
     },
 }
 
+# CSRF Trusted Origins
+CSRF_TRUSTED_ORIGINS = [
+    'https://smartswap-production-61lb.up.railway.app',
+    'https://*.railway.app',
+]
+
+# If you're still having issues, temporarily allow all origins (for testing)
+CSRF_TRUSTED_ORIGINS = ['https://*', 'http://*']
+
+# CORS settings
+CORS_ALLOWED_ORIGINS = [
+    "https://smartswap-production-61lb.up.railway.app",
+    "https://*.railway.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
