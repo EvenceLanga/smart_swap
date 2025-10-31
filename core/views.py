@@ -108,6 +108,10 @@ def register(request):
 
 @csrf_exempt
 def user_login(request):
+    # ADD THIS CHECK - If user is already logged in, redirect to dashboard
+    if request.user.is_authenticated:
+        return redirect('core:dashboard')
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')

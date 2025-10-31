@@ -181,5 +181,6 @@ else:
 
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = 'core:dashboard'  # Use URL name, not path
-LOGOUT_REDIRECT_URL = 'core:index'     # Use URL name, not path
+LOGIN_REDIRECT_URL = 'core:dashboard'  
+LOGOUT_REDIRECT_URL = 'core:index'     
+SECURE_SSL_REDIRECT = False
