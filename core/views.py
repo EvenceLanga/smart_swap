@@ -27,16 +27,6 @@ from .models import Meeting
 from .forms import MeetingForm
 from django.views.decorators.csrf import csrf_exempt
 
-
-def login_required_message(view_func):
-    """Decorator to redirect to login with message for unauthenticated users"""
-    def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            messages.warning(request, 'Please log in to access this page.')
-            return redirect('core:login')  # CHANGE THIS LINE
-        return view_func(request, *args, **kwargs)
-    return wrapper
-
 @staff_member_required
 def admin_dashboard(request):
     total_users = User.objects.count()
@@ -63,7 +53,7 @@ def admin_dashboard(request):
     })
 
 
-@login_required_message
+@login_required
 def view_profile(request, username):
     profile_user = get_object_or_404(User, username=username)
     
@@ -77,7 +67,7 @@ def view_profile(request, username):
         'core/view_profile.html',
         {'profile_user': profile_user, 'profile': profile, 'reviews': reviews}
     )
-@login_required_message
+@login_required
 def edit_profile(request):
     """Allow current user to edit their own profile"""
     # Get or create profile
@@ -133,7 +123,7 @@ def user_logout(request):
     logout(request)
     return redirect('core:index')
 
-@login_required_message
+@login_required
 def dashboard(request):
     my_skills = request.user.skills.all()
     my_requests = request.user.requests_made.all()
@@ -156,7 +146,7 @@ def dashboard(request):
         'skills_with_stats': skills_with_stats,  
     })
 
-@login_required_message
+@login_required
 def skill_requests(request):
     """View for managing skill requests"""
     # Requests user has made to others
@@ -175,7 +165,7 @@ from django.db.models import Count, Avg, Q
 from django.utils import timezone
 from datetime import timedelta
 
-@login_required_message
+@login_required
 def skill_list(request):
     # Start with all skills
     skills = Skill.objects.all()
@@ -265,7 +255,7 @@ def skill_list(request):
     return render(request, 'core/skill_list.html', context)
 
 
-@login_required_message
+@login_required
 def create_skill(request):
     if request.method == 'POST':
         form = SkillForm(request.POST)
@@ -279,7 +269,7 @@ def create_skill(request):
         form = SkillForm()
     return render(request, 'core/create_skill.html', {'form': form})
 
-@login_required_message
+@login_required
 def skill_detail(request, skill_id):
     skill = get_object_or_404(Skill, id=skill_id)
     reviews = Review.objects.filter(skill=skill).order_by('-created_at')
@@ -311,7 +301,7 @@ def skill_detail(request, skill_id):
         'active_sessions': active_sessions,
     })
 
-@login_required_message
+@login_required
 def request_skill(request, skill_id):
     skill = get_object_or_404(Skill, id=skill_id)
     
@@ -350,7 +340,7 @@ def request_skill(request, skill_id):
     messages.success(request, 'Request sent to skill owner.')
     return redirect('core:dashboard')
 
-@login_required_message
+@login_required
 def start_skill_session(request, request_id):
     """Mark a skill request as In Progress"""
     skill_request = get_object_or_404(SkillRequest, id=request_id)
@@ -380,7 +370,7 @@ def start_skill_session(request, request_id):
     messages.success(request, f"Skill session with {skill_request.requester.username} started!")
     return redirect('core:dashboard')
 
-@login_required_message
+@login_required
 def complete_skill_session(request, request_id):
     """Mark a skill request as Completed"""
     skill_request = get_object_or_404(SkillRequest, id=request_id)
@@ -412,7 +402,7 @@ def complete_skill_session(request, request_id):
     return redirect('core:dashboard')
 
 
-@login_required_message
+@login_required
 def accept_request(request, request_id):
     req = get_object_or_404(SkillRequest, id=request_id, owner=request.user)
     req.status = 'ACCEPTED'
@@ -420,7 +410,7 @@ def accept_request(request, request_id):
     messages.success(request, 'Request accepted.')
     return redirect('core:dashboard')
 
-@login_required_message
+@login_required
 def reject_request(request, request_id):
     req = get_object_or_404(SkillRequest, id=request_id, owner=request.user)
     req.status = 'REJECTED'
@@ -428,7 +418,7 @@ def reject_request(request, request_id):
     messages.success(request, 'Request rejected.')
     return redirect('core:dashboard')
 
-@login_required_message
+@login_required
 def complete_request(request, request_id):
     req = get_object_or_404(SkillRequest, id=request_id)
     if request.user not in [req.requester, req.owner]:
@@ -439,7 +429,7 @@ def complete_request(request, request_id):
     messages.success(request, 'Marked as completed. Please leave a review.')
     return redirect('core:dashboard')
 
-@login_required_message
+@login_required
 def send_message(request):
     users = User.objects.exclude(id=request.user.id)  # exclude current user
     preselect = request.GET.get('to')  # ✅ capture preselected user ID
@@ -467,7 +457,7 @@ def send_message(request):
     # ✅ Include preselect in the context
     return render(request, 'core/send_message.html', {'users': users, 'preselect': preselect})
 
-@login_required_message
+@login_required
 def add_review(request, skill_id):
     skill = get_object_or_404(Skill, id=skill_id)
 
@@ -486,7 +476,7 @@ def add_review(request, skill_id):
         messages.success(request, 'Your review or comment has been submitted.')
         return redirect('core:skill_detail', skill_id=skill_id)
 
-@login_required_message
+@login_required
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
 
@@ -505,7 +495,7 @@ def edit_review(request, review_id):
     return render(request, 'core/edit_review.html', {'review': review})
 
 
-@login_required_message
+@login_required
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
 
@@ -524,7 +514,7 @@ def delete_review(request, review_id):
 
 from django.db.models import Q
 
-@login_required_message
+@login_required
 def inbox(request):
     # Identify all messages where the user is either sender or receiver
     messages = Message.objects.filter(
@@ -553,7 +543,7 @@ def reply_message(request):
         )
         messages.success(request, "Reply sent successfully!")
     return redirect('core:inbox')
-@login_required_message
+@login_required
 def chat_room(request, username):
     other_user = get_object_or_404(User, username=username)
     room_name = f"chat_{min(request.user.id, other_user.id)}_{max(request.user.id, other_user.id)}"
@@ -583,12 +573,12 @@ def search_skills(request):
         results = Skill.objects.none()
     return render(request, 'core/search_results.html', {'results': results, 'query': query})
 
-@login_required_message
+@login_required
 def notifications(request):
     # Placeholder for now — you can later connect to real Notification model
     return render(request, 'core/notifications.html', {})
 
-@login_required_message
+@login_required
 def conversation(request, username):
     other_user = get_object_or_404(User, username=username)
     messages = Message.objects.filter(
@@ -598,7 +588,7 @@ def conversation(request, username):
     return render(request, 'core/conversation.html', {'messages': messages, 'other_user': other_user})
 
 
-@login_required_message
+@login_required
 def chat_dashboard(request):
     """Main chat dashboard with conversation list and active chat"""
     
@@ -674,7 +664,7 @@ def chat_dashboard(request):
         'users': User.objects.exclude(id=request.user.id)
     })
 
-@login_required_message
+@login_required
 def send_chat_message(request):
     """Send message from chat interface"""
     if request.method == 'POST':
@@ -699,7 +689,7 @@ def send_chat_message(request):
     return redirect('core:chat_dashboard')
 
 
-@login_required_message
+@login_required
 def mark_messages_read(request, username):
     """Mark messages from a user as read"""
     other_user = get_object_or_404(User, username=username)
@@ -709,7 +699,7 @@ def mark_messages_read(request, username):
     
     return JsonResponse({'status': 'success'})
 
-@login_required_message
+@login_required
 def search_users(request):
     """Search users for starting new conversations"""
     query = request.GET.get('q', '')
@@ -742,7 +732,7 @@ from datetime import timedelta, datetime
 from .models import Meeting
 from .forms import MeetingForm
 
-@login_required_message
+@login_required
 def schedule_meeting(request):
     """Schedule a new meeting"""
     if request.method == 'POST':
@@ -774,7 +764,7 @@ def schedule_meeting(request):
     
     return render(request, 'core/schedule_meeting.html', {'form': form})
 
-@login_required_message
+@login_required
 def quick_schedule(request, username):
     """Quick schedule a meeting with a specific user"""
     try:
@@ -822,7 +812,7 @@ def quick_schedule(request, username):
         'other_user': other_user
     })
 
-@login_required_message
+@login_required
 def meeting_detail(request, meeting_id):
     """View meeting details"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
@@ -837,7 +827,7 @@ def meeting_detail(request, meeting_id):
         'now': timezone.now()  # Pass current time to template
     })
 
-@login_required_message
+@login_required
 def my_meetings(request):
     """View user's meetings"""
     now = timezone.now()
@@ -857,7 +847,7 @@ def my_meetings(request):
         'past_meetings': past_meetings
     })
 
-@login_required_message
+@login_required
 def update_meeting_status(request, meeting_id, status):
     """Update meeting status (confirm, cancel, etc.)"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
@@ -885,7 +875,7 @@ def update_meeting_status(request, meeting_id, status):
     
     return redirect('core:meeting_detail', meeting_id=meeting.id)
 
-@login_required_message
+@login_required
 def meeting_calendar(request):
     """Calendar view of meetings"""
     meetings = Meeting.objects.filter(
@@ -907,7 +897,7 @@ def meeting_calendar(request):
     
     return render(request, 'core/meeting_calendar.html', {'events': events})
 
-@login_required_message
+@login_required
 def quick_schedule(request, username):
     """Quick schedule with a specific user"""
     other_user = get_object_or_404(User, username=username)
