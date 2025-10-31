@@ -12,7 +12,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Allowed Hosts
 ALLOWED_HOSTS = [
-    'smartswap-production-61lb.up.railway.app',
+    'smartswap-production-611b.up.railway.app',
     '.railway.app',
     'localhost',
     '127.0.0.1'
