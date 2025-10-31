@@ -3,9 +3,14 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'replace-this-with-a-secure-secret-key'
-DEBUG = True
 
+# Security - Use environment variable in production
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9w+#hdh+)&g258dvqk=!#h(_o!me&+bexwdt6+*_7z6l%&z_(-')
+
+# Debug - False in production
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+
+# Allowed Hosts
 ALLOWED_HOSTS = [
     'smartswap-production-61lb.up.railway.app',
     '.railway.app',
@@ -13,7 +18,23 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
+# CSRF Trusted Origins
+CSRF_TRUSTED_ORIGINS = [
+    'https://smartswap-production-61lb.up.railway.app',
+    'https://*.railway.app',
+]
+
+# CORS Settings
+CORS_ALLOWED_ORIGINS = [
+    "https://smartswap-production-61lb.up.railway.app",
+    "https://*.railway.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Installed Apps
 INSTALLED_APPS = [
+    'corsheaders',
     'channels',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,6 +49,8 @@ INSTALLED_APPS = [
     # local apps
     'core.apps.CoreConfig',
 ]
+
+# ASGI Application
 ASGI_APPLICATION = 'skillswap_django_project.asgi.application'
 
 # Channel layer for local dev (use Redis in production)
@@ -37,24 +60,9 @@ CHANNEL_LAYERS = {
     },
 }
 
-# CSRF Trusted Origins
-CSRF_TRUSTED_ORIGINS = [
-    'https://smartswap-production-61lb.up.railway.app',
-    'https://*.railway.app',
-]
-
-# If you're still having issues, temporarily allow all origins (for testing)
-CSRF_TRUSTED_ORIGINS = ['https://*', 'http://*']
-
-# CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "https://smartswap-production-61lb.up.railway.app",
-    "https://*.railway.app",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
+# Middleware
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,8 +72,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# URL Configuration
 ROOT_URLCONF = 'skillswap_project.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -83,9 +93,10 @@ TEMPLATES = [
     },
 ]
 
+# WSGI Application
 WSGI_APPLICATION = 'skillswap_project.wsgi.application'
 
-
+# Database Configuration
 if os.getenv('DATABASE_URL'):
     # Use Railway's database
     DATABASES = {
@@ -104,21 +115,44 @@ else:
         }
     }
 
+# Password Validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Africa/Johannesburg'
 USE_I18N = True
 USE_TZ = True
 
+# Static Files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
