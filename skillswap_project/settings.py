@@ -65,7 +65,7 @@ WSGI_APPLICATION = 'skillswap_project.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'postgresql://smartswap_user:jB1Rq9DudqrSm1arY07k1NrwTQUAAXKE@dpg-d3urhs75r7bs73fojhqg-a/smartswap'),
+        default=os.getenv('DATABASE_URL', 'postgresql://postgres:SmartSwap2024@db.gkvkkciaqlxvquwfalxl.supabase.co:5432/postgres'),
         conn_max_age=600,
         ssl_require=True
     )
