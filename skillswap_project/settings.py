@@ -12,7 +12,7 @@ DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Allowed Hosts
 ALLOWED_HOSTS = [
-    'smartswap-production-61lb.up.railway.app',
+    'smartswap-production-611b.up.railway.app',
     '.railway.app',
     'localhost',
     '127.0.0.1',
@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
 
 # CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = [
-    'https://smartswap-production-61lb.up.railway.app',
+    'https://smartswap-production-611b.up.railway.app',
     'https://*.railway.app',
     'https://*.up.railway.app',
     'http://localhost',
