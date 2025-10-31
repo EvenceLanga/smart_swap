@@ -179,7 +179,7 @@ else:
     CSRF_COOKIE_SECURE = False
     SESSION_COOKIE_SECURE = False
 
-# Login URL
+
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'core:dashboard'  # Use URL name, not path
+LOGOUT_REDIRECT_URL = 'core:index'     # Use URL name, not path

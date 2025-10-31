@@ -33,7 +33,7 @@ def login_required_message(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.warning(request, 'Please log in to access this page.')
-            return redirect_to_login(request.get_full_path(), 'core:login')
+            return redirect('core:login')  # CHANGE THIS LINE
         return view_func(request, *args, **kwargs)
     return wrapper
 
