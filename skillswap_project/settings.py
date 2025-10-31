@@ -8,29 +8,47 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-9w+#hdh+)&g258dvqk=!#h(_o!me&+bexwdt6+*_7z6l%&z_(-')
 
 # Debug - False in production
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 # Allowed Hosts
 ALLOWED_HOSTS = [
-    'smartswap-production-611b.up.railway.app',
+    'smartswap-production-61lb.up.railway.app',
     '.railway.app',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    '.up.railway.app',
 ]
 
 # CSRF Trusted Origins
 CSRF_TRUSTED_ORIGINS = [
     'https://smartswap-production-61lb.up.railway.app',
     'https://*.railway.app',
+    'https://*.up.railway.app',
+    'http://localhost',
+    'http://127.0.0.1',
 ]
+
+# Additional CSRF settings
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+CSRF_COOKIE_SECURE = True
+CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [
-    "https://smartswap-production-61lb.up.railway.app",
+    "https://smartswap-production-611b.up.railway.app",
     "https://*.railway.app",
+    "https://*.up.railway.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Allow all in development
+
+# Session settings
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
 
 # Installed Apps
 INSTALLED_APPS = [
@@ -156,3 +174,12 @@ if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+else:
+    # Development settings
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
+# Login URL
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
