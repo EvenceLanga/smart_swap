@@ -25,6 +25,7 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 from .models import Meeting
 from .forms import MeetingForm
+from django.views.decorators.csrf import csrf_exempt
 
 
 def login_required_message(view_func):
@@ -96,7 +97,7 @@ def index(request):
     skills = Skill.objects.order_by('-created_at')[:10]
     return render(request, 'core/index.html', {'skills': skills})
 
-
+@csrf_exempt
 def register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -115,7 +116,7 @@ def register(request):
 
     return render(request, 'core/register.html', {'form': form})
 
-
+@csrf_exempt
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
