@@ -68,13 +68,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'skillswap_project.wsgi.application'
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),  # Remove the Supabase fallback
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+
+if os.getenv('DATABASE_URL'):
+    # Use Railway's database
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # Fallback for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
