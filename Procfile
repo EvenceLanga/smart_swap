@@ -1,1 +1,2 @@
-python manage.py migrate && python manage.py collectstatic --noinput && gunicorn skillswap_project.wsgi
+web: gunicorn skillswap_project.wsgi:application
+release: python manage.py migrate
