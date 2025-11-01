@@ -160,6 +160,10 @@
       <div class="auth-links">
         <p>Don't have an account? <a href="{% url 'core:register' %}">Register here</a></p>
       </div>
+      <!-- Add this after your login form -->
+      <div class="text-center mt-3">
+          <a href="{% url 'core:password_reset' %}" class="text-decoration-none">Forgot your password?</a>
+      </div>
     </form>
   </div>
 </div>

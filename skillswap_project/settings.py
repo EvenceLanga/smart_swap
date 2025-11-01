@@ -184,3 +184,16 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'core:dashboard'  
 LOGOUT_REDIRECT_URL = 'core:index'     
 SECURE_SSL_REDIRECT = False
+
+# Email Configuration for Password Reset
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # or your email provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'evotelnet@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'Evo00126')
+DEFAULT_FROM_EMAIL = 'SkillSwap <noreply@skillswap.com>'
+
+# For development - use console backend
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
