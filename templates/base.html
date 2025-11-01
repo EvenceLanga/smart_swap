@@ -17,33 +17,34 @@
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
-      color: #2d3748;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #ffffff;
+      color: #1a1a1a;
       line-height: 1.6;
       min-height: 100vh;
+      font-weight: 400;
     }
 
     /* ===== Modern Navbar ===== */
     header {
-      background: linear-gradient(135deg,blue 0%, #764ba2 100%);
-      color: white;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e5e5;
       padding: 0;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       backdrop-filter: blur(10px);
     }
 
     .navbar-container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 70px;
+      height: 72px;
     }
 
     /* ===== Logo/Brand ===== */
@@ -54,106 +55,82 @@
     }
 
     .brand a {
-      color: white;
+      color: #000000;
       text-decoration: none;
-      font-size: 1.8rem;
-      font-weight: 800;
+      font-size: 1.5rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 10px;
-      transition: all 0.3s ease;
-    }
-
-    .brand a:hover {
-      transform: translateY(-2px);
-      text-shadow: 0 4px 12px rgba(255,255,255,0.3);
+      letter-spacing: -0.5px;
     }
 
     .logo-icon {
-      font-size: 2rem;
-      background: rgba(255,255,255,0.2);
+      font-size: 1.5rem;
+      background: #000000;
+      color: #ffffff;
       padding: 8px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      font-weight: 600;
     }
 
     /* ===== Navigation Links ===== */
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       transition: all 0.3s ease-in-out;
     }
 
     .nav-link {
-      color: white;
+      color: #666666;
       text-decoration: none;
-      font-weight: 600;
-      padding: 12px 18px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
+      font-weight: 500;
+      padding: 12px 16px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: 8px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .nav-link::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-
-    .nav-link:hover::before {
-      left: 100%;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
     }
 
     .nav-link:hover {
-      background: rgba(255,255,255,0.15);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      background: #f8f9fa;
+      color: #000000;
+      border-color: #e5e5e5;
     }
 
     .nav-link.active {
-      background: rgba(255,255,255,0.2);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #000000;
+      color: #ffffff;
+      border-color: #000000;
     }
 
     .nav-icon {
-      font-size: 1.1rem;
-      width: 20px;
+      font-size: 1rem;
+      width: 16px;
       text-align: center;
     }
 
     /* ===== Badge ===== */
     .badge {
-      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      background: #dc2626;
       color: white;
-      border-radius: 20px;
-      padding: 2px 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      min-width: 20px;
+      border-radius: 10px;
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      min-width: 18px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(255,107,107,0.4);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      line-height: 1;
     }
 
     /* ===== Search Bar ===== */
     .search-container {
       position: relative;
-      margin: 0 20px;
+      margin: 0 24px;
       flex: 1;
       max-width: 400px;
     }
@@ -161,92 +138,92 @@
     .search-bar {
       display: flex;
       align-items: center;
-      background: rgba(255,255,255,0.15);
-      border-radius: 25px;
-      padding: 8px 20px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      transition: all 0.3s ease;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 8px 16px;
+      border: 1px solid #e5e5e5;
+      transition: all 0.2s ease;
     }
 
     .search-bar:focus-within {
-      background: rgba(255,255,255,0.25);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      transform: translateY(-1px);
+      background: #ffffff;
+      border-color: #000000;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
     }
 
     .search-bar input {
       background: transparent;
       border: none;
-      color: white;
+      color: #1a1a1a;
       padding: 8px 12px;
       outline: none;
       width: 100%;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .search-bar input::placeholder {
-      color: rgba(255,255,255,0.7);
+      color: #999999;
     }
 
     .search-bar button {
       background: transparent;
-      color: white;
+      color: #666666;
       border: none;
-      padding: 8px;
+      padding: 6px;
       cursor: pointer;
-      border-radius: 50%;
-      transition: all 0.3s ease;
+      border-radius: 4px;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .search-bar button:hover {
-      background: rgba(255,255,255,0.2);
-      transform: scale(1.1);
+      background: #e5e5e5;
+      color: #000000;
     }
 
     /* ===== User Menu ===== */
     .user-menu {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
     }
 
     .user-avatar {
       width: 40px;
       height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 8px;
+      background: #000000;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: 600;
-      border: 2px solid rgba(255,255,255,0.3);
+      border: 1px solid #e5e5e5;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
 
     .user-avatar:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      background: #333333;
     }
 
     .dropdown-menu {
       position: absolute;
       top: 100%;
-      right: 20px;
+      right: 24px;
       background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-      padding: 10px 0;
-      min-width: 200px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 8px 0;
+      min-width: 180px;
+      border: 1px solid #e5e5e5;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
+      transform: translateY(-8px);
+      transition: all 0.2s ease;
     }
 
     .dropdown-menu.show {
@@ -259,26 +236,26 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 20px;
-      color: #2d3748;
+      padding: 10px 16px;
+      color: #1a1a1a;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       border: none;
       background: none;
       width: 100%;
       text-align: left;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     .dropdown-item:hover {
-      background: #f7fafc;
-      color: #667eea;
+      background: #f8f9fa;
+      color: #000000;
     }
 
     .dropdown-divider {
       height: 1px;
-      background: #e2e8f0;
-      margin: 8px 0;
+      background: #e5e5e5;
+      margin: 6px 0;
     }
 
     /* ===== Mobile Menu ===== */
@@ -287,26 +264,27 @@
       flex-direction: column;
       cursor: pointer;
       padding: 8px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid #e5e5e5;
     }
 
     .menu-toggle:hover {
-      background: rgba(255,255,255,0.1);
+      background: #f8f9fa;
     }
 
     .menu-toggle span {
-      background: white;
-      height: 3px;
-      width: 25px;
-      margin: 3px 0;
-      border-radius: 3px;
+      background: #000000;
+      height: 2px;
+      width: 20px;
+      margin: 2px 0;
+      border-radius: 2px;
       transition: all 0.3s ease;
       transform-origin: center;
     }
 
     .menu-toggle.open span:nth-child(1) {
-      transform: rotate(45deg) translate(6px, 6px);
+      transform: rotate(45deg) translate(5px, 5px);
     }
 
     .menu-toggle.open span:nth-child(2) {
@@ -314,53 +292,75 @@
     }
 
     .menu-toggle.open span:nth-child(3) {
-      transform: rotate(-45deg) translate(6px, -6px);
+      transform: rotate(-45deg) translate(5px, -5px);
     }
 
     /* ===== Message Styles ===== */
     .message {
-      background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-      border-left: 4px solid #667eea;
+      background: #f8f9fa;
+      border-left: 4px solid #000000;
       padding: 16px 20px;
       margin: 20px auto;
-      border-radius: 12px;
+      border-radius: 6px;
       max-width: 900px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
       font-weight: 500;
+      border: 1px solid #e5e5e5;
     }
 
     /* ===== Footer ===== */
     footer {
-      background: linear-gradient(135deg, #2d3748, #4a5568);
-      color: white;
+      background: #000000;
+      color: #ffffff;
       text-align: center;
-      padding: 30px 20px;
+      padding: 24px 20px;
       margin-top: 60px;
     }
 
     footer p {
-      font-size: 1.1rem;
-      opacity: 0.9;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      min-height: calc(100vh - 140px);
+      padding: 24px;
+    }
+
+    /* ===== Enhanced Badge Styles ===== */
+    .nav-link {
+      position: relative;
+      padding-right: 35px !important;
+    }
+
+    .badge {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      border: 2px solid #ffffff;
+    }
+
+    .nav-link.active .badge {
+      border-color: #000000;
     }
 
     /* ===== Mobile Responsive ===== */
     @media (max-width: 1024px) {
       .navbar-container {
-        padding: 0 15px;
-        height: 65px;
+        padding: 0 20px;
       }
 
       .nav-links {
-        gap: 5px;
+        gap: 2px;
       }
 
       .nav-link {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+        padding: 10px 14px;
+        font-size: 0.85rem;
       }
 
       .search-container {
-        margin: 0 15px;
+        margin: 0 20px;
         max-width: 300px;
       }
     }
@@ -369,21 +369,22 @@
       .navbar-container {
         flex-wrap: wrap;
         height: auto;
-        padding: 15px;
+        padding: 16px;
       }
 
       .nav-links {
         display: none;
         flex-direction: column;
-        background: linear-gradient(135deg, #667eea, #764ba2);
+        background: #ffffff;
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        border-radius: 0 0 20px 20px;
-        gap: 10px;
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border: 1px solid #e5e5e5;
+        border-top: none;
+        gap: 4px;
       }
 
       .nav-links.active {
@@ -392,7 +393,7 @@
 
       .search-container {
         order: 3;
-        margin: 15px 0 0;
+        margin: 16px 0 0;
         max-width: 100%;
         width: 100%;
       }
@@ -406,242 +407,76 @@
       }
 
       .brand a {
-        font-size: 1.6rem;
+        font-size: 1.3rem;
       }
     }
-    /* ===== Enhanced Badge Styles ===== */
-.nav-link {
-  position: relative;
-  padding-right: 35px !important; /* Make space for badge */
-}
 
-.badge {
-  background: linear-gradient(135deg, #ff4757, #ff3742);
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
-  animation: pulse 2s infinite;
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  border: 2px solid white;
-  line-height: 1;
-}
-
-/* Different badge colors for different types */
-.nav-link[href*="skill_list"] .badge {
-  background: linear-gradient(135deg, #ffa502, #ff7e00);
-}
-
-.nav-link[href*="my_meetings"] .badge {
-  background: linear-gradient(135deg, #3742fa, #5352ed);
-}
-
-.nav-link[href*="skill_requests"] .badge {
-  background: linear-gradient(135deg, #2ed573, #1dd1a1);
-}
-
-.nav-link[href*="chat"] .badge {
-  background: linear-gradient(135deg, #ff4757, #ff3742);
-}
-
-@keyframes pulse {
-  0%, 100% { 
-    transform: scale(1); 
-    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
-  }
-  50% { 
-    transform: scale(1.1); 
-    box-shadow: 0 3px 12px rgba(255, 71, 87, 0.6);
-  }
-}
     @media (max-width: 480px) {
       .navbar-container {
         padding: 12px;
       }
 
       .brand a {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
       }
 
       .logo-icon {
-        font-size: 1.6rem;
+        font-size: 1.3rem;
         padding: 6px;
       }
 
       .user-avatar {
-        width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
       }
     }
 
-    /* ===== Main Content ===== */
-    main {
-      min-height: calc(100vh - 140px);
-      padding: 20px;
-    }
     /* ===== Enhanced Responsive Design ===== */
+    @media (max-width: 1100px) {
+      .nav-text {
+        display: none;
+      }
+      
+      .nav-link {
+        padding: 12px !important;
+        border-radius: 6px;
+        width: 44px;
+        height: 44px;
+        justify-content: center;
+      }
+      
+      .nav-icon {
+        font-size: 1.1rem;
+        margin: 0;
+      }
+      
+      .badge {
+        top: 6px;
+        right: 6px;
+        font-size: 0.65rem;
+        min-width: 16px;
+        height: 16px;
+      }
+    }
 
-/* Medium screens (tablets) */
-@media (max-width: 1100px) {
-  .nav-text {
-    display: none;
-  }
-  
-  .nav-link {
-    padding: 12px !important;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    justify-content: center;
-  }
-  
-  .nav-icon {
-    font-size: 1.2rem;
-    margin: 0;
-  }
-  
-  .badge {
-    top: 4px;
-    right: 4px;
-    font-size: 0.6rem;
-    min-width: 16px;
-    height: 16px;
-  }
-  
-  .search-container {
-    margin: 0 10px;
-    max-width: 250px;
-  }
-}
-
-/* Small tablets */
-@media (max-width: 900px) {
-  .navbar-container {
-    padding: 0 10px;
-  }
-  
-  .brand a {
-    font-size: 1.5rem;
-  }
-  
-  .logo-icon {
-    font-size: 1.7rem;
-  }
-  
-  .search-container {
-    max-width: 200px;
-  }
-  
-  .nav-link {
-    padding: 10px !important;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* Mobile - keep your existing mobile styles but enhance */
-@media (max-width: 768px) {
-  .nav-links {
-    gap: 15px;
-  }
-  
-  .nav-link {
-    width: auto !important;
-    height: auto !important;
-    border-radius: 12px !important;
-    padding: 12px 18px !important;
-    justify-content: flex-start;
-  }
-  
-  .nav-text {
-    display: inline !important;
-  }
-  
-  .search-container {
-    max-width: 100%;
-    margin: 15px 0 0;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 380px) {
-  .brand a {
-    font-size: 1.3rem;
-  }
-  
-  .logo-icon {
-    font-size: 1.4rem;
-    padding: 5px;
-  }
-  
-  .nav-link {
-    padding: 10px 15px !important;
-    font-size: 0.85rem;
-  }
-  
-  .nav-icon {
-    font-size: 1rem;
-  }
-}
-
-/* Ensure badges are visible in icon-only mode */
-.nav-link {
-  position: relative;
-  padding-right: 35px !important;
-}
-
-.badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  border: 2px solid white;
-  font-size: 0.7rem;
-  min-width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Hover tooltip for icon-only navigation */
-.nav-link[title] {
-  position: relative;
-}
-
-.nav-link[title]:hover::after {
-  content: attr(title);
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  z-index: 1001;
-}
-
-.nav-link[title]:hover::before {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 5px solid transparent;
-  border-bottom-color: rgba(0,0,0,0.8);
-}
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 8px;
+      }
+      
+      .nav-link {
+        width: auto !important;
+        height: auto !important;
+        border-radius: 6px !important;
+        padding: 12px 16px !important;
+        justify-content: flex-start;
+      }
+      
+      .nav-text {
+        display: inline !important;
+      }
+    }
   </style>
 </head>
 
@@ -649,10 +484,10 @@
   <header>
     <div class="navbar-container">
       <!-- Brand/Logo -->
-      <div class="brand" >
+      <div class="brand">
         <a href="{% url 'core:dashboard' %}">
-          <span class="logo-icon">🔄</span>
-          SmartSwap
+          <span class="logo-icon">SW</span>
+          SkillSwap
         </a>
       </div>
 
@@ -666,71 +501,71 @@
         </form>
       </div>
 
-      <!-- Updated Navigation Links -->
-<nav class="nav-links" id="navbar">
-  {% if user.is_authenticated %}
-    <a href="{% url 'core:dashboard' %}" class="nav-link">
-      <span class="nav-icon">📊</span>
-      Dashboard
-      {% if total_notifications > 0 %}
-        <span class="badge">{{ total_notifications }}</span>
-      {% endif %}
-    </a>
-    
-    <a href="{% url 'core:skill_list' %}" class="nav-link">
-      <span class="nav-icon">🛠️</span>
-      All Skills
-      {% if new_skills_count > 0 %}
-        <span class="badge">{{ new_skills_count }}</span>
-      {% endif %}
-    </a>
-    
-    <a href="{% url 'core:create_skill' %}" class="nav-link">
-      <span class="nav-icon">➕</span>
-      Add Skill
-    </a>
-    
-    <a href="{% url 'core:my_meetings' %}" class="nav-link">
-      <span class="nav-icon"><i class="fa-solid fa-calendar-days"></i></span>
-      My Meetings
-      {% if meeting_notifications_count > 0 %}
-        <span class="badge">{{ meeting_notifications_count }}</span>
-      {% endif %}
-    </a>
+      <!-- Navigation Links -->
+      <nav class="nav-links" id="navbar">
+        {% if user.is_authenticated %}
+          <a href="{% url 'core:dashboard' %}" class="nav-link" title="Dashboard">
+            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+            <span class="nav-text">Dashboard</span>
+            {% if total_notifications > 0 %}
+              <span class="badge">{{ total_notifications }}</span>
+            {% endif %}
+          </a>
+          
+          <a href="{% url 'core:skill_list' %}" class="nav-link" title="All Skills">
+            <span class="nav-icon"><i class="fas fa-tools"></i></span>
+            <span class="nav-text">All Skills</span>
+            {% if new_skills_count > 0 %}
+              <span class="badge">{{ new_skills_count }}</span>
+            {% endif %}
+          </a>
+          
+          <a href="{% url 'core:create_skill' %}" class="nav-link" title="Add Skill">
+            <span class="nav-icon"><i class="fas fa-plus"></i></span>
+            <span class="nav-text">Add Skill</span>
+          </a>
+          
+          <a href="{% url 'core:my_meetings' %}" class="nav-link" title="My Meetings">
+            <span class="nav-icon"><i class="fas fa-calendar"></i></span>
+            <span class="nav-text">My Meetings</span>
+            {% if meeting_notifications_count > 0 %}
+              <span class="badge">{{ meeting_notifications_count }}</span>
+            {% endif %}
+          </a>
 
-    <a href="{% url 'core:skill_requests' %}" class="nav-link">
-      <span class="nav-icon">📥</span>
-      Requests
-      {% if skill_requests_count > 0 %}
-        <span class="badge">{{ skill_requests_count }}</span>
-      {% endif %}
-    </a>
+          <a href="{% url 'core:skill_requests' %}" class="nav-link" title="Requests">
+            <span class="nav-icon"><i class="fas fa-inbox"></i></span>
+            <span class="nav-text">Requests</span>
+            {% if skill_requests_count > 0 %}
+              <span class="badge">{{ skill_requests_count }}</span>
+            {% endif %}
+          </a>
 
-    <a href="{% url 'core:chat_dashboard' %}" class="nav-link">
-      <span class="nav-icon">💬</span>
-      Inbox
-      {% if unread_count > 0 %}
-        <span class="badge">{{ unread_count }}</span>
-      {% endif %}
-    </a>
-    
-    {% if user.is_staff %}
-      <a href="{% url 'core:admin_dashboard' %}" class="nav-link">
-        <span class="nav-icon">⚡</span>
-        Admin
-      </a>
-    {% endif %}
-  {% else %}
-    <a href="{% url 'core:login' %}" class="nav-link">
-      <span class="nav-icon">🔑</span>
-      Login
-    </a>
-    <a href="{% url 'core:register' %}" class="nav-link">
-      <span class="nav-icon">👤</span>
-      Register
-    </a>
-  {% endif %}
-</nav>
+          <a href="{% url 'core:chat_dashboard' %}" class="nav-link" title="Inbox">
+            <span class="nav-icon"><i class="fas fa-comments"></i></span>
+            <span class="nav-text">Inbox</span>
+            {% if unread_count > 0 %}
+              <span class="badge">{{ unread_count }}</span>
+            {% endif %}
+          </a>
+          
+          {% if user.is_staff %}
+            <a href="{% url 'core:admin_dashboard' %}" class="nav-link" title="Admin">
+              <span class="nav-icon"><i class="fas fa-cog"></i></span>
+              <span class="nav-text">Admin</span>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'core:login' %}" class="nav-link" title="Login">
+            <span class="nav-icon"><i class="fas fa-sign-in-alt"></i></span>
+            <span class="nav-text">Login</span>
+          </a>
+          <a href="{% url 'core:register' %}" class="nav-link" title="Register">
+            <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+            <span class="nav-text">Register</span>
+          </a>
+        {% endif %}
+      </nav>
 
       <!-- User Menu -->
       {% if user.is_authenticated %}
@@ -777,7 +612,7 @@
   </main>
 
   <footer>
-    <p>SmartSwap &copy; {{ now|date:"Y" }} | 2025 Empowering People Through Shared Skills</p>
+    <p>SkillSwap &copy; {{ now|date:"Y" }} | Empowering People Through Shared Skills</p>
   </footer>
 
   <script>
