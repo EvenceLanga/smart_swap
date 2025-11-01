@@ -1,10 +1,146 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>Delete Review</h2>
-  <p>Are you sure you want to delete your review?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, Delete</button>
-    <a href="{% url 'core:skill_detail' review.skill.id %}">Cancel</a>
-  </form>
+
+<style>
+.confirmation-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+.confirmation-card {
+  background: #ffffff;
+  padding: 50px 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  text-align: center;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.confirmation-header {
+  background: #000000;
+  color: #ffffff;
+  padding: 30px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.confirmation-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: #ffffff;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.confirmation-content {
+  margin-bottom: 30px;
+}
+
+.confirmation-content p {
+  font-size: 1.1rem;
+  color: #666666;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-danger {
+  background: #000000;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: #ffffff;
+  color: #000000;
+}
+
+.btn-cancel:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+</style>
+
+<div class="confirmation-container">
+  <div class="confirmation-card">
+    <div class="confirmation-header">
+      <h2>Delete Review</h2>
+    </div>
+    
+    <div class="confirmation-content">
+      <p>Are you sure you want to delete your review?</p>
+      <p style="font-size: 0.9rem; color: #999999; margin-top: 10px;">
+        This action cannot be undone.
+      </p>
+    </div>
+    
+    <form method="post" class="confirmation-actions">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <a href="{% url 'core:skill_detail' review.skill.id %}" class="btn btn-cancel">Cancel</a>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

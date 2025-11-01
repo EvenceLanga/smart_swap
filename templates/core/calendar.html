@@ -1,0 +1,700 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+.calendar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.calendar-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-primary {
+    background: #000;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #333;
+    color: white;
+    text-decoration: none;
+}
+
+/* Month Navigation */
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.month-year {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000;
+}
+
+.nav-btn {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #000;
+    color: white;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.calendar-header-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #000;
+    color: white;
+}
+
+.calendar-day-header {
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.calendar-day-header:last-child {
+    border-right: none;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 1px;
+    background: #e5e5e5;
+}
+
+.calendar-day {
+    background: white;
+    min-height: 120px;
+    padding: 10px;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.calendar-day.other-month {
+    background: #f8f9fa;
+    color: #999;
+}
+
+.calendar-day.today {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+}
+
+.calendar-day.has-meetings {
+    background: #f0f8ff;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.meetings-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.meeting-item {
+    background: #000;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+    display: block;
+}
+
+.meeting-item:hover {
+    background: #333;
+    transform: translateX(2px);
+    text-decoration: none;
+    color: white;
+}
+
+.meeting-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.more-meetings {
+    background: #666;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    text-align: center;
+    margin-top: 2px;
+}
+
+/* List View */
+.meetings-list {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: none;
+}
+
+.meeting-card {
+    padding: 20px;
+    border-bottom: 1px solid #e5e5e5;
+    transition: all 0.2s ease;
+}
+
+.meeting-card:hover {
+    background: #f8f9fa;
+}
+
+.meeting-card:last-child {
+    border-bottom: none;
+}
+
+.meeting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.meeting-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+}
+
+.meeting-time {
+    color: #666;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meeting-details {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.meeting-participants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.participant-tag {
+    background: #e9ecef;
+    color: #495057;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+/* View Toggle */
+.view-toggle {
+    display: flex;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+
+.view-option {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-option.active {
+    background: #000;
+    color: white;
+}
+
+/* Meeting colors for different types */
+.meeting-in-person { background: #000; }
+.meeting-virtual { background: #dc2626; }
+.meeting-hybrid { background: #059669; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 15px;
+    }
+    
+    .calendar-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .calendar-actions {
+        justify-content: center;
+    }
+    
+    .month-navigation {
+        padding: 0 10px;
+    }
+    
+    .calendar-day {
+        min-height: 100px;
+        padding: 8px 5px;
+    }
+    
+    .day-number {
+        font-size: 0.9rem;
+    }
+    
+    .meeting-item {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+    }
+    
+    .meeting-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-day-header {
+        padding: 10px 5px;
+        font-size: 0.7rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+    }
+    
+    .meeting-item span {
+        display: none;
+    }
+    
+    .meeting-item {
+        padding: 4px;
+        text-align: center;
+    }
+    
+    .day-number {
+        text-align: center;
+    }
+}
+</style>
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h1 class="calendar-title">
+            <i class="fas fa-calendar-alt"></i>
+            My Meetings Calendar
+        </h1>
+        <div class="calendar-actions">
+            <a href="{% url 'core:schedule_meeting' %}" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                Schedule New Meeting
+            </a>
+        </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="view-toggle">
+        <button class="view-option active" data-view="calendar">
+            <i class="fas fa-calendar"></i> Calendar View
+        </button>
+        <button class="view-option" data-view="list">
+            <i class="fas fa-list"></i> List View
+        </button>
+    </div>
+
+    <!-- Calendar View -->
+    <div id="calendar-view" class="calendar-view">
+        <!-- Month Navigation -->
+        <div class="month-navigation">
+            <button class="nav-btn prev-month">
+                <i class="fas fa-chevron-left"></i> Prev
+            </button>
+            <div class="month-year" id="current-month-year">November 2024</div>
+            <button class="nav-btn next-month">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid">
+            <!-- Calendar Header -->
+            <div class="calendar-header-row">
+                <div class="calendar-day-header">SUN</div>
+                <div class="calendar-day-header">MON</div>
+                <div class="calendar-day-header">TUE</div>
+                <div class="calendar-day-header">WED</div>
+                <div class="calendar-day-header">THU</div>
+                <div class="calendar-day-header">FRI</div>
+                <div class="calendar-day-header">SAT</div>
+            </div>
+
+            <!-- Calendar Body -->
+            <div class="calendar-body" id="calendar-body">
+                <!-- Calendar days will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- List View -->
+    <div id="list-view" class="meetings-list">
+        {% if meetings %}
+            {% for meeting in meetings %}
+            <div class="meeting-card">
+                <div class="meeting-header">
+                    <h3 class="meeting-title">{{ meeting.title }}</h3>
+                    <div class="meeting-time">
+                        <i class="fas fa-clock"></i>
+                        {{ meeting.scheduled_date|date:"M j, Y" }} at {{ meeting.scheduled_date|time:"g:i A" }}
+                    </div>
+                </div>
+                
+                <div class="meeting-details">
+                    {% if meeting.location %}
+                    <div>
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{ meeting.location|truncatewords:8 }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if meeting.meeting_type %}
+                    <div>
+                        <i class="fas fa-video"></i>
+                        {{ meeting.get_meeting_type_display }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if meeting.related_skill %}
+                    <div>
+                        <i class="fas fa-tools"></i>
+                        {{ meeting.related_skill.title }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if meeting.participants.all %}
+                <div class="meeting-participants">
+                    <strong>Participants:</strong>
+                    {% for participant in meeting.participants.all %}
+                        {% if participant != request.user %}
+                        <span class="participant-tag">
+                            {{ participant.get_full_name|default:participant.username }}
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <a href="{% url 'core:meeting_detail' meeting.id %}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <h3>No Meetings Scheduled</h3>
+                <p>You don't have any meetings scheduled yet.</p>
+                <a href="{% url 'core:schedule_meeting' %}" class="btn-primary" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i> Schedule Your First Meeting
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentDate = new Date();
+    
+    // Convert Django meetings to JavaScript format
+    const meetingsData = [
+        {% for meeting in meetings %}
+        {
+            id: {{ meeting.id }},
+            title: "{{ meeting.title|escapejs }}",
+            date: new Date("{{ meeting.scheduled_date|date:'c' }}"),
+            meeting_type: "{{ meeting.meeting_type }}",
+            location: "{{ meeting.location|escapejs }}",
+            url: "{% url 'core:meeting_detail' meeting.id %}"
+        },
+        {% endfor %}
+    ];
+    
+    // View Toggle
+    const viewOptions = document.querySelectorAll('.view-option');
+    const calendarView = document.getElementById('calendar-view');
+    const listView = document.getElementById('list-view');
+    
+    viewOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const view = this.dataset.view;
+            
+            // Update active state
+            viewOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show/hide views
+            if (view === 'calendar') {
+                calendarView.style.display = 'block';
+                listView.style.display = 'none';
+                renderCalendar();
+            } else {
+                calendarView.style.display = 'none';
+                listView.style.display = 'block';
+            }
+        });
+    });
+    
+    // Month Navigation
+    const prevMonthBtn = document.querySelector('.prev-month');
+    const nextMonthBtn = document.querySelector('.next-month');
+    const currentMonthYear = document.getElementById('current-month-year');
+    
+    prevMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+    
+    nextMonthBtn.addEventListener('click', function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+    
+    // Calendar rendering function
+    function renderCalendar() {
+        const calendarBody = document.getElementById('calendar-body');
+        const today = new Date();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+        
+        // Update month/year display
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        currentMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        
+        // Get first day of month and number of days
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        
+        // Clear previous calendar
+        calendarBody.innerHTML = '';
+        
+        // Add empty days for previous month
+        const daysFromPrevMonth = startingDay;
+        const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+        
+        for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
+            const day = prevMonthLastDay - i;
+            const date = new Date(currentYear, currentMonth - 1, day);
+            const dayElement = createDayElement(day, date, true, false);
+            calendarBody.appendChild(dayElement);
+        }
+        
+        // Add days of current month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(currentYear, currentMonth, day);
+            const isToday = date.toDateString() === today.toDateString();
+            const dayElement = createDayElement(day, date, false, isToday);
+            calendarBody.appendChild(dayElement);
+        }
+        
+        // Add empty days for next month to complete the grid (42 cells total)
+        const totalCells = 42; // 6 rows × 7 days
+        const remainingCells = totalCells - (daysFromPrevMonth + daysInMonth);
+        
+        for (let day = 1; day <= remainingCells; day++) {
+            const date = new Date(currentYear, currentMonth + 1, day);
+            const dayElement = createDayElement(day, date, true, false);
+            calendarBody.appendChild(dayElement);
+        }
+    }
+    
+    function createDayElement(dayNumber, date, isOtherMonth, isToday) {
+        const dayElement = document.createElement('div');
+        dayElement.className = `calendar-day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`;
+        
+        // Find meetings for this day
+        const dayMeetings = meetingsData.filter(meeting => {
+            const meetingDate = new Date(meeting.date);
+            return meetingDate.getDate() === date.getDate() &&
+                   meetingDate.getMonth() === date.getMonth() &&
+                   meetingDate.getFullYear() === date.getFullYear();
+        });
+        
+        if (dayMeetings.length > 0 && !isOtherMonth) {
+            dayElement.classList.add('has-meetings');
+        }
+        
+        let meetingsHTML = '';
+        if (dayMeetings.length > 0 && !isOtherMonth) {
+            // Show up to 2 meetings, then "more" indicator
+            const meetingsToShow = dayMeetings.slice(0, 2);
+            const extraMeetings = dayMeetings.length - 2;
+            
+            meetingsToShow.forEach(meeting => {
+                const meetingClass = `meeting-${meeting.meeting_type}`.toLowerCase().replace('_', '-');
+                meetingsHTML += `
+                    <a href="${meeting.url}" class="meeting-item ${meetingClass}">
+                        <span>${meeting.title}</span>
+                    </a>
+                `;
+            });
+            
+            if (extraMeetings > 0) {
+                meetingsHTML += `<div class="more-meetings">+${extraMeetings} more</div>`;
+            }
+        }
+        
+        dayElement.innerHTML = `
+            <div class="day-number">${dayNumber}</div>
+            <div class="meetings-container">
+                ${meetingsHTML}
+            </div>
+        `;
+        
+        // Make the entire day clickable to view day details
+        if (!isOtherMonth) {
+            dayElement.style.cursor = 'pointer';
+            dayElement.addEventListener('click', function(e) {
+                // Don't trigger if clicking on a meeting link
+                if (!e.target.closest('.meeting-item')) {
+                    viewDayDetails(date, dayMeetings);
+                }
+            });
+        }
+        
+        return dayElement;
+    }
+    
+    function viewDayDetails(date, meetings) {
+        if (meetings.length === 1) {
+            // If only one meeting, go directly to it
+            window.location.href = meetings[0].url;
+        } else if (meetings.length > 1) {
+            // If multiple meetings, show a simple popup or go to first meeting
+            // For now, let's go to the first meeting
+            window.location.href = meetings[0].url;
+        } else {
+            // If no meetings, you could show a "schedule meeting" prompt
+            const schedule = confirm(`No meetings on ${date.toDateString()}. Would you like to schedule one?`);
+            if (schedule) {
+                window.location.href = "{% url 'core:schedule_meeting' %}";
+            }
+        }
+    }
+    
+    // Initialize calendar
+    renderCalendar();
+});
+</script>
+
+{% endblock %}

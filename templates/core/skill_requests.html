@@ -6,23 +6,39 @@
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
+  background: #000000;
+  color: #ffffff;
+  padding: 40px 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .dashboard-header h2 {
   margin: 0;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .requests-grid {
@@ -33,45 +49,49 @@
 }
 
 .requests-section {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  background: #ffffff;
+  padding: 0;
+  margin-bottom: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .section-header {
-  color: #2c3e50;
+  color: #000000;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 300;
   margin-bottom: 25px;
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 2px solid #f8f9fa;
-  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 30px 30px 15px 30px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .request-card {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin: 0 30px 20px 30px;
   transition: all 0.3s ease;
-  border-left: 4px solid #667eea;
+  border-left: 2px solid #000000;
 }
 
 .request-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  border-color: #000000;
 }
 
 .request-title {
   font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 400;
+  color: #000000;
   margin-bottom: 10px;
+  letter-spacing: 0.5px;
 }
 
 .request-meta {
@@ -85,42 +105,50 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #555;
+  color: #666666;
   font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .status-badge {
   padding: 4px 12px;
-  border-radius: 20px;
+  border: 1px solid;
+  border-radius: 1px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
-  display: inline-block;
+  letter-spacing: 0.5px;
 }
 
 .status-pending {
-  background: #fff3cd;
-  color: #856404;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .status-approved {
-  background: #d4edda;
-  color: #155724;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .status-rejected {
-  background: #f8d7da;
-  color: #721c24;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .status-in-progress {
-  background: #cce7ff;
-  color: #004085;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .status-completed {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .request-actions {
@@ -131,47 +159,64 @@
 
 .btn-accept, .btn-reject, .btn-view {
   padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 400;
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-accept {
-  background: #28a745;
-  color: white;
+  background: #000000;
+  color: #ffffff;
 }
 
 .btn-reject {
-  background: #dc3545;
-  color: white;
+  background: #ffffff;
+  color: #000000;
 }
 
 .btn-view {
-  background: #667eea;
-  color: white;
+  background: #000000;
+  color: #ffffff;
 }
 
-.btn-accept:hover, .btn-reject:hover, .btn-view:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+.btn-accept:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.btn-reject:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.btn-view:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 10px;
+  color: #666666;
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 1px;
+  margin: 0 30px 20px 30px;
 }
 
-.empty-state i {
+.empty-state div {
   font-size: 3rem;
   margin-bottom: 15px;
   opacity: 0.5;
@@ -180,6 +225,40 @@
 .empty-state p {
   font-size: 1.1rem;
   margin-bottom: 10px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
 }
 
 /* Mobile Responsive */
@@ -192,11 +271,11 @@
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 15px;
+    padding: 30px 15px;
   }
   
   .dashboard-header {
-    padding: 25px 20px;
+    padding: 30px 25px;
   }
   
   .dashboard-header h2 {
@@ -204,11 +283,18 @@
   }
   
   .requests-section {
-    padding: 20px;
+    margin: 0;
+    border-left: none;
+    border-right: none;
   }
   
   .section-header {
     font-size: 1.3rem;
+    padding: 20px 20px 15px 20px;
+  }
+  
+  .request-card {
+    margin: 0 20px 20px 20px;
   }
   
   .request-actions {
@@ -219,6 +305,10 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .empty-state {
+    margin: 0 20px 20px 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -228,10 +318,28 @@
   
   .request-card {
     padding: 15px;
+    margin: 0 15px 15px 15px;
   }
   
   .request-title {
     font-size: 1.1rem;
+  }
+}
+
+/* Focus states for accessibility */
+.btn-accept:focus,
+.btn-reject:focus,
+.btn-view:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
@@ -239,14 +347,14 @@
 <div class="dashboard-container">
   <!-- Dashboard Header -->
   <div class="dashboard-header">
-    <h2>🔁 My Skill Requests</h2>
+    <h2>My Skill Requests</h2>
   </div>
 
   <div class="requests-grid">
     <!-- Requests I've Made -->
     <div class="requests-section">
       <div class="section-header">
-        <span>📤 Requests I've Sent</span>
+        <span>Requests I've Sent</span>
       </div>
 
       {% if requests_made %}
@@ -257,28 +365,28 @@
             </div>
             <div class="request-meta">
               <div class="meta-item">
-                <span>📊 Status:</span>
+                <span>Status:</span>
                 <span class="status-badge status-{{ request.status|lower }}">
                   {{ request.status }}
                 </span>
               </div>
               <div class="meta-item">
-                <span>👤 Teacher:</span>
+                <span>Teacher:</span>
                 <span>{{ request.skill.owner.username }}</span>
               </div>
               <div class="meta-item">
-                <span>📅 Requested:</span>
+                <span>Requested:</span>
                 <span>{{ request.created_at|date:"M j, Y" }}</span>
               </div>
             </div>
             <div class="request-actions">
               <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
-                👀 View Skill
+                View Skill
               </a>
               {% if request.status == 'IN_PROGRESS' %}
                 <a href="{% url 'core:complete_skill_session' request.id %}" class="btn-accept"
                    onclick="return confirm('Mark this skill session as completed?')">
-                  ✅ Complete Session
+                  Complete Session
                 </a>
               {% endif %}
             </div>
@@ -286,11 +394,11 @@
         {% endfor %}
       {% else %}
         <div class="empty-state">
-          <i>📤</i>
+          <div>📤</div>
           <p>No requests sent yet</p>
-          <p>Browse skills and send requests to start learning!</p>
+          <p>Browse skills and send requests to start learning</p>
           <a href="{% url 'core:skill_list' %}" class="btn-view" style="margin-top: 15px;">
-            🔍 Browse Skills
+            Browse Skills
           </a>
         </div>
       {% endif %}
@@ -299,7 +407,7 @@
     <!-- Requests I've Received -->
     <div class="requests-section">
       <div class="section-header">
-        <span>📥 Requests I've Received</span>
+        <span>Requests I've Received</span>
       </div>
 
       {% if requests_received %}
@@ -310,17 +418,17 @@
             </div>
             <div class="request-meta">
               <div class="meta-item">
-                <span>📊 Status:</span>
+                <span>Status:</span>
                 <span class="status-badge status-{{ request.status|lower }}">
                   {{ request.status }}
                 </span>
               </div>
               <div class="meta-item">
-                <span>👤 From:</span>
+                <span>From:</span>
                 <span>{{ request.requester.username }}</span>
               </div>
               <div class="meta-item">
-                <span>📅 Received:</span>
+                <span>Received:</span>
                 <span>{{ request.created_at|date:"M j, Y" }}</span>
               </div>
             </div>
@@ -329,40 +437,40 @@
               <div class="request-actions">
                 <a href="{% url 'core:accept_request' request.id %}" class="btn-accept"
                    onclick="return confirm('Accept this skill request from {{ request.requester.username }}?')">
-                  ✅ Accept
+                  Accept
                 </a>
                 <a href="{% url 'core:reject_request' request.id %}" class="btn-reject"
                    onclick="return confirm('Reject this skill request from {{ request.requester.username }}?')">
-                  ❌ Reject
+                  Reject
                 </a>
                 <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
-                  👀 View Skill
+                  View Skill
                 </a>
               </div>
             {% elif request.status == 'APPROVED' %}
               <div class="request-actions">
                 <a href="{% url 'core:start_skill_session' request.id %}" class="btn-accept"
                    onclick="return confirm('Start skill session with {{ request.requester.username }}?')">
-                  🚀 Start Session
+                  Start Session
                 </a>
                 <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
-                  👀 View Skill
+                  View Skill
                 </a>
               </div>
             {% elif request.status == 'IN_PROGRESS' %}
               <div class="request-actions">
                 <a href="{% url 'core:complete_skill_session' request.id %}" class="btn-accept"
                    onclick="return confirm('Mark this skill session as completed?')">
-                  ✅ Complete Session
+                  Complete Session
                 </a>
                 <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
-                  👀 View Skill
+                  View Skill
                 </a>
               </div>
             {% else %}
               <div class="request-actions">
                 <a href="{% url 'core:skill_detail' request.skill.id %}" class="btn-view">
-                  👀 View Skill
+                  View Skill
                 </a>
               </div>
             {% endif %}
@@ -370,11 +478,11 @@
         {% endfor %}
       {% else %}
         <div class="empty-state">
-          <i>📥</i>
+          <div>📥</div>
           <p>No requests received yet</p>
           <p>When users request your skills, they'll appear here</p>
           <a href="{% url 'core:create_skill' %}" class="btn-view" style="margin-top: 15px;">
-            ➕ Add More Skills
+            Add More Skills
           </a>
         </div>
       {% endif %}

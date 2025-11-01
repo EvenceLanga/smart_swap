@@ -7,49 +7,46 @@
 .profile-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 40px 30px;
-  border-radius: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  text-align: center;
+  margin-bottom: 40px;
   position: relative;
   overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
 }
 
-.profile-header::before {
+.profile-header::after {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  animation: float 20s linear infinite;
-}
-
-@keyframes float {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  100% { transform: translate(-20px, -20px) rotate(360deg); }
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .profile-header h2 {
   margin: 0 0 10px 0;
   font-size: 2.5rem;
-  font-weight: 800;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .profile-subtitle {
   font-size: 1.2rem;
   opacity: 0.9;
   font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .profile-content {
@@ -60,37 +57,38 @@
 }
 
 .profile-sidebar {
-  background: white;
+  background: #ffffff;
   padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   text-align: center;
   height: fit-content;
   position: sticky;
   top: 20px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .profile-main {
-  background: white;
+  background: #ffffff;
   padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.7s both;
 }
 
 .profile-pic {
   width: 150px;
   height: 150px;
-  border-radius: 50%;
+  border-radius: 1px;
   object-fit: cover;
   margin: 0 auto 20px;
-  border: 5px solid #fff;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  border: 1px solid #e0e0e0;
   transition: all 0.3s ease;
 }
 
 .profile-pic:hover {
-  transform: scale(1.05);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  transform: scale(1.02);
+  border-color: #000000;
 }
 
 .profile-stats {
@@ -101,25 +99,28 @@
 }
 
 .stat-item {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  background: #fafafa;
   padding: 15px;
-  border-radius: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   text-align: center;
-  border: 1px solid #e9ecef;
 }
 
 .stat-number {
   display: block;
   font-size: 1.8rem;
-  font-weight: 700;
-  color: #667eea;
+  font-weight: 400;
+  color: #000000;
   margin-bottom: 5px;
+  letter-spacing: 0.5px;
 }
 
 .stat-label {
   font-size: 0.85rem;
-  color: #6c757d;
-  font-weight: 500;
+  color: #666666;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .profile-info {
@@ -133,21 +134,15 @@
   gap: 12px;
   margin-bottom: 15px;
   padding: 12px;
-  background: #f8f9fa;
-  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   transition: all 0.3s ease;
 }
 
 .info-item:hover {
-  background: #e9ecef;
+  border-color: #000000;
   transform: translateX(5px);
-}
-
-.info-icon {
-  width: 20px;
-  text-align: center;
-  color: #667eea;
-  font-size: 1.1rem;
 }
 
 .info-content {
@@ -156,38 +151,70 @@
 
 .info-label {
   font-size: 0.85rem;
-  color: #6c757d;
-  font-weight: 500;
+  color: #666666;
+  font-weight: 300;
   margin-bottom: 2px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .info-value {
   font-size: 1rem;
-  color: #2c3e50;
-  font-weight: 600;
+  color: #000000;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .btn-edit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 12px 30px;
-  border: none;
-  border-radius: 50px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   width: 100%;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
 }
 
 .btn-edit:hover {
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  color: white;
+}
+
+.btn-danger {
+  background: #ffffff;
+  color: #000000;
+  padding: 12px 30px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-color: #666666;
+  color: #666666;
+}
+
+.btn-danger:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+  border-color: #000000;
 }
 
 .section {
@@ -204,28 +231,28 @@
   gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #f8f9fa;
-}
-
-.section-icon {
-  font-size: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .section-title {
   font-size: 1.4rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 300;
+  color: #000000;
   margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .bio-content {
-  background: #f8f9fa;
+  background: #fafafa;
   padding: 20px;
-  border-radius: 15px;
-  border-left: 4px solid #667eea;
+  border-radius: 1px;
+  border-left: 2px solid #000000;
   line-height: 1.6;
-  color: #495057;
+  color: #000000;
   font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .skills-grid {
@@ -235,17 +262,16 @@
 }
 
 .skill-category {
-  background: #f8f9fa;
+  background: #fafafa;
   padding: 25px;
-  border-radius: 15px;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   transition: all 0.3s ease;
 }
 
 .skill-category:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  border-color: #000000;
 }
 
 .category-header {
@@ -255,21 +281,21 @@
   margin-bottom: 15px;
 }
 
-.category-icon {
-  font-size: 1.3rem;
-}
-
 .category-title {
   font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 400;
+  color: #000000;
   margin: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .skill-content {
-  color: #495057;
+  color: #000000;
   line-height: 1.5;
   font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .reviews-list {
@@ -279,17 +305,16 @@
 }
 
 .review-item {
-  background: #f8f9fa;
+  background: #fafafa;
   padding: 20px;
-  border-radius: 15px;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   transition: all 0.3s ease;
 }
 
 .review-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  border-color: #667eea;
+  border-color: #000000;
 }
 
 .review-header {
@@ -306,38 +331,44 @@
 }
 
 .reviewer-name {
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 400;
+  color: #000000;
   font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 .rating-stars {
-  color: #ffc107;
+  color: #000000;
   font-size: 1.1rem;
   margin-left: 5px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .review-time {
-  color: #6c757d;
+  color: #666666;
   font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .review-comment {
-  color: #495057;
+  color: #000000;
   line-height: 1.5;
-  font-style: italic;
   margin: 0;
   padding-left: 10px;
-  border-left: 3px solid #667eea;
+  border-left: 2px solid #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 15px;
-  border: 2px dashed #dee2e6;
+  color: #666666;
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 1px;
 }
 
 .empty-state-icon {
@@ -349,6 +380,8 @@
 .empty-state p {
   font-size: 1.1rem;
   margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .contact-actions {
@@ -359,13 +392,13 @@
 
 .btn-contact {
   flex: 1;
-  background: #28a745;
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -373,22 +406,253 @@
   justify-content: center;
   text-align: center;
   font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-contact:hover {
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-  color: white;
 }
 
-.btn-message {
-  background: #007bff;
+.badge-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #000000;
+  color: #ffffff;
+  padding: 4px 10px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  margin-left: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-.btn-message:hover {
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+.member-since {
+  background: #fafafa;
+  color: #000000;
+  padding: 8px 15px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-size: 0.85rem;
+  font-weight: 400;
+  display: inline-block;
+  margin-top: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
+/* Account Deletion Modal Styles */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  padding: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  max-width: 500px;
+  width: 90%;
+  animation: modalSlideIn 0.3s ease;
+}
+
+.modal-header {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: #000000;
+  margin: 0 0 10px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.modal-subtitle {
+  color: #666666;
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.modal-body {
+  margin-bottom: 30px;
+}
+
+.warning-text {
+  background: #fafafa;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  margin-bottom: 20px;
+}
+
+.warning-text p {
+  margin: 0 0 15px 0;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: #000000;
+}
+
+.warning-text ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #666666;
+}
+
+.warning-text li {
+  margin-bottom: 8px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.confirmation-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+}
+
+.confirmation-input:focus {
+  border-color: #000000;
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-cancel {
+  background: #ffffff;
+  color: #000000;
+  padding: 12px 30px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #fafafa;
+  transform: translateY(-2px);
+}
+
+.btn-confirm-delete {
+  background: #000000;
+  color: #ffffff;
+  padding: 12px 30px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  text-decoration: none;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+}
+
+.btn-confirm-delete:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.btn-confirm-delete:disabled {
+  background: #666666;
+  border-color: #666666;
+  color: #ffffff;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .profile-content {
     grid-template-columns: 1fr;
@@ -416,15 +680,24 @@
   .contact-actions {
     flex-direction: column;
   }
+  
+  .modal-content {
+    padding: 30px 20px;
+    width: 95%;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 10px;
+    padding: 30px 15px;
   }
   
   .profile-header {
-    padding: 30px 20px;
+    padding: 30px 25px;
   }
   
   .profile-header h2 {
@@ -442,33 +715,23 @@
   }
 }
 
-.badge-online {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: #28a745;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 10px;
+/* Focus states for accessibility */
+.btn-edit:focus,
+.btn-contact:focus,
+.btn-danger:focus,
+.btn-cancel:focus,
+.btn-confirm-delete:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
 }
 
-.badge-online::before {
-  content: '●';
-  font-size: 0.7rem;
-}
-
-.member-since {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #856404;
-  padding: 8px 15px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  display: inline-block;
-  margin-top: 10px;
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>
 
@@ -531,7 +794,6 @@
       <!-- Basic Info -->
       <div class="profile-info">
         <div class="info-item">
-          <span class="info-icon">👤</span>
           <div class="info-content">
             <div class="info-label">Username</div>
             <div class="info-value">@{{ profile_user.username }}</div>
@@ -539,7 +801,6 @@
         </div>
         
         <div class="info-item">
-          <span class="info-icon">📧</span>
           <div class="info-content">
             <div class="info-label">Email</div>
             <div class="info-value">{{ profile_user.email }}</div>
@@ -548,7 +809,6 @@
         
         {% if profile.course %}
         <div class="info-item">
-          <span class="info-icon">🎓</span>
           <div class="info-content">
             <div class="info-label">Course</div>
             <div class="info-value">{{ profile.course }}</div>
@@ -558,7 +818,6 @@
         
         {% if profile.year %}
         <div class="info-item">
-          <span class="info-icon">📅</span>
           <div class="info-content">
             <div class="info-label">Year</div>
             <div class="info-value">{{ profile.year }}</div>
@@ -569,23 +828,23 @@
 
       <!-- Member Since Badge -->
       <div class="member-since">
-        🎉 Member since {{ profile_user.date_joined|date:"M Y" }}
+        Member since {{ profile_user.date_joined|date:"M Y" }}
       </div>
 
       <!-- Action Buttons -->
       {% if user == profile_user %}
         <a href="{% url 'core:edit_profile' %}" class="btn-edit">
-          <span>✏️</span>
           Edit Profile
         </a>
+        <button class="btn-danger" onclick="openDeleteModal()">
+          Delete Account
+        </button>
       {% else %}
         <div class="contact-actions">
-          <a href="{% url 'core:chat_dashboard' %}?user={{ profile_user.username }}" class="btn-contact btn-message">
-            <span>💬</span>
+          <a href="{% url 'core:chat_dashboard' %}?user={{ profile_user.username }}" class="btn-contact">
             Send Message
           </a>
           <a href="{% url 'core:skill_list' %}?q={{ profile_user.username }}" class="btn-contact">
-            <span>🛠️</span>
             View Skills
           </a>
         </div>
@@ -597,7 +856,6 @@
       <!-- Bio Section -->
       <div class="section">
         <div class="section-header">
-          <span class="section-icon">📝</span>
           <h3 class="section-title">About Me</h3>
         </div>
         <div class="bio-content">
@@ -608,13 +866,11 @@
       <!-- Skills Section -->
       <div class="section">
         <div class="section-header">
-          <span class="section-icon">🛠️</span>
           <h3 class="section-title">Skills & Expertise</h3>
         </div>
         <div class="skills-grid">
           <div class="skill-category">
             <div class="category-header">
-              <span class="category-icon">🎯</span>
               <h4 class="category-title">Skills I Can Teach</h4>
             </div>
             <div class="skill-content">
@@ -624,7 +880,6 @@
           
           <div class="skill-category">
             <div class="category-header">
-              <span class="category-icon">🎓</span>
               <h4 class="category-title">Skills I Want to Learn</h4>
             </div>
             <div class="skill-content">
@@ -637,7 +892,6 @@
       <!-- Reviews Section -->
       <div class="section">
         <div class="section-header">
-          <span class="section-icon">⭐</span>
           <h3 class="section-title">Ratings & Reviews</h3>
         </div>
         
@@ -650,7 +904,7 @@
                     <span class="reviewer-name">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
                     <span class="rating-stars">
                       {% with ''|center:review.rating as range %}
-                        {% for _ in range %}⭐{% endfor %}
+                        {% for _ in range %}{% endfor %}
                       {% endwith %}
                       ({{ review.rating }}/5)
                     </span>
@@ -672,5 +926,101 @@
     </div>
   </div>
 </div>
+
+<!-- Account Deletion Modal -->
+<div id="deleteModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Delete Account</h3>
+      <p class="modal-subtitle">This action cannot be undone</p>
+    </div>
+    
+    <div class="modal-body">
+      <div class="warning-text">
+        <p><strong>Warning: You are about to permanently delete your account.</strong></p>
+        <p>This will immediately:</p>
+        <ul>
+          <li>Delete all your skills and skill requests</li>
+          <li>Remove all your reviews and ratings</li>
+          <li>Delete your message history</li>
+          <li>Cancel all your scheduled meetings</li>
+          <li>Permanently remove your profile data</li>
+        </ul>
+        <p>This action cannot be reversed. Please be certain.</p>
+      </div>
+      
+      <div>
+        <label for="confirmText" style="display: block; margin-bottom: 10px; font-weight: 300; letter-spacing: 0.5px;">
+          Type "DELETE ACCOUNT" to confirm:
+        </label>
+        <input 
+          type="text" 
+          id="confirmText" 
+          class="confirmation-input" 
+          placeholder="DELETE ACCOUNT"
+          oninput="toggleDeleteButton()"
+        >
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <form id="deleteAccountForm" method="post" action="{% url 'core:delete_account' %}" style="display: inline; flex: 1;">
+        {% csrf_token %}
+        <button type="submit" class="btn-confirm-delete" id="confirmDeleteBtn" disabled>
+          Delete My Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Modal functionality
+function openDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'block';
+  document.getElementById('confirmText').value = '';
+  document.getElementById('confirmDeleteBtn').disabled = true;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function toggleDeleteButton() {
+  const confirmText = document.getElementById('confirmText').value;
+  const deleteButton = document.getElementById('confirmDeleteBtn');
+  deleteButton.disabled = confirmText !== 'DELETE ACCOUNT';
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDeleteModal();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDeleteModal();
+  }
+});
+
+// Prevent form submission if button is disabled
+document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+  const confirmText = document.getElementById('confirmText').value;
+  if (confirmText !== 'DELETE ACCOUNT') {
+    e.preventDefault();
+    alert('Please type "DELETE ACCOUNT" to confirm deletion.');
+  } else {
+    if (!confirm('Are you absolutely sure? This cannot be undone!')) {
+      e.preventDefault();
+    }
+  }
+});
+</script>
 
 {% endblock %}

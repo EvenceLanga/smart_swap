@@ -199,3 +199,12 @@ class Report(models.Model):
 
     def __str__(self):
         return f"Report: {self.reporter.username} → {self.reported_user.username}"
+
+# In core/models.py
+from django.db.models import Q
+
+class MeetingManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(
+            Q(participants=user) | Q(organizer=user)
+        ).distinct()

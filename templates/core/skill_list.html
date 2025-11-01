@@ -5,43 +5,39 @@
 .skills-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 40px 30px;
-  border-radius: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  text-align: center;
+  margin-bottom: 40px;
   position: relative;
   overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
 }
 
-.page-header::before {
+.page-header::after {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-  animation: float 20s linear infinite;
-}
-
-@keyframes float {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  100% { transform: translate(-20px, -20px) rotate(360deg); }
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .page-header h2 {
   margin: 0 0 10px 0;
-  font-size: 2.8rem;
-  font-weight: 800;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .page-subtitle {
@@ -53,6 +49,7 @@
   margin-left: auto;
   margin-right: auto;
   line-height: 1.5;
+  letter-spacing: 0.5px;
 }
 
 .skills-actions {
@@ -62,10 +59,11 @@
   margin-bottom: 30px;
   gap: 20px;
   flex-wrap: wrap;
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .search-box {
@@ -76,119 +74,127 @@
 
 .search-input {
   width: 100%;
-  padding: 14px 20px 14px 50px;
-  border: 2px solid #e9ecef;
-  border-radius: 50px;
+  padding: 12px 20px 12px 45px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: #f8f9fa;
-  font-weight: 500;
+  background: #ffffff;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  color: #000000;
 }
 
 .search-input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+  border-color: #000000;
   outline: none;
-  background: white;
-  transform: translateY(-1px);
+  background: #fafafa;
 }
 
 .search-icon {
   position: absolute;
-  left: 18px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #667eea;
+  color: #000000;
   font-size: 1.1rem;
 }
 
 .btn-create-skill {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 14px 28px;
-  border: none;
-  border-radius: 50px;
+  background: #000000;
+  color: #ffffff;
+  padding: 12px 24px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .btn-create-skill:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
-  color: white;
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
 }
 
 .current-filters {
-  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-  border: 2px solid #bbdefb;
-  border-radius: 15px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   padding: 20px;
   margin-bottom: 25px;
   display: flex;
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  animation: fadeInUp 0.8s ease-out 0.7s both;
 }
 
 .current-filters strong {
-  color: #1976d2;
+  color: #000000;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .filter-tag {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
+  background: #000000;
+  color: #ffffff;
+  padding: 6px 12px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .clear-filters {
-  background: #6c757d;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
+  background: #ffffff;
+  color: #000000;
+  padding: 6px 12px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 0.85rem;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.3s ease;
   margin-left: auto;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .clear-filters:hover {
-  background: #5a6268;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .results-count {
-  color: #495057;
+  color: #000000;
   margin-bottom: 25px;
   font-size: 1.1rem;
-  font-weight: 500;
-  background: white;
+  font-weight: 400;
+  background: #ffffff;
   padding: 15px 20px;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-  border-left: 4px solid #667eea;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  border-left: 2px solid #000000;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
 }
 
 .skills-filters {
@@ -196,10 +202,11 @@
   gap: 15px;
   margin-bottom: 30px;
   flex-wrap: wrap;
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.9s both;
 }
 
 .filter-dropdown {
@@ -208,40 +215,38 @@
 }
 
 .dropdown-btn {
-  background: white;
-  border: 2px solid #e9ecef;
-  padding: 12px 24px;
-  border-radius: 50px;
-  color: #495057;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 12px 20px;
+  border-radius: 1px;
+  color: #000000;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 0.95rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .dropdown-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.15);
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
-  background: white;
+  background: #ffffff;
   min-width: 220px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-  border-radius: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   z-index: 1000;
   margin-top: 8px;
   padding: 10px 0;
-  border: 1px solid #e9ecef;
   animation: dropdownFade 0.3s ease;
 }
 
@@ -262,27 +267,27 @@
 
 .dropdown-item {
   display: block;
-  padding: 12px 24px;
-  color: #495057;
+  padding: 12px 20px;
+  color: #000000;
   text-decoration: none;
   transition: all 0.3s ease;
   border: none;
   background: none;
   width: 100%;
   text-align: left;
-  font-weight: 500;
+  font-weight: 300;
   font-size: 0.9rem;
+  letter-spacing: 0.5px;
 }
 
 .dropdown-item:hover {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  transform: translateX(5px);
+  background: #000000;
+  color: #ffffff;
 }
 
 .dropdown-item.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: #000000;
+  color: #ffffff;
 }
 
 .skills-grid {
@@ -293,14 +298,15 @@
 }
 
 .skill-card {
-  background: white;
-  border: 1px solid #e9ecef;
-  border-radius: 20px;
-  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  padding: 25px;
   transition: all 0.4s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  animation: fadeInUp 1s ease-out both;
+  animation-delay: calc(var(--animation-order) * 0.1s);
 }
 
 .skill-card::before {
@@ -309,16 +315,15 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 2px;
+  background: #000000;
   transform: scaleX(0);
   transition: transform 0.4s ease;
 }
 
 .skill-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  border-color: #667eea;
+  transform: translateY(-5px);
+  border-color: #000000;
 }
 
 .skill-card:hover::before {
@@ -335,47 +340,38 @@
 
 .skill-title {
   font-size: 1.4rem;
-  font-weight: 700;
-  color: #2c3e50;
+  font-weight: 400;
+  color: #000000;
   margin: 0;
   line-height: 1.3;
   flex: 1;
+  letter-spacing: 0.5px;
 }
 
 .skill-title a {
   color: inherit;
   text-decoration: none;
-  transition: color 0.3s ease;
-  background: linear-gradient(135deg, #2c3e50, #667eea);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
 }
 
 .skill-title a:hover {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  border-bottom: 1px solid #000000;
 }
 
 .skill-owner {
-  color: #6c757d;
+  color: #666666;
   font-size: 1rem;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 500;
-}
-
-.skill-owner::before {
-  content: '👤';
-  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .skill-description {
-  color: #555;
+  color: #666666;
   line-height: 1.6;
   margin-bottom: 25px;
   display: -webkit-box;
@@ -383,6 +379,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .skill-meta {
@@ -393,34 +391,23 @@
 }
 
 .meta-tag {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  padding: 8px 16px;
-  border-radius: 25px;
+  background: #fafafa;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   font-size: 0.85rem;
-  color: #495057;
-  border: 1px solid #dee2e6;
+  color: #000000;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
+  font-weight: 300;
   transition: all 0.3s ease;
+  letter-spacing: 0.5px;
 }
 
 .meta-tag:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.meta-tag.category::before {
-  content: '📁';
-}
-
-.meta-tag.level::before {
-  content: '🎯';
-}
-
-.meta-tag.availability::before {
-  content: '⏰';
+  border-color: #000000;
 }
 
 .skill-stats {
@@ -428,36 +415,28 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 20px;
-  border-top: 2px solid #f8f9fa;
+  border-top: 1px solid #e0e0e0;
   font-size: 0.9rem;
-  color: #6c757d;
+  color: #666666;
   margin-bottom: 20px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .request-count {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  color: #495057;
-}
-
-.request-count::before {
-  content: '📨';
-  font-size: 1.1rem;
+  font-weight: 400;
+  color: #000000;
 }
 
 .rating {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
-  color: #495057;
-}
-
-.rating::before {
-  content: '⭐';
-  font-size: 1.1rem;
+  font-weight: 400;
+  color: #000000;
 }
 
 .skill-actions {
@@ -468,69 +447,73 @@
 }
 
 .btn-view {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 50px;
+  background: #000000;
+  color: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   flex: 1;
   text-align: center;
   font-size: 0.9rem;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-view:hover {
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  color: white;
 }
 
 .btn-request {
-  background: linear-gradient(135deg, #28a745, #20c997);
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 50px;
+  background: #ffffff;
+  color: #000000;
+  padding: 10px 20px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   flex: 1;
   text-align: center;
   font-size: 0.9rem;
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-request:hover {
-  background: linear-gradient(135deg, #218838, #1ea085);
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-  color: white;
 }
 
 .empty-state {
   text-align: center;
-  padding: 80px 40px;
-  color: #6c757d;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 60px 30px;
+  color: #666666;
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 1px;
   margin: 40px 0;
+  animation: fadeInUp 0.8s ease-out 1s both;
 }
 
-.empty-state-icon {
-  font-size: 5rem;
-  margin-bottom: 25px;
-  opacity: 0.6;
+.empty-state div {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
 }
 
 .empty-state h3 {
-  color: #495057;
+  color: #000000;
   margin-bottom: 15px;
   font-size: 1.8rem;
-  font-weight: 700;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .empty-state p {
@@ -540,6 +523,8 @@
   margin-left: auto;
   margin-right: auto;
   line-height: 1.6;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .pagination {
@@ -552,135 +537,145 @@
 }
 
 .page-btn {
-  padding: 12px 18px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  color: #667eea;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  color: #000000;
   text-decoration: none;
   transition: all 0.3s ease;
-  font-weight: 600;
-  min-width: 45px;
+  font-weight: 400;
+  min-width: 40px;
   text-align: center;
-  background: white;
+  background: #ffffff;
+  letter-spacing: 0.5px;
 }
 
 .page-btn:hover {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: #667eea;
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
 }
 
 .page-btn.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border-color: #667eea;
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
 }
 
 .page-btn.disabled {
-  color: #adb5bd;
+  color: #666666;
   cursor: not-allowed;
   opacity: 0.5;
-  background: #f8f9fa;
+  background: #fafafa;
 }
 
 .page-btn.disabled:hover {
-  background: #f8f9fa;
-  color: #adb5bd;
-  border-color: #e9ecef;
+  background: #fafafa;
+  color: #666666;
+  border-color: #e0e0e0;
   transform: none;
-  box-shadow: none;
 }
 
 .page-info {
-  color: #6c757d;
+  color: #666666;
   margin: 0 20px;
   font-size: 1rem;
-  font-weight: 500;
-  background: white;
-  padding: 10px 20px;
-  border-radius: 25px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  font-weight: 300;
+  background: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  letter-spacing: 0.5px;
 }
 
 /* Popular skill highlight */
 .skill-card.popular {
-  border: 3px solid #ffd700;
-  background: linear-gradient(135deg, #fffdf0, #fff9e6);
-  position: relative;
-}
-
-.skill-card.popular::before {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border: 1px solid #000000;
+  background: #f8f8f8;
 }
 
 .popular-badge {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #856404;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  background: #000000;
+  color: #ffffff;
+  padding: 4px 10px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-size: 0.7rem;
+  font-weight: 400;
   text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-  z-index: 2;
+  letter-spacing: 0.5px;
 }
 
 /* New skill highlight */
 .skill-card.new {
-  border: 3px solid #28a745;
-  background: linear-gradient(135deg, #f8fff8, #e8f5e8);
-}
-
-.skill-card.new::before {
-  background: linear-gradient(135deg, #28a745, #34ce57);
+  border: 1px solid #000000;
+  background: #f8f8f8;
 }
 
 .new-badge {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #28a745, #34ce57);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  background: #000000;
+  color: #ffffff;
+  padding: 4px 10px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-size: 0.7rem;
+  font-weight: 400;
   text-transform: uppercase;
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-  z-index: 2;
+  letter-spacing: 0.5px;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .skills-grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 25px;
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .skills-container {
-    padding: 15px;
+    padding: 30px 15px;
   }
   
   .page-header {
-    padding: 30px 20px;
-    border-radius: 15px;
+    padding: 30px 25px;
   }
   
   .page-header h2 {
-    font-size: 2.2rem;
-  }
-  
-  .page-subtitle {
-    font-size: 1.1rem;
+    font-size: 2rem;
   }
   
   .skills-grid {
@@ -729,7 +724,6 @@
   
   .btn-view, .btn-request {
     width: 100%;
-    margin-left: 0;
   }
   
   .current-filters {
@@ -747,7 +741,7 @@
   }
   
   .page-btn {
-    padding: 10px 14px;
+    padding: 8px 12px;
     font-size: 0.9rem;
   }
   
@@ -761,7 +755,7 @@
 
 @media (max-width: 480px) {
   .page-header h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .skill-card {
@@ -773,13 +767,32 @@
   }
   
   .meta-tag {
-    padding: 6px 12px;
+    padding: 4px 8px;
     font-size: 0.8rem;
   }
   
   .btn-view, .btn-request {
-    padding: 10px 20px;
+    padding: 8px 16px;
     font-size: 0.85rem;
+  }
+}
+
+/* Focus states for accessibility */
+.btn-create-skill:focus,
+.btn-view:focus,
+.btn-request:focus,
+.page-btn:focus,
+.dropdown-btn:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
@@ -787,7 +800,7 @@
 <div class="skills-container">
   <!-- Page Header -->
   <div class="page-header">
-    <h2>🛠️ All Skills</h2>
+    <h2 style="color: aliceblue;">All Skills</h2>
     <p class="page-subtitle">Discover and learn from amazing skills shared by our community</p>
   </div>
 
@@ -795,11 +808,10 @@
   <div class="skills-actions">
     <form method="get" action="{% url 'core:skill_list' %}" class="search-box">
       <input type="text" name="q" class="search-input" placeholder="Search skills..." value="{{ search_query }}">
-      <button type="submit" class="search-icon" style="background: none; border: none; cursor: pointer;">🔍</button>
+      <button type="submit" class="search-icon" style="background: none; border: none; cursor: pointer;"></button>
     </form>
     
     <a href="{% url 'core:create_skill' %}" class="btn-create-skill">
-      <span>➕</span>
       Share Your Skill
     </a>
   </div>
@@ -820,8 +832,8 @@
     {% if current_level %}
       <span class="filter-tag">Level: {{ current_level }}</span>
     {% endif %}
-    <a href="{% url 'core:skill_list' %}" class="clear-filters" style="margin-left: 10px;">
-      🗑️ Clear All
+    <a href="{% url 'core:skill_list' %}" class="clear-filters">
+      Clear All
     </a>
   </div>
   {% endif %}
@@ -837,25 +849,25 @@
     <!-- Sort Filters -->
     <div class="filter-dropdown">
       <button class="dropdown-btn">
-        📊 Sort By
+        Sort By
         <span>▼</span>
       </button>
       <div class="dropdown-content">
         <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}sort=recent" 
            class="dropdown-item {% if current_sort == 'recent' %}active{% endif %}">
-          🕒 Most Recent
+          Most Recent
         </a>
         <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}sort=popular" 
            class="dropdown-item {% if current_sort == 'popular' %}active{% endif %}">
-          🔥 Most Popular
+          Most Popular
         </a>
         <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}sort=rating" 
            class="dropdown-item {% if current_sort == 'rating' %}active{% endif %}">
-          ⭐ Highest Rated
+          Highest Rated
         </a>
         <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_level %}level={{ current_level }}&{% endif %}sort=name" 
            class="dropdown-item {% if current_sort == 'name' %}active{% endif %}">
-          🔤 Alphabetical
+          Alphabetical
         </a>
       </div>
     </div>
@@ -863,7 +875,7 @@
     <!-- Category Filters -->
     <div class="filter-dropdown">
       <button class="dropdown-btn">
-        📁 Category
+        Category
         <span>▼</span>
       </button>
       <div class="dropdown-content">
@@ -883,7 +895,7 @@
     <!-- Level Filters -->
     <div class="filter-dropdown">
       <button class="dropdown-btn">
-        🎯 Level
+        Level
         <span>▼</span>
       </button>
       <div class="dropdown-content">
@@ -905,14 +917,14 @@
   {% if skills %}
     <div class="skills-grid">
       {% for skill in skills %}
-        <div class="skill-card {% if skill.request_count > 5 %}popular{% endif %} {% if skill.is_new %}new{% endif %}">
+        <div class="skill-card {% if skill.request_count > 5 %}popular{% endif %} {% if skill.is_new %}new{% endif %}" style="--animation-order: {{ forloop.counter0 }};">
           
           {% if skill.request_count > 5 %}
-            <span class="popular-badge">🔥 Popular</span>
+            <span class="popular-badge">Popular</span>
           {% endif %}
           
           {% if skill.is_new %}
-            <span class="new-badge">🆕 New</span>
+            <span class="new-badge">New</span>
           {% endif %}
 
           <div class="skill-header">
@@ -932,9 +944,9 @@
           {% endif %}
 
           <div class="skill-meta">
-            <span class="meta-tag category">{{ skill.category }}</span>
-            <span class="meta-tag level">{{ skill.level }}</span>
-            <span class="meta-tag availability">{{ skill.availability }}</span>
+            <span class="meta-tag">{{ skill.category }}</span>
+            <span class="meta-tag">{{ skill.level }}</span>
+            <span class="meta-tag">{{ skill.availability }}</span>
           </div>
 
           <div class="skill-stats">
@@ -952,15 +964,15 @@
 
           <div class="skill-actions">
             <a href="{% url 'core:skill_detail' skill.id %}" class="btn-view">
-              👀 View Details
+              View Details
             </a>
             {% if user.is_authenticated and user != skill.owner %}
               <a href="{% url 'core:request_skill' skill.id %}" class="btn-request">
-                📨 Request
+                Request
               </a>
             {% elif not user.is_authenticated %}
               <a href="{% url 'core:login' %}?next={{ request.path }}" class="btn-request">
-                🔐 Login to Request
+                Login to Request
               </a>
             {% endif %}
           </div>
@@ -974,9 +986,9 @@
       <!-- Previous Page -->
       {% if skills.has_previous %}
         <a href="?page={{ skills.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_level %}&level={{ current_level }}{% endif %}" 
-           class="page-btn">← Previous</a>
+           class="page-btn">Previous</a>
       {% else %}
-        <span class="page-btn disabled">← Previous</span>
+        <span class="page-btn disabled">Previous</span>
       {% endif %}
 
       <!-- Page Numbers -->
@@ -992,9 +1004,9 @@
       <!-- Next Page -->
       {% if skills.has_next %}
         <a href="?page={{ skills.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_level %}&level={{ current_level }}{% endif %}" 
-           class="page-btn">Next →</a>
+           class="page-btn">Next</a>
       {% else %}
-        <span class="page-btn disabled">Next →</span>
+        <span class="page-btn disabled">Next</span>
       {% endif %}
 
       <span class="page-info">
@@ -1006,7 +1018,7 @@
   {% else %}
     <!-- Empty State -->
     <div class="empty-state">
-      <div class="empty-state-icon">🔍</div>
+      <div>🔍</div>
       <h3>No Skills Found</h3>
       <p>
         {% if search_query %}
@@ -1015,11 +1027,11 @@
           No skills available matching your criteria. Try different filters.
         {% endif %}
       </p>
-      <a href="{% url 'core:skill_list' %}" class="btn-create-skill" style="background: #6c757d;">
-        🗑️ Clear Filters
+      <a href="{% url 'core:skill_list' %}" class="btn-create-skill" style="background: #ffffff; color: #000000;">
+        Clear Filters
       </a>
       <a href="{% url 'core:create_skill' %}" class="btn-create-skill" style="margin-left: 10px;">
-        ➕ Share Your Skill
+        Share Your Skill
       </a>
     </div>
   {% endif %}

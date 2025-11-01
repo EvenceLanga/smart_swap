@@ -5,7 +5,7 @@
 
 <style>
 .dashboard-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -13,37 +13,37 @@
 .form-card {
   background: white;
   padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border: 1px solid #e5e5e5;
 }
 
 .form-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #000;
   color: white;
-  padding: 30px;
-  border-radius: 12px;
+  padding: 25px;
+  border-radius: 6px;
   margin-bottom: 30px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
 .form-icon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .form-header h1 {
   margin: 0;
-  font-size: 2.2rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 600;
 }
 
 .form-content {
@@ -58,48 +58,47 @@
 }
 
 .form-group {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
 }
 
 .form-input, .form-select, .form-textarea {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
+  transition: all 0.2s ease;
+  background: white;
   font-family: inherit;
 }
 
 .form-textarea {
-  min-height: 120px;
+  min-height: 100px;
   resize: vertical;
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #000;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
 }
 
 .form-help {
-  color: #6c757d;
+  color: #666;
   font-size: 0.85rem;
   margin-top: 5px;
 }
 
 .form-errors {
-  color: #dc3545;
+  color: #dc2626;
   font-size: 0.9rem;
   margin-top: 5px;
 }
@@ -109,19 +108,19 @@
   gap: 15px;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid #e5e5e5;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #000;
   color: white;
   padding: 12px 30px;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -129,21 +128,20 @@
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: #333;
   color: white;
 }
 
 .btn-secondary {
-  background: #6c757d;
+  background: #666;
   color: white;
   padding: 12px 30px;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -151,49 +149,106 @@
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
+  background: #555;
   color: white;
 }
 
-/* Style the select2 multiple select */
-.select2-container--default .select2-selection--multiple {
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
+/* Map Container */
+.map-container {
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  height: 200px;
   background: #f8f9fa;
-  min-height: 44px;
 }
 
-.select2-container--default.select2-container--focus .select2-selection--multiple {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Style form fields to match our design */
-input[type="text"],
-input[type="datetime-local"],
-input[type="number"],
-select,
-textarea {
+#map {
+  height: 100%;
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
-  font-family: inherit;
 }
 
-input[type="text"]:focus,
-input[type="datetime-local"]:focus,
-input[type="number"]:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #667eea;
+/* Custom Participants Selection */
+.participants-container {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  background: #fafafa;
+}
+
+.selected-participants {
+  margin-bottom: 15px;
+}
+
+.participant-tag {
+  display: inline-flex;
+  align-items: center;
+  background: #000;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin: 5px;
+  font-size: 0.9rem;
+}
+
+.remove-participant {
+  background: none;
+  border: none;
+  color: white;
+  margin-left: 8px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+}
+
+.remove-participant:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.add-participant-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#participant-select {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.btn-add {
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-add:hover {
+  background: #333;
+}
+
+.btn-add:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Mobile-friendly select */
+.mobile-select {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  font-size: 16px; /* Prevents zoom on iOS */
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  margin-bottom: 10px;
 }
 
 /* Mobile Responsive */
@@ -203,24 +258,24 @@ textarea:focus {
   }
   
   .form-card {
-    padding: 30px 20px;
+    padding: 25px 20px;
   }
   
   .form-header {
-    padding: 25px 20px;
+    padding: 20px;
     flex-direction: column;
     text-align: center;
-    gap: 15px;
+    gap: 12px;
   }
   
   .form-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
   }
   
   .form-icon {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
   }
   
   .form-grid {
@@ -236,44 +291,33 @@ textarea:focus {
     width: 100%;
     justify-content: center;
   }
+  
+  .add-participant-controls {
+    flex-direction: column;
+  }
+  
+  #participant-select {
+    width: 100%;
+  }
+  
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
   .form-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
   
   .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   
   .form-input, .form-select, .form-textarea {
     padding: 10px 14px;
   }
-}
-
-/* Custom styling for form fields to override any existing styles */
-.form-content input,
-.form-content select,
-.form-content textarea {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
-  font-family: inherit;
-  box-sizing: border-box;
-}
-
-.form-content input:focus,
-.form-content select:focus,
-.form-content textarea:focus {
-  outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 </style>
 
@@ -282,7 +326,7 @@ textarea:focus {
     <!-- Form Header -->
     <div class="form-header">
       <div class="form-icon">
-        📅
+        <i class="fas fa-calendar-plus"></i>
       </div>
       <h1>Schedule New Meeting</h1>
     </div>
@@ -293,7 +337,7 @@ textarea:focus {
       <div class="form-grid">
         <div class="form-group">
           <label for="{{ form.title.id_for_label }}">
-            📝 Meeting Title
+            <i class="fas fa-heading"></i> Meeting Title
           </label>
           {{ form.title }}
           {% if form.title.errors %}
@@ -307,7 +351,7 @@ textarea:focus {
         
         <div class="form-group">
           <label for="{{ form.meeting_type.id_for_label }}">
-            📋 Meeting Type
+            <i class="fas fa-list"></i> Meeting Type
           </label>
           {{ form.meeting_type }}
         </div>
@@ -315,7 +359,7 @@ textarea:focus {
 
       <div class="form-group">
         <label for="{{ form.description.id_for_label }}">
-          📄 Description
+          <i class="fas fa-file-alt"></i> Description
         </label>
         {{ form.description }}
       </div>
@@ -323,7 +367,7 @@ textarea:focus {
       <div class="form-grid">
         <div class="form-group">
           <label for="{{ form.scheduled_date.id_for_label }}">
-            🗓️ Date & Time
+            <i class="fas fa-calendar"></i> Date & Time
           </label>
           {{ form.scheduled_date }}
           {% if form.scheduled_date.errors %}
@@ -337,75 +381,210 @@ textarea:focus {
         
         <div class="form-group">
           <label for="{{ form.duration_minutes.id_for_label }}">
-            ⏰ Duration (minutes)
+            <i class="fas fa-clock"></i> Duration (minutes)
           </label>
           {{ form.duration_minutes }}
         </div>
       </div>
 
+      <!-- Simple Location Field -->
       <div class="form-group">
         <label for="{{ form.location.id_for_label }}">
-          📍 Location/Meeting Link
+          <i class="fas fa-map-marker-alt"></i> Location/Meeting Link
         </label>
         {{ form.location }}
         <div class="form-help">
-          Physical address or video call link
+          Enter physical address or video call link
         </div>
+        
+        <!-- Map Container -->
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+        
+        {% if form.location.errors %}
+          <div class="form-errors">
+            {% for error in form.location.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
+      <!-- Custom Participants Selection -->
       <div class="form-group">
-        <label for="{{ form.participants.id_for_label }}">
-          👥 Participants
+        <label>
+          <i class="fas fa-users"></i> Participants
         </label>
-        {{ form.participants }}
+        <div class="participants-container">
+          <!-- Selected Participants Display -->
+          <div class="selected-participants" id="selected-participants">
+            <!-- Selected participants will appear here -->
+          </div>
+          
+          <!-- Add Participant Controls -->
+          <div class="add-participant-controls">
+            <select id="participant-select" class="mobile-select">
+              <option value="">Select a participant...</option>
+              {% for user in form.participants.field.queryset %}
+                {% if user != request.user %}
+                  <option value="{{ user.id }}" data-email="{{ user.email }}" data-username="{{ user.username }}">
+                    {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                  </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+            <button type="button" class="btn-add" id="add-participant">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
+        </div>
+        
+        <!-- Hidden field to store selected participant IDs -->
+        <input type="hidden" name="participants" id="hidden-participants" value="">
+        
+        {% if form.participants.errors %}
+          <div class="form-errors">
+            {% for error in form.participants.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
       </div>
 
       <div class="form-group">
         <label for="{{ form.related_skill.id_for_label }}">
-          🛠️ Related Skill (Optional)
+          <i class="fas fa-tools"></i> Related Skill (Optional)
         </label>
         {{ form.related_skill }}
       </div>
 
       <div class="form-actions">
         <button type="submit" class="btn-primary">
-          ✅ Schedule Meeting
+          <i class="fas fa-check"></i> Schedule Meeting
         </button>
         <a href="{% url 'core:my_meetings' %}" class="btn-secondary">
-          ← Cancel
+          <i class="fas fa-arrow-left"></i> Cancel
         </a>
       </div>
     </form>
   </div>
 </div>
 
-<!-- Add some JavaScript to enhance the form -->
+<!-- Leaflet for Maps -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Add focus styles to all form elements
-  const formElements = document.querySelectorAll('input, select, textarea');
+  console.log('Initializing meeting form...');
   
-  formElements.forEach(element => {
-    element.addEventListener('focus', function() {
-      this.style.borderColor = '#667eea';
-      this.style.backgroundColor = 'white';
-      this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
-    });
+  // Initialize map
+  let map = L.map('map').setView([-26.1076, 28.0567], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  console.log('Map initialized');
+
+  let marker = null;
+
+  // Custom Participants Management
+  const participantSelect = document.getElementById('participant-select');
+  const addParticipantBtn = document.getElementById('add-participant');
+  const selectedParticipantsContainer = document.getElementById('selected-participants');
+  const hiddenParticipantsInput = document.getElementById('hidden-participants');
+  
+  let selectedParticipants = [];
+
+  function updateParticipantSelect() {
+    const options = participantSelect.options;
+    for (let i = 0; i < options.length; i++) {
+      const option = options[i];
+      if (option.value) {
+        option.disabled = selectedParticipants.includes(option.value);
+        option.style.display = selectedParticipants.includes(option.value) ? 'none' : '';
+      }
+    }
+    addParticipantBtn.disabled = !participantSelect.value || selectedParticipants.includes(participantSelect.value);
+  }
+
+  function addParticipant() {
+    const selectedOption = participantSelect.options[participantSelect.selectedIndex];
+    const participantId = selectedOption.value;
+    const participantName = selectedOption.dataset.username;
+    const participantEmail = selectedOption.dataset.email;
     
-    element.addEventListener('blur', function() {
-      this.style.borderColor = '#e9ecef';
-      this.style.backgroundColor = '#f8f9fa';
-      this.style.boxShadow = 'none';
+    if (participantId && !selectedParticipants.includes(participantId)) {
+      selectedParticipants.push(participantId);
+      
+      // Create participant tag
+      const participantTag = document.createElement('div');
+      participantTag.className = 'participant-tag';
+      participantTag.innerHTML = `
+        ${participantName} (${participantEmail})
+        <button type="button" class="remove-participant" data-id="${participantId}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      
+      selectedParticipantsContainer.appendChild(participantTag);
+      
+      // Update hidden input
+      hiddenParticipantsInput.value = selectedParticipants.join(',');
+      
+      // Add remove event listener
+      participantTag.querySelector('.remove-participant').addEventListener('click', function() {
+        removeParticipant(participantId);
+      });
+      
+      // Reset select
+      participantSelect.value = '';
+      updateParticipantSelect();
+    }
+  }
+
+  function removeParticipant(participantId) {
+    selectedParticipants = selectedParticipants.filter(id => id !== participantId);
+    
+    // Remove from DOM
+    const tagToRemove = document.querySelector(`.remove-participant[data-id="${participantId}"]`).parentElement;
+    tagToRemove.remove();
+    
+    // Update hidden input
+    hiddenParticipantsInput.value = selectedParticipants.join(',');
+    
+    updateParticipantSelect();
+  }
+
+  // Event listeners
+  if (addParticipantBtn && participantSelect) {
+    addParticipantBtn.addEventListener('click', addParticipant);
+    
+    participantSelect.addEventListener('change', function() {
+      addParticipantBtn.disabled = !this.value || selectedParticipants.includes(this.value);
     });
-  });
-  
-  // Add current datetime as min value for scheduled_date
+
+    // Allow adding with Enter key
+    participantSelect.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addParticipant();
+      }
+    });
+
+    // Initialize
+    updateParticipantSelect();
+  }
+
+  // Set minimum datetime for scheduled_date
   const scheduledDateInput = document.querySelector('input[type="datetime-local"]');
   if (scheduledDateInput) {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     scheduledDateInput.min = localDateTime;
   }
+
+  console.log('Meeting form initialization complete!');
 });
 </script>
 

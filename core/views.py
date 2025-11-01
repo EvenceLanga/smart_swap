@@ -1,3 +1,4 @@
+from gettext import translation
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -762,16 +763,29 @@ def schedule_meeting(request):
             
             messages.success(request, f"Meeting '{meeting.title}' scheduled successfully!")
             return redirect('core:meeting_detail', meeting_id=meeting.id)
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         # Pre-fill with default values
         default_time = timezone.now() + timedelta(hours=24)
         form = MeetingForm(initial={
             'scheduled_date': default_time.strftime('%Y-%m-%dT%H:%M'),
-            'organizer': request.user
+            'duration_minutes': 60
         }, organizer=request.user)
     
     return render(request, 'core/schedule_meeting.html', {'form': form})
 
+
+def calendar(request):
+    # Get meetings where user is either organizer or participant
+    meetings = Meeting.objects.filter(
+        Q(organizer=request.user) | Q(participants=request.user)
+    ).distinct().select_related('organizer', 'related_skill')
+    
+    context = {
+        'meetings': meetings,
+    }
+    return render(request, 'core/calendar.html', context)
 
 def quick_schedule(request, username):
     """Quick schedule a meeting with a specific user"""
@@ -1122,3 +1136,100 @@ def delete_meeting(request, meeting_id):
     meeting.delete()
     messages.success(request, 'Meeting deleted successfully.')
     return redirect('core:manage_meetings')
+
+from django.db import transaction 
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                user = request.user
+                print(f"Starting deletion for user: {user.username}")  # Debug
+                
+                # Get user ID before any operations
+                user_id = user.id
+                username = user.username
+                
+                # Step 1: Logout the user FIRST
+                logout(request)
+                
+                # Step 2: Delete using the user ID (avoids any user object reference issues)
+                from django.contrib.auth.models import User
+                from core.models import Meeting
+                
+                # Remove user from meeting participants (ManyToMany)
+                user_to_delete = User.objects.get(id=user_id)
+                user_to_delete.meetings.clear()
+                
+                # Delete the user - let database cascades handle the rest
+                deletion_result = User.objects.filter(id=user_id).delete()
+                print(f"Deletion result: {deletion_result}")  # Debug
+                
+                messages.success(request, 'Your account has been permanently deleted.')
+                return redirect('core:login')
+                
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Account deletion error for user {request.user.id if request.user.is_authenticated else 'unknown'}: {str(e)}")
+            logger.error(f"Full error: {repr(e)}")
+            
+            messages.error(request, 'An error occurred while deleting your account. Please try again.')
+            return redirect('core:index')
+    
+    return redirect('core:index')
+
+# In views.py
+import smtplib
+from django.core.mail import send_mail, EmailMessage
+from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth.models import User
+
+def debug_email_test(request):
+    results = []
+    
+    try:
+        # Test 1: Basic SMTP connection
+        results.append("=== Testing SMTP Connection ===")
+        server = smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT)
+        server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
+        results.append("✓ SMTP Login Successful")
+        server.quit()
+    except Exception as e:
+        results.append(f"✗ SMTP Connection Failed: {str(e)}")
+    
+    try:
+        # Test 2: Send test email
+        results.append("=== Testing Email Sending ===")
+        send_mail(
+            'SkillSwap Test Email',
+            'This is a test email from SkillSwap.',
+            settings.DEFAULT_FROM_EMAIL,
+            [request.user.email] if request.user.is_authenticated else ['test@example.com'],
+            fail_silently=False,
+        )
+        results.append("✓ Test email sent successfully")
+    except Exception as e:
+        results.append(f"✗ Email Sending Failed: {str(e)}")
+    
+    try:
+        # Test 3: Test password reset specifically
+        results.append("=== Testing Password Reset Flow ===")
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.encoding import force_bytes
+        from django.utils.http import urlsafe_base64_encode
+        
+        user = request.user if request.user.is_authenticated else User.objects.first()
+        if user:
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            results.append(f"✓ Password reset token generated for {user.email}")
+        else:
+            results.append("✗ No user found for testing")
+            
+    except Exception as e:
+        results.append(f"✗ Password Reset Test Failed: {str(e)}")
+    
+    return HttpResponse('<br>'.join(results))

@@ -5,64 +5,82 @@
 .profile-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
+  background: #000000;
+  color: #ffffff;
+  padding: 40px 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.profile-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .profile-header h2 {
   margin: 0 0 10px 0;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .profile-email {
   font-size: 1.2rem;
   opacity: 0.9;
   margin-bottom: 20px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .profile-actions {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
+  margin-top: 20px;
 }
 
 .btn-message {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 12px 25px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: #ffffff;
+  color: #000000;
+  padding: 12px 24px;
+  border: 1px solid #ffffff;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .btn-message:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-2px);
-  color: white;
 }
 
 .skills-section {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  margin-bottom: 30px;
+  background: #ffffff;
+  padding: 0;
+  margin-bottom: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .section-header {
@@ -70,73 +88,80 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
-  border-bottom: 2px solid #f8f9fa;
-  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 30px 30px 15px 30px;
 }
 
 .section-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #000000;
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 300;
   display: flex;
   align-items: center;
   gap: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+  padding: 0 30px 30px 30px;
 }
 
 .skill-card {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   padding: 20px;
   transition: all 0.3s ease;
-  border-left: 4px solid #667eea;
+  border-left: 2px solid #000000;
+  animation: fadeInUp 0.8s ease-out 0.7s both;
 }
 
 .skill-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  border-color: #000000;
 }
 
 .skill-title {
   font-size: 1.3rem;
-  font-weight: 600;
-  color: #2c3e50;
+  font-weight: 400;
+  color: #000000;
   margin-bottom: 10px;
   display: block;
   text-decoration: none;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid transparent;
 }
 
 .skill-title:hover {
-  color: #667eea;
+  border-bottom: 1px solid #000000;
 }
 
 .skill-rating {
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #ffc107;
-  font-weight: 600;
+  color: #000000;
+  font-weight: 400;
   font-size: 1.1rem;
+  letter-spacing: 0.5px;
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 10px;
+  color: #666666;
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 1px;
   grid-column: 1 / -1;
 }
 
-.empty-state i {
+.empty-state div {
   font-size: 3rem;
   margin-bottom: 15px;
   opacity: 0.5;
@@ -145,16 +170,50 @@
 .empty-state p {
   font-size: 1.1rem;
   margin-bottom: 10px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .profile-container {
-    padding: 15px;
+    padding: 30px 15px;
   }
   
   .profile-header {
-    padding: 30px 20px;
+    padding: 30px 25px;
   }
   
   .profile-header h2 {
@@ -166,27 +225,25 @@
   }
   
   .skills-section {
-    padding: 20px;
+    margin: 0;
+    border-left: none;
+    border-right: none;
   }
   
   .section-header {
     flex-direction: column;
     gap: 15px;
     text-align: center;
+    padding: 20px 20px 15px 20px;
   }
   
   .skills-grid {
     grid-template-columns: 1fr;
+    padding: 0 20px 20px 20px;
   }
   
   .profile-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .btn-message {
-    width: 200px;
-    justify-content: center;
+    text-align: center;
   }
 }
 
@@ -203,18 +260,34 @@
     padding: 15px;
   }
 }
+
+/* Focus states for accessibility */
+.btn-message:focus,
+.skill-title:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 
 <div class="profile-container">
   <!-- Profile Header -->
   <div class="profile-header">
-    <h2>👤 {{ profile_user.username }}'s Profile</h2>
-    <div class="profile-email">📧 {{ profile_user.email }}</div>
+    <h2 style="color: aliceblue;">{{ profile_user.username }}'s Profile</h2>
+    <div class="profile-email">{{ profile_user.email }}</div>
     
     {% if user.is_authenticated and user != profile_user %}
     <div class="profile-actions">
       <a href="{% url 'core:send_message' %}?to={{ profile_user.id }}" class="btn-message">
-        💬 Send Message
+        Send Message
       </a>
     </div>
     {% endif %}
@@ -223,7 +296,7 @@
   <!-- Skills Section -->
   <div class="skills-section">
     <div class="section-header">
-      <h3>🛠️ Skills</h3>
+      <h3>Skills</h3>
     </div>
 
     {% if skills %}
@@ -234,14 +307,14 @@
               {{ s.title }}
             </a>
             <div class="skill-rating">
-              ⭐ {{ s.average_rating|default:"0" }}/5
+              {{ s.average_rating|default:"0" }}/5
             </div>
           </div>
         {% endfor %}
       </div>
     {% else %}
       <div class="empty-state">
-        <i>🛠️</i>
+        <div>🛠️</div>
         <p>No skills yet</p>
         <p>{{ profile_user.username }} hasn't added any skills yet</p>
       </div>

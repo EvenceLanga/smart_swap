@@ -1,17 +1,305 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>🗓️ Edit Meeting: {{ meeting.title }}</h2>
-<form method="post">
-  {% csrf_token %}
-  <label>Title:</label>
-  <input type="text" name="title" value="{{ meeting.title }}"><br>
-  <label>Type:</label>
-  <input type="text" name="meeting_type" value="{{ meeting.meeting_type }}"><br>
-  <label>Status:</label>
-  <input type="text" name="status" value="{{ meeting.status }}"><br>
-  <label>Date:</label>
-  <input type="datetime-local" name="scheduled_date" value="{{ meeting.scheduled_date|date:'Y-m-d\\TH:i' }}"><br>
-  <button type="submit" class="btn-edit">Save</button>
-</form>
-<a href="{% url 'core:manage_meetings' %}" class="btn-cancel">Cancel</a>
+
+<style>
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: #ffffff;
+}
+
+.form-card {
+  background: #ffffff;
+  padding: 50px 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.form-header {
+  background: #000000;
+  color: #ffffff;
+  padding: 40px 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: slideInFromTop 0.8s ease-out 0.2s both;
+}
+
+.form-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.form-content {
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 30px;
+  position: relative;
+  animation: fadeInUp 0.8s ease-out;
+  animation-fill-mode: both;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.3s; }
+.form-group:nth-child(2) { animation-delay: 0.4s; }
+.form-group:nth-child(3) { animation-delay: 0.5s; }
+.form-group:nth-child(4) { animation-delay: 0.6s; }
+
+.form-group label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 400;
+  color: #000000;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: #000000;
+  background: #fafafa;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+.form-input:hover, .form-select:hover {
+  border-color: #b0b0b0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 16px 32px;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+  flex: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-edit {
+  background: #000000;
+  color: #ffffff;
+}
+
+.btn-edit:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: #ffffff;
+  color: #000000;
+}
+
+.btn-cancel:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 80px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 30px 15px;
+  }
+  
+  .form-card {
+    padding: 40px 30px;
+  }
+  
+  .form-header {
+    padding: 30px 25px;
+  }
+  
+  .form-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 20px 10px;
+  }
+  
+  .form-card {
+    padding: 30px 20px;
+  }
+  
+  .form-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .form-input, .form-select {
+    padding: 14px 16px;
+  }
+  
+  .btn {
+    padding: 14px 24px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Focus states for accessibility */
+.form-input:focus,
+.form-select:focus,
+.btn:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+
+<div class="form-container">
+  <div class="form-card">
+    <div class="form-header">
+      <h2>Edit Meeting</h2>
+    </div>
+    
+    <form method="post" class="form-content">
+      {% csrf_token %}
+      
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" name="title" id="title" value="{{ meeting.title }}" class="form-input" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="meeting_type">Type</label>
+        <select name="meeting_type" id="meeting_type" class="form-select" required>
+          <option value="IN_PERSON" {% if meeting.meeting_type == 'IN_PERSON' %}selected{% endif %}>In Person</option>
+          <option value="VIRTUAL" {% if meeting.meeting_type == 'VIRTUAL' %}selected{% endif %}>Virtual</option>
+          <option value="HYBRID" {% if meeting.meeting_type == 'HYBRID' %}selected{% endif %}>Hybrid</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select name="status" id="status" class="form-select" required>
+          <option value="SCHEDULED" {% if meeting.status == 'SCHEDULED' %}selected{% endif %}>Scheduled</option>
+          <option value="IN_PROGRESS" {% if meeting.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+          <option value="COMPLETED" {% if meeting.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+          <option value="CANCELLED" {% if meeting.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="scheduled_date">Date & Time</label>
+        <input type="datetime-local" name="scheduled_date" id="scheduled_date" 
+               value="{{ meeting.scheduled_date|date:'Y-m-d\\TH:i' }}" class="form-input" required>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-edit">Save Changes</button>
+        <a href="{% url 'core:manage_meetings' %}" class="btn btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

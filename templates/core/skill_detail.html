@@ -3,30 +3,49 @@
 
 <style>
 .skill-detail {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .skill-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  background: #000000;
+  color: #ffffff;
+  padding: 40px 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.skill-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .skill-header h2 {
   margin: 0 0 10px 0;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .skill-owner {
   font-size: 1.1rem;
   opacity: 0.9;
   margin-bottom: 15px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .skill-meta {
@@ -39,26 +58,33 @@
 .meta-item {
   background: rgba(255,255,255,0.2);
   padding: 8px 16px;
-  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 1px;
   font-size: 0.9rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .skill-description {
-  background: white;
+  background: #ffffff;
   padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   margin-bottom: 30px;
   line-height: 1.6;
   font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
 .skill-stats {
-  background: #f8f9fa;
+  background: #fafafa;
   padding: 20px;
-  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   margin: 20px 0;
-  border: 1px solid #e9ecef;
+  animation: fadeInUp 0.8s ease-out 0.7s both;
 }
 
 .stats-grid {
@@ -71,108 +97,121 @@
 .stat-item {
   text-align: center;
   padding: 15px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
 }
 
 .stat-number {
   display: block;
   font-size: 1.8rem;
-  font-weight: bold;
-  color: #004080;
+  font-weight: 400;
+  color: #000000;
+  letter-spacing: 0.5px;
 }
 
 .stat-label {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: #666666;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .approval-rate {
   text-align: center;
   padding: 10px;
-  background: #e8f5e8;
-  border-radius: 6px;
-  color: #2e7d32;
-  font-weight: 500;
+  background: #f8f8f8;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  color: #000000;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .request-section {
-  background: white;
+  background: #ffffff;
   padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   margin-bottom: 30px;
   text-align: center;
+  animation: fadeInUp 0.8s ease-out 0.8s both;
 }
 
 .btn-request {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 12px 30px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   text-decoration: none;
   display: inline-block;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .btn-request:hover {
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  color: white;
 }
 
 .alert {
   padding: 15px 20px;
-  border-radius: 8px;
+  border: 1px solid;
+  border-radius: 1px;
   margin: 10px 0;
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .alert-info {
-  background: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #bbdefb;
+  background: #ffffff;
+  color: #000000;
+  border-color: #e0e0e0;
 }
 
 .alert-success {
-  background: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .alert-warning {
-  background: #fff3e0;
-  color: #f57c00;
-  border: 1px solid #ffe0b2;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .alert-danger {
-  background: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .reviews-section {
-  background: white;
+  background: #ffffff;
   padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.9s both;
 }
 
 .review-form {
-  background: #f8f9fa;
+  background: #fafafa;
   padding: 25px;
-  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   margin-top: 30px;
 }
 
 .review-item {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #e0e0e0;
   padding: 20px 0;
 }
 
@@ -188,18 +227,22 @@
 }
 
 .reviewer-name {
-  font-weight: 600;
-  color: #333;
+  font-weight: 400;
+  color: #000000;
+  letter-spacing: 0.5px;
 }
 
 .review-rating {
-  color: #ffc107;
-  font-weight: 600;
+  color: #000000;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .review-time {
-  color: #6c757d;
+  color: #666666;
   font-size: 0.9rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .review-actions {
@@ -210,14 +253,15 @@
   margin-right: 15px;
   text-decoration: none;
   font-size: 0.9rem;
+  color: #000000;
+  border-bottom: 1px solid #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
-.btn-edit {
-  color: #007bff;
-}
-
-.btn-delete {
-  color: #dc3545;
+.review-actions a:hover {
+  color: #666666;
+  border-bottom-color: #666666;
 }
 
 .form-group {
@@ -227,16 +271,22 @@
 .form-group label {
   display: block;
   margin-bottom: 5px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 400;
+  color: #000000;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .form-control {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   font-size: 1rem;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .rating-input {
@@ -244,56 +294,61 @@
 }
 
 .btn-submit {
-  background: #28a745;
-  color: white;
+  background: #000000;
+  color: #ffffff;
   padding: 12px 30px;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .btn-submit:hover {
-  background: #218838;
+  background: #ffffff;
+  color: #000000;
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: #666666 !important;
   font-style: italic;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .no-reviews {
   text-align: center;
-  color: #6c757d;
+  color: #666666;
   padding: 40px 20px;
   font-style: italic;
-}
-
-.star-rating {
-  color: #ffc107;
-  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .session-status {
   text-align: center;
   padding: 20px;
-  border-radius: 10px;
+  border: 1px solid;
+  border-radius: 1px;
   margin: 20px 0;
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .status-in-progress {
-  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-  color: #856404;
-  border: 2px solid #ffd43b;
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
 }
 
 .status-completed {
-  background: linear-gradient(135deg, #d4edda, #c3e6cb);
-  color: #155724;
-  border: 2px solid #28a745;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .session-participants {
@@ -310,9 +365,11 @@
   align-items: center;
   gap: 8px;
   padding: 8px 15px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 20px;
-  font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .session-actions {
@@ -325,49 +382,52 @@
 
 .btn-session {
   padding: 8px 20px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  border: 1px solid #000000;
+  border-radius: 1px;
+  font-weight: 400;
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-start {
-  background: #ffc107;
-  color: #856404;
+  background: #000000;
+  color: #ffffff;
 }
 
 .btn-complete {
-  background: #28a745;
-  color: white;
+  background: #000000;
+  color: #ffffff;
 }
 
 .btn-start:hover {
-  background: #e0a800;
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  color: #856404;
 }
 
 .btn-complete:hover {
-  background: #218838;
+  background: #ffffff;
+  color: #000000;
   transform: translateY(-2px);
-  color: white;
 }
 
 .current-session {
-  background: #e7f3ff;
-  border: 2px solid #007bff;
-  border-radius: 10px;
+  background: #fafafa;
+  border: 1px solid #000000;
+  border-radius: 1px;
   padding: 20px;
   margin: 20px 0;
 }
 
 .session-timeline {
-  background: white;
+  background: #ffffff;
   padding: 15px;
-  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
   margin: 15px 0;
 }
 
@@ -376,50 +436,148 @@
   align-items: center;
   gap: 10px;
   margin: 8px 0;
-  color: #666;
-}
-
-.timeline-item i {
-  width: 20px;
-  text-align: center;
+  color: #666666;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .activity-level {
   text-align: center;
   padding: 10px;
-  border-radius: 6px;
+  border: 1px solid;
+  border-radius: 1px;
   margin: 10px 0;
-  font-weight: 500;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .level-new {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .level-low {
-  background: #fff3e0;
-  color: #f57c00;
+  background: #ffffff;
+  color: #666666;
+  border-color: #e0e0e0;
 }
 
 .level-medium {
-  background: #fff8e1;
-  color: #ffa000;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .level-high {
-  background: #e8f5e8;
-  color: #2e7d32;
+  background: #f8f8f8;
+  color: #000000;
+  border-color: #000000;
 }
 
 .success-stories {
   text-align: center;
   padding: 10px;
-  background: #e8f5e8;
-  border-radius: 6px;
+  background: #f8f8f8;
+  border: 1px solid #000000;
+  border-radius: 1px;
   margin: 10px 0;
-  color: #2e7d32;
-  font-weight: 500;
+  color: #000000;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .skill-detail {
+    padding: 30px 15px;
+  }
+  
+  .skill-header {
+    padding: 30px 25px;
+  }
+  
+  .skill-header h2 {
+    font-size: 2rem;
+  }
+  
+  .skill-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .session-participants {
+    flex-direction: column;
+  }
+  
+  .session-actions {
+    flex-direction: column;
+  }
+  
+  .btn-session {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .skill-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Focus states for accessibility */
+.btn-request:focus,
+.btn-submit:focus,
+.btn-session:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>
 
@@ -429,10 +587,10 @@
     <h2>{{ skill.title }}</h2>
     <div class="skill-owner">By {{ skill.owner.get_full_name|default:skill.owner.username }}</div>
     <div class="skill-meta">
-      <span class="meta-item">📅 {{ skill.created_at|date:"F j, Y, g:i a" }}</span>
-      <span class="meta-item">📁 {{ skill.category }}</span>
-      <span class="meta-item">🎯 {{ skill.level }}</span>
-      <span class="meta-item">⏰ {{ skill.availability }}</span>
+      <span class="meta-item">{{ skill.created_at|date:"F j, Y, g:i a" }}</span>
+      <span class="meta-item">{{ skill.category }}</span>
+      <span class="meta-item">{{ skill.level }}</span>
+      <span class="meta-item">{{ skill.availability }}</span>
     </div>
   </div>
 
@@ -440,31 +598,28 @@
   {% for active_session in active_sessions %}
   <div class="current-session">
     <div class="session-status status-in-progress">
-      <h4>🔄 Session In Progress</h4>
+      <h4>Session In Progress</h4>
       <p>This skill is currently being taught to {{ active_session.requester.get_full_name|default:active_session.requester.username }}</p>
       
       <div class="session-participants">
         <div class="participant">
-          <span>👨‍🏫 Teacher:</span>
+          <span>Teacher:</span>
           <strong>{{ active_session.owner.get_full_name|default:active_session.owner.username }}</strong>
         </div>
         <div class="participant">
-          <span>👨‍🎓 Learner:</span>
+          <span>Learner:</span>
           <strong>{{ active_session.requester.get_full_name|default:active_session.requester.username }}</strong>
         </div>
       </div>
       
       <div class="session-timeline">
         <div class="timeline-item">
-          <i>📅</i>
           <span>Requested: {{ active_session.created_at|date:"M j, Y" }}</span>
         </div>
         <div class="timeline-item">
-          <i>✅</i>
           <span>Approved: {{ active_session.started_at|date:"M j, Y"|default:"Not set" }}</span>
         </div>
         <div class="timeline-item">
-          <i>🔄</i>
           <span>Started: {{ active_session.started_at|date:"M j, Y" }}</span>
         </div>
       </div>
@@ -475,12 +630,12 @@
         <a href="{% url 'core:complete_skill_session' active_session.id %}" 
            class="btn-session btn-complete"
            onclick="return confirm('Mark this skill session as completed?')">
-          ✅ Mark as Completed
+          Mark as Completed
         </a>
         <a href="{% url 'core:chat_dashboard' %}?user={% if user == active_session.owner %}{{ active_session.requester.username }}{% else %}{{ active_session.owner.username }}{% endif %}" 
            class="btn-session" 
-           style="background: #007bff; color: white;">
-          💬 Message Partner
+           style="background: #ffffff; color: #000000;">
+          Message Partner
         </a>
       </div>
       {% endif %}
@@ -496,7 +651,7 @@
 
   <!-- Skill Statistics -->
   <div class="skill-stats">
-    <h4>📊 Skill Activity</h4>
+    <h4>Skill Activity</h4>
     <div class="stats-grid">
       <div class="stat-item">
         <span class="stat-number">{{ total_requests }}</span>
@@ -518,7 +673,7 @@
     
     {% if active_sessions %}
     <div class="alert alert-warning">
-      <strong>⚠️ Active Session:</strong> This skill is currently being taught to {{ active_sessions.0.requester.username }}. 
+      <strong>Active Session:</strong> This skill is currently being taught to {{ active_sessions.0.requester.username }}. 
       New requests may be delayed until this session completes.
     </div>
     {% endif %}
@@ -551,7 +706,7 @@
     
     {% if completed_requests > 0 %}
     <div class="success-stories">
-      <span class="success-count">🎉 {{ completed_requests }} successful exchanges</span>
+      <span class="success-count">{{ completed_requests }} successful exchanges</span>
     </div>
     {% endif %}
   </div>
@@ -563,7 +718,7 @@
         <!-- Check if there's an active session -->
         {% if active_sessions %}
           <div class="alert alert-info">
-            <h4>⏳ Skill Currently in Session</h4>
+            <h4>Skill Currently in Session</h4>
             <p>This skill is currently being taught to {{ active_sessions.0.requester.username }}.</p>
             <p>You can still request this skill, but the session may start after the current one completes.</p>
           </div>
@@ -582,35 +737,35 @@
                 {% else %}alert-info{% endif %}">
                 
                 {% if req.status == 'PENDING' %}
-                  <h4>⏳ Request Pending</h4>
+                  <h4>Request Pending</h4>
                   <p>You have requested to learn this skill. Waiting for approval from {{ skill.owner.username }}.</p>
                 {% elif req.status == 'APPROVED' %}
-                  <h4>✅ Request Approved!</h4>
-                  <p>Your request has been approved! Waiting for the session to start.</p>
+                  <h4>Request Approved</h4>
+                  <p>Your request has been approved. Waiting for the session to start.</p>
                 {% elif req.status == 'IN_PROGRESS' %}
-                  <h4>🔄 Session In Progress</h4>
-                  <p>You are currently learning this skill from {{ skill.owner.username }}!</p>
+                  <h4>Session In Progress</h4>
+                  <p>You are currently learning this skill from {{ skill.owner.username }}.</p>
                   <div class="session-actions">
                     <a href="{% url 'core:complete_skill_session' req.id %}" 
                        class="btn-session btn-complete"
                        onclick="return confirm('Mark this skill session as completed?')">
-                      ✅ Mark as Completed
+                      Mark as Completed
                     </a>
                     <a href="{% url 'core:chat_dashboard' %}?user={{ skill.owner.username }}" 
                        class="btn-session" 
-                       style="background: #007bff; color: white;">
-                      💬 Message Teacher
+                       style="background: #ffffff; color: #000000;">
+                      Message Teacher
                     </a>
                   </div>
                 {% elif req.status == 'COMPLETED' %}
-                  <h4>🎉 Skill Completed!</h4>
-                  <p>Congratulations! You have successfully completed learning this skill.</p>
+                  <h4>Skill Completed</h4>
+                  <p>Congratulations. You have successfully completed learning this skill.</p>
                   <p><small>Completed on: {{ req.completed_at|date:"F j, Y"|default:"Date not set" }}</small></p>
                 {% elif req.status == 'REJECTED' %}
-                  <h4>❌ Request Rejected</h4>
+                  <h4>Request Rejected</h4>
                   <p>Your request to learn this skill was not approved by {{ skill.owner.username }}.</p>
                 {% else %}
-                  <h4>📝 Request Submitted</h4>
+                  <h4>Request Submitted</h4>
                   <p>You have already requested to learn this skill.</p>
                 {% endif %}
                 
@@ -625,28 +780,28 @@
             <h3>Interested in Learning This Skill?</h3>
             <p>Request to learn from {{ skill.owner.get_full_name|default:skill.owner.username }}</p>
             <a href="{% url 'core:request_skill' skill.id %}" class="btn-request">
-              📨 Request to Learn This Skill
+              Request to Learn This Skill
             </a>
           {% endif %}
         {% endwith %}
       {% else %}
         <div class="alert alert-info">
-          <h4>👋 This is Your Skill</h4>
+          <h4>This is Your Skill</h4>
           <p>You are the owner of this skill listing. Others can request to learn from you.</p>
           <p><strong>You have received {{ total_requests }} requests for this skill.</strong></p>
           
           {% if active_sessions %}
             <div style="margin-top: 15px;">
-              <h5>🎯 Currently Teaching:</h5>
+              <h5>Currently Teaching:</h5>
               {% for session in active_sessions %}
                 <div class="participant" style="justify-content: start; margin: 5px 0;">
-                  <span>👨‍🎓</span>
+                  <span>Learner:</span>
                   <strong>{{ session.requester.get_full_name|default:session.requester.username }}</strong>
                   <a href="{% url 'core:complete_skill_session' session.id %}" 
                      class="btn-session btn-complete"
                      style="margin-left: auto; padding: 4px 12px; font-size: 0.9rem;"
                      onclick="return confirm('Mark this skill session as completed?')">
-                    ✅ Complete
+                    Complete
                   </a>
                 </div>
               {% endfor %}
@@ -658,16 +813,16 @@
             {% if req.status == 'APPROVED' %}
               {% if forloop.first %}
                 <div style="margin-top: 15px;">
-                  <h5>✅ Approved Requests Waiting to Start:</h5>
+                  <h5>Approved Requests Waiting to Start:</h5>
               {% endif %}
               <div class="participant" style="justify-content: start; margin: 5px 0;">
-                <span>👨‍🎓</span>
+                <span>Learner:</span>
                 <strong>{{ req.requester.get_full_name|default:req.requester.username }}</strong>
                 <a href="{% url 'core:start_skill_session' req.id %}" 
                    class="btn-session btn-start"
                    style="margin-left: auto; padding: 4px 12px; font-size: 0.9rem;"
                    onclick="return confirm('Start skill session with {{ req.requester.username }}?')">
-                  🚀 Start
+                  Start
                 </a>
               </div>
               {% if forloop.last %}
@@ -679,15 +834,15 @@
       {% endif %}
     {% else %}
       <div class="alert alert-warning">
-        <h4>🔒 Login Required</h4>
-        <p>Please <a href="{% url 'core:login' %}">login</a> to request this skill.</p>
+        <h4>Login Required</h4>
+        <p>Please <a href="{% url 'core:login' %}" style="color: #000000; border-bottom: 1px solid #000000;">login</a> to request this skill.</p>
       </div>
     {% endif %}
   </div>
 
   <!-- Reviews Section -->
   <div class="reviews-section">
-    <h3>🌟 Reviews & Feedback</h3>
+    <h3>Reviews & Feedback</h3>
     
     {% if reviews %}
       <div class="reviews-list">
@@ -698,7 +853,7 @@
                 <span class="reviewer-name">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
                 <span class="review-rating">
                   {% with ''|center:review.rating as range %}
-                    {% for _ in range %}⭐{% endfor %}
+                    {% for _ in range %}{% endfor %}
                   {% endwith %}
                   ({{ review.rating }}/5)
                 </span>
@@ -709,8 +864,8 @@
             
             {% if review.reviewer == user %}
               <div class="review-actions">
-                <a href="{% url 'core:edit_review' review.id %}" class="btn-edit">✏️ Edit</a>
-                <a href="{% url 'core:delete_review' review.id %}" class="btn-delete">🗑️ Delete</a>
+                <a href="{% url 'core:edit_review' review.id %}">Edit</a>
+                <a href="{% url 'core:delete_review' review.id %}">Delete</a>
               </div>
             {% endif %}
           </div>
@@ -718,7 +873,7 @@
       </div>
     {% else %}
       <div class="no-reviews">
-        <p>No reviews yet. Be the first to share your experience!</p>
+        <p>No reviews yet. Be the first to share your experience.</p>
       </div>
     {% endif %}
 
@@ -729,7 +884,7 @@
         <form method="post" action="{% url 'core:add_review' skill.id %}">
           {% csrf_token %}
           <div class="form-group">
-            <label for="rating">Your Rating (1-5 stars):</label>
+            <label for="rating">Your Rating (1-5):</label>
             <input type="number" name="rating" min="1" max="5" required class="form-control rating-input" placeholder="5">
           </div>
           <div class="form-group">
@@ -745,7 +900,7 @@
       </div>
     {% else %}
       <div class="alert alert-warning">
-        <p>Please <a href="{% url 'core:login' %}">login</a> to leave a review.</p>
+        <p>Please <a href="{% url 'core:login' %}" style="color: #000000; border-bottom: 1px solid #000000;">login</a> to leave a review.</p>
       </div>
     {% endif %}
   </div>

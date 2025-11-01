@@ -5,88 +5,107 @@
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
+  background: #000000;
+  color: #ffffff;
+  padding: 40px 30px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 2px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .dashboard-header h2 {
   margin: 0;
-  font-size: 2.2rem;
-  font-weight: 700;
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 0.8s ease-out 0.3s both;
 }
 
 .header-actions {
-  display: flex;
-  gap: 15px;
-  align-items: center;
+  margin-top: 20px;
 }
 
 .btn-back {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 10px 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: #ffffff;
+  color: #000000;
+  padding: 12px 24px;
+  border: 1px solid #ffffff;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .btn-back:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #000000;
+  color: #ffffff;
   transform: translateY(-2px);
-  color: white;
 }
 
 .users-section {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  margin-bottom: 30px;
+  background: #ffffff;
+  padding: 0;
+  margin-bottom: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.table-container {
   overflow-x: auto;
+  border-radius: 1px;
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  min-width: 700px;
+  background: #ffffff;
+  animation: fadeInUp 0.8s ease-out 0.7s both;
 }
 
 .users-table th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 15px 12px;
+  background: #000000;
+  color: #ffffff;
+  padding: 20px 16px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 0.95rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #333333;
 }
 
 .users-table td {
-  padding: 15px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #555;
+  padding: 20px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #000000;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
 }
 
 .users-table tr:last-child td {
@@ -94,146 +113,189 @@
 }
 
 .users-table tr:hover {
-  background: #f8f9fa;
+  background: #fafafa;
 }
 
 .user-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .btn-edit, .btn-delete {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 400;
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
   display: inline-block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .btn-edit {
-  background: #28a745;
-  color: white;
+  background: #000000;
+  color: #ffffff;
 }
 
 .btn-delete {
-  background: #dc3545;
-  color: white;
+  background: #ffffff;
+  color: #000000;
 }
 
-.btn-edit:hover, .btn-delete:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+.btn-edit:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.btn-delete:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 10px;
+  padding: 60px 30px;
+  color: #666666;
+  background: #fafafa;
+  border: 1px dashed #e0e0e0;
+  border-radius: 1px;
 }
 
-.empty-state i {
+.empty-state div {
   font-size: 3rem;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   opacity: 0.5;
 }
 
 .empty-state p {
   font-size: 1.1rem;
   margin-bottom: 10px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .no-data {
-  color: #6c757d;
+  color: #666666;
   font-style: italic;
   font-size: 0.9rem;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 15px;
-  }
-  
-  .dashboard-header {
-    padding: 20px;
-    text-align: center;
-    flex-direction: column;
-  }
-  
-  .dashboard-header h2 {
-    font-size: 1.8rem;
-  }
-  
-  .header-actions {
-    justify-content: center;
-  }
-  
-  .users-section {
-    padding: 20px 15px;
-    margin: 0 -15px;
-    border-radius: 0;
-    box-shadow: none;
-  }
-  
-  .users-table {
-    font-size: 0.9rem;
-    min-width: 600px;
-  }
-  
-  .users-table th,
-  .users-table td {
-    padding: 12px 8px;
-  }
-  
-  .user-actions {
-    flex-direction: column;
-    gap: 5px;
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-header h2 {
-    font-size: 1.5rem;
-  }
-  
-  .btn-back {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-  
-  .users-table {
-    font-size: 0.85rem;
-    min-width: 550px;
-  }
-}
-
-.table-container {
-  overflow-x: auto;
-  border-radius: 10px;
-  margin-top: 20px;
+  letter-spacing: 0.5px;
 }
 
 .table-scroll-hint {
   display: none;
   text-align: center;
-  color: #6c757d;
+  color: #666666;
   font-size: 0.9rem;
-  margin-bottom: 10px;
-  padding: 10px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
+  .dashboard-container {
+    padding: 30px 15px;
+  }
+  
+  .dashboard-header {
+    padding: 30px 25px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 2rem;
+  }
+  
+  .users-table {
+    min-width: 600px;
+  }
+  
   .table-scroll-hint {
     display: block;
+  }
+  
+  .user-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-edit, .btn-delete {
+    text-align: center;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .btn-back {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: 15px 12px;
+  }
+}
+
+/* Focus states for accessibility */
+.btn-back:focus,
+.btn-edit:focus,
+.btn-delete:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
@@ -241,10 +303,10 @@
 <div class="dashboard-container">
   <!-- Dashboard Header -->
   <div class="dashboard-header">
-    <h2>👤 Manage Users</h2>
+    <h2 style="color: aliceblue;">Manage Users</h2>
     <div class="header-actions">
       <a href="{% url 'core:admin_dashboard' %}" class="btn-back">
-        ← Back to Dashboard
+        Back to Dashboard
       </a>
     </div>
   </div>
@@ -252,7 +314,7 @@
   <!-- Users Section -->
   <div class="users-section">
     <div class="table-scroll-hint">
-      💡 Scroll horizontally to view all table columns
+      Scroll horizontally to view all table columns
     </div>
 
     <div class="table-container">
@@ -287,8 +349,8 @@
             </td>
             <td>
               <div class="user-actions">
-                <a href="#" class="btn-edit">Edit</a>
-                <a href="#" class="btn-delete" onclick="return confirm('Delete this user?')">Delete</a>
+                <a href="{% url 'core:edit_user' u.id %}" class="btn-edit">Edit</a>
+                <a href="{% url 'core:delete_user' u.id %}" class="btn-delete" onclick="return confirm('Delete this skill?')">Delete</a>
               </div>
             </td>
           </tr>
@@ -296,7 +358,7 @@
           <tr>
             <td colspan="5">
               <div class="empty-state">
-                <i>👤</i>
+                <div>👤</div>
                 <p>No users found</p>
                 <p>When users register, they'll appear here</p>
               </div>

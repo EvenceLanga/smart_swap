@@ -12,34 +12,36 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
-    
+    path('account/delete/', views.delete_account, name='delete_account'),
     # Password Reset URLs
-    path('password-reset/', auth_views.PasswordResetView.as_view(
-             template_name='core/password_reset.html',
-             email_template_name='core/password_reset_email.html',
-             subject_template_name='core/password_reset_subject.txt',
-             success_url='/password-reset/done/'
+    path('password-reset/', 
+         auth_views.PasswordResetView.as_view(
+             template_name='registration/password_reset_form.html',
+             email_template_name='registration/password_reset_email.html',
+             subject_template_name='registration/password_reset_subject.txt'
          ), 
          name='password_reset'),
     
     path('password-reset/done/', 
          auth_views.PasswordResetDoneView.as_view(
-             template_name='core/password_reset_done.html'
+             template_name='registration/password_reset_done.html'
          ), 
          name='password_reset_done'),
     
     path('password-reset-confirm/<uidb64>/<token>/', 
          auth_views.PasswordResetConfirmView.as_view(
-             template_name='core/password_reset_confirm.html',
-             success_url='/password-reset-complete/'
+             template_name='registration/password_reset_confirm.html'
          ), 
          name='password_reset_confirm'),
     
     path('password-reset-complete/', 
          auth_views.PasswordResetCompleteView.as_view(
-             template_name='core/password_reset_complete.html'
+             template_name='registration/password_reset_complete.html'
          ), 
          name='password_reset_complete'),
+    
+    # Debug URL
+    path('debug-email/', views.debug_email_test, name='debug_email'),
 
     # User Dashboard & Profile URLs
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -85,7 +87,7 @@ urlpatterns = [
     path('meetings/quick/<str:username>/', views.quick_schedule, name='quick_schedule'),
     path('meetings/<int:meeting_id>/', views.meeting_detail, name='meeting_detail'),
     path('meetings/<int:meeting_id>/<str:status>/', views.update_meeting_status, name='update_meeting_status'),
-    path('meetings/calendar/', views.meeting_calendar, name='meeting_calendar'),
+    path('meetings/calendar/', views.calendar, name='meeting_calendar'),
     
     # Notifications & Debug
     path('notifications/', views.notifications, name='notifications'),

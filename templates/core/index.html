@@ -5,204 +5,620 @@
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  background: #ffffff;
 }
 
+/* Minimalist Header */
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 15px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  background: #000000;
+  color: #ffffff;
+  padding: 60px 40px;
+  margin-bottom: 60px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: #ffffff;
+  animation: expandLine 1s ease-out 0.5s both;
 }
 
 .dashboard-header h2 {
   margin: 0;
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 3.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: slideInFromTop 1s ease-out 0.3s both;
+  position: relative;
 }
 
+/* Skills Section */
 .skills-section {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-  margin-bottom: 30px;
+  background: #ffffff;
+  padding: 0;
+  margin-bottom: 60px;
+  animation: fadeIn 1s ease-out 0.6s both;
 }
 
 .section-header {
-  color: #2c3e50;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 25px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  color: #000000;
+  font-size: 2rem;
+  font-weight: 300;
+  margin-bottom: 50px;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  padding-bottom: 20px;
+  opacity: 0;
+  animation: slideInUpFade 0.8s ease-out 0.7s forwards;
 }
 
+.section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: #000000;
+  animation: expandWidth 1s ease-out 0.8s both;
+}
+
+/* Elegant Skills Grid */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  perspective: 1000px;
 }
 
+/* Sophisticated Skill Cards */
 .skill-card {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 25px;
-  transition: all 0.3s ease;
-  border-left: 4px solid #667eea;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  padding: 40px 35px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  overflow: hidden;
+  animation: cardAppear 0.8s ease-out;
+  animation-fill-mode: both;
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+
+.skill-card.animate-in {
+  animation: cardSlideUp 0.6s ease-out forwards;
+}
+
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.02), transparent);
+  transition: left 0.6s ease;
+}
+
+.skill-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.01) 50%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.skill-card:hover::before {
+  left: 100%;
+}
+
+.skill-card:hover::after {
+  opacity: 1;
 }
 
 .skill-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  border-color: #667eea;
+  transform: translateY(-8px) scale(1.02);
+  border-color: #000000;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* Stagger animation for cards */
+.skill-card:nth-child(1) { animation-delay: 0.1s; }
+.skill-card:nth-child(2) { animation-delay: 0.2s; }
+.skill-card:nth-child(3) { animation-delay: 0.3s; }
+.skill-card:nth-child(4) { animation-delay: 0.4s; }
+.skill-card:nth-child(5) { animation-delay: 0.5s; }
+.skill-card:nth-child(6) { animation-delay: 0.6s; }
+
 .skill-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 15px;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #000000;
+  margin-bottom: 25px;
   display: block;
   text-decoration: none;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  position: relative;
+  padding-left: 0;
+  line-height: 1.4;
+  transform-origin: left center;
 }
 
 .skill-title:hover {
-  color: #667eea;
+  color: #333333;
+  padding-left: 15px;
+  transform: translateX(5px);
+}
+
+.skill-title::before {
+  content: '→';
+  position: absolute;
+  left: -20px;
+  opacity: 0;
+  transition: all 0.3s ease;
+  color: #000000;
+}
+
+.skill-title:hover::before {
+  opacity: 1;
+  left: -15px;
+  animation: arrowBounce 0.6s ease;
 }
 
 .skill-owner {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
-  color: #6c757d;
+  gap: 12px;
+  margin-bottom: 25px;
+  color: #666666;
   font-size: 0.95rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out 0.3s forwards;
 }
 
 .skill-meta {
   display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 10px;
+  margin-bottom: 25px;
   flex-wrap: wrap;
 }
 
 .meta-tag {
-  background: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #6c757d;
-  border: 1px solid #dee2e6;
+  background: #f8f8f8;
+  color: #000000;
+  padding: 8px 16px;
+  border-radius: 1px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.meta-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.meta-tag:hover::before {
+  left: 100%;
+}
+
+.meta-tag:hover {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+  transform: translateY(-2px);
 }
 
 .skill-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 15px;
+  gap: 12px;
+  margin-top: 25px;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out 0.5s forwards;
 }
 
 .btn-view {
-  background: #667eea;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
+  background: #000000;
+  color: #ffffff;
+  padding: 14px 28px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-view::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-view:hover::before {
+  left: 100%;
 }
 
 .btn-view:hover {
-  background: #5a6fd8;
-  transform: translateY(-1px);
-  color: white;
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .btn-login {
-  background: #28a745;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
+  background: #ffffff;
+  color: #000000;
+  padding: 14px 28px;
+  border: 1px solid #000000;
+  border-radius: 1px;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-login::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-login:hover::before {
+  left: 100%;
 }
 
 .btn-login:hover {
-  background: #218838;
-  transform: translateY(-1px);
-  color: white;
+  background: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Minimalist Empty State */
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
-  color: #6c757d;
-  background: #f8f9fa;
-  border-radius: 10px;
+  padding: 80px 40px;
+  color: #666666;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
   grid-column: 1 / -1;
+  animation: fadeInScale 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.02), transparent);
+  animation: shimmer 3s ease-in-out infinite;
 }
 
 .empty-state i {
-  font-size: 3rem;
-  margin-bottom: 15px;
-  opacity: 0.5;
+  font-size: 4rem;
+  margin-bottom: 25px;
+  display: block;
+  opacity: 0.7;
+  animation: subtlePulse 3s ease-in-out infinite, float 6s ease-in-out infinite;
 }
 
 .empty-state p {
   font-size: 1.1rem;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out 0.3s forwards;
+}
+
+.empty-state p:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+/* Enhanced Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotateX(10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes expandLine {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 60px;
+  }
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes arrowBounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Loading animation */
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 10px;
+}
+
+.loading-dots span {
+  width: 4px;
+  height: 4px;
+  background: #000000;
+  border-radius: 50%;
+  animation: loadingBounce 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes loadingBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Ripple effect for buttons */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 15px;
+    padding: 30px 15px;
   }
   
   .dashboard-header {
-    padding: 25px 20px;
+    padding: 40px 25px;
   }
   
   .dashboard-header h2 {
-    font-size: 2rem;
-  }
-  
-  .skills-section {
-    padding: 20px;
+    font-size: 2.2rem;
   }
   
   .skills-grid {
     grid-template-columns: 1fr;
+    gap: 25px;
   }
   
   .section-header {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+    margin-bottom: 40px;
+  }
+  
+  .skill-card {
+    padding: 30px 25px;
+  }
+  
+  .skill-title {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
   .dashboard-header h2 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+  }
+  
+  .section-header {
+    font-size: 1.3rem;
   }
   
   .skill-card {
-    padding: 20px;
+    padding: 25px 20px;
   }
   
   .skill-meta {
@@ -213,23 +629,50 @@
   .skill-actions {
     flex-direction: column;
   }
+  
+  .btn-view, .btn-login {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .empty-state {
+    padding: 50px 25px;
+  }
+}
+
+/* Focus states for accessibility */
+.skill-title:focus,
+.btn-view:focus,
+.btn-login:focus {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 </style>
 
 <div class="dashboard-container">
-  <!-- Dashboard Header -->
+  <!-- Minimalist Header -->
   <div class="dashboard-header">
-    <h2>🚀 Latest Skills</h2>
+    <h2 style="color: #ffffff;">Latest Skills</h2>
   </div>
 
   <!-- Skills Section -->
   <div class="skills-section">
-    <div class="section-header">🛠️ Recently Added Skills</div>
+    <div class="section-header">Recently Added Skills</div>
 
     {% if skills %}
       <div class="skills-grid">
         {% for s in skills %}
-          <div class="skill-card">
+          <div class="skill-card" data-delay="{{ forloop.counter0 }}">
             {% if user.is_authenticated %}
               <a href="{% url 'core:skill_detail' s.id %}" class="skill-title">
                 {{ s.title }}
@@ -241,30 +684,29 @@
             {% endif %}
             
             <div class="skill-owner">
-              <i>👤</i>
               <span>by {{ s.owner.username }}</span>
             </div>
             
             <div class="skill-meta">
               {% if s.category %}
-                <span class="meta-tag">📁 {{ s.category }}</span>
+                <span class="meta-tag">{{ s.category }}</span>
               {% endif %}
               {% if s.level %}
-                <span class="meta-tag">🎯 {{ s.level }}</span>
+                <span class="meta-tag">{{ s.level }}</span>
               {% endif %}
               {% if s.created_at %}
-                <span class="meta-tag">📅 {{ s.created_at|date:"M j" }}</span>
+                <span class="meta-tag">{{ s.created_at|date:"M j, Y" }}</span>
               {% endif %}
             </div>
             
             <div class="skill-actions">
               {% if user.is_authenticated %}
                 <a href="{% url 'core:skill_detail' s.id %}" class="btn-view">
-                  👀 View Details
+                  View Details
                 </a>
               {% else %}
                 <a href="{% url 'core:login' %}?next={% url 'core:skill_detail' s.id %}" class="btn-login">
-                  🔐 Login to View
+                  Login to View
                 </a>
               {% endif %}
             </div>
@@ -273,21 +715,137 @@
       </div>
     {% else %}
       <div class="empty-state">
-        <i>🛠️</i>
+        <div>⚙️</div>
         <p>No skills available yet</p>
-        <p>Be the first to share your skills with the community!</p>
+        <p>Be the first to share your skills with the community</p>
         {% if user.is_authenticated %}
-          <a href="{% url 'core:create_skill' %}" class="btn-view" style="margin-top: 15px;">
-            ➕ Add Your First Skill
+          <a href="{% url 'core:create_skill' %}" class="btn-view" style="margin-top: 20px;">
+            Add Your First Skill
           </a>
         {% else %}
-          <a href="{% url 'core:register' %}" class="btn-login" style="margin-top: 15px;">
-            🚀 Join Now
+          <a href="{% url 'core:register' %}" class="btn-login" style="margin-top: 20px;">
+            Join Now
           </a>
         {% endif %}
       </div>
     {% endif %}
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Add intersection observer for scroll animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const delay = entry.target.getAttribute('data-delay') * 100 || 0;
+        setTimeout(() => {
+          entry.target.classList.add('animate-in');
+        }, delay);
+      }
+    });
+  }, observerOptions);
+
+  // Observe all skill cards for scroll-triggered animations
+  document.querySelectorAll('.skill-card').forEach(card => {
+    observer.observe(card);
+  });
+
+  // Add ripple effect to buttons
+  function createRipple(event) {
+    const button = event.currentTarget;
+    const circle = document.createElement('span');
+    const diameter = Math.max(button.clientWidth, button.clientHeight);
+    const radius = diameter / 2;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+    circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+    circle.classList.add('ripple');
+
+    const ripple = button.getElementsByClassName('ripple')[0];
+    if (ripple) {
+      ripple.remove();
+    }
+
+    button.appendChild(circle);
+  }
+
+  // Add ripple to buttons
+  const buttons = document.querySelectorAll('.btn-view, .btn-login');
+  buttons.forEach(button => {
+    button.addEventListener('click', createRipple);
+  });
+
+  // Add smooth hover effects with parallax
+  const interactiveElements = document.querySelectorAll('.skill-card, .btn-view, .btn-login, .skill-title, .meta-tag');
+  
+  interactiveElements.forEach(element => {
+    element.addEventListener('mouseenter', function(e) {
+      this.style.transition = 'all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)';
+    });
+  });
+
+  // Add mouse move parallax effect to cards
+  document.querySelectorAll('.skill-card').forEach(card => {
+    card.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const angleY = (x - centerX) / 25;
+      const angleX = (centerY - y) / 25;
+      
+      this.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) translateZ(10px)`;
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
+    });
+  });
+
+  // Add loading state for buttons
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      if (!this.href) return;
+      
+      const originalText = this.innerHTML;
+      this.innerHTML = 'Loading<span class="loading-dots"><span></span><span></span><span></span></span>';
+      this.style.pointerEvents = 'none';
+      
+      setTimeout(() => {
+        this.innerHTML = originalText;
+        this.style.pointerEvents = 'auto';
+      }, 1500);
+    });
+  });
+
+  // Add typewriter effect to header
+  const header = document.querySelector('.dashboard-header h2');
+  if (header) {
+    const text = header.textContent;
+    header.textContent = '';
+    let i = 0;
+    
+    function typeWriter() {
+      if (i < text.length) {
+        header.textContent += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 100);
+      }
+    }
+    
+    setTimeout(typeWriter, 500);
+  }
+});
+</script>
 
 {% endblock %}
