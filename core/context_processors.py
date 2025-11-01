@@ -1,25 +1,20 @@
 # core/context_processors.py
 from django.utils import timezone
-from .models import Skill, Message, SkillRequest  # Import your models
 
 def notification_counts(request):
     if not request.user.is_authenticated:
         return {}
     
     try:
+        # Import models INSIDE the function to avoid circular imports
+        from .models import Skill, Message, SkillRequest
+        
         # Count new skills added today (excluding user's own skills)
         new_skills_count = Skill.objects.filter(
             created_at__date=timezone.now().date()
         ).exclude(user=request.user).count()
         
-        # Count pending meeting requests (adjust based on your Meeting model)
-        # If you have a Meeting model, use this:
-        # meeting_notifications_count = Meeting.objects.filter(
-        #     participants=request.user,
-        #     status='pending'
-        # ).count()
-        
-        # For now, using skill requests as meetings count
+        # Count pending meeting requests
         meeting_notifications_count = SkillRequest.objects.filter(
             skill__user=request.user,  # Requests received for user's skills
             status='PENDING'
@@ -31,7 +26,7 @@ def notification_counts(request):
             status='PENDING'
         ).count()
         
-        # Count unread messages (you already have this)
+        # Count unread messages
         unread_count = Message.objects.filter(
             to_user=request.user, 
             is_read=False
@@ -55,6 +50,7 @@ def notification_counts(request):
         
     except Exception as e:
         # Return empty counts if there's any error
+        print(f"Error in notification_counts: {e}")  # For debugging
         return {
             'new_skills_count': 0,
             'meeting_notifications_count': 0,
