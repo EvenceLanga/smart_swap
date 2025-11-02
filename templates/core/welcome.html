@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to SmartSwap</title>
+  <!-- Futuristic Font: Audiowide -->
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 4em;
+      letter-spacing: 4px;
+      text-shadow: 0 0 9px #ffffff;
+      opacity: 1;
+      animation: fadeInDown 1.2s ease-out forwards;
+    }
+
+    .slogan {
+      font-size: 1.5em;
+      color: #cccccc;
+      margin-top: 20px;
+      height: 40px;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid #00ffe7;
+      animation: typing 4s steps(30, end), blink 0.7s step-end infinite;
+    }
+
+    .glow-button {
+      margin-top: 40px;
+      padding: 15px 30px;
+      font-size: 1em;
+      background-color: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #ffffff;
+      opacity: 0;
+      animation: fadeInUp 1.5s ease-out forwards;
+      animation-delay: 1.6s;
+    }
+
+    .glow-button:hover {
+      background-color: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 20px #ffffff;
+    }
+
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    .button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* space between buttons */
+  margin-top: 20px;
+}
+
+.neon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s ease;
+  position: relative;
+}
+
+.neon-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 2px;
+  background: linear-gradient(45deg, #ffffff, #ffffff);
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+}
+
+.login-btn {
+  box-shadow: 0 0 20px #e2e5e7, 0 0 40px #e9ecee;
+  color: #ffffff;
+}
+
+.login-btn:hover {
+  background: rgba(0, 170, 255, 0.2);
+  box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+}
+
+.register-btn {
+  box-shadow: 0 0 20px #dde4e0, 0 0 40px #ffffff;
+  color: #ffffff;
+}
+
+.register-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
+}
+
+.neon-btn i {
+  font-size: 1rem;
+}
+
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div class="container">
+    <h1>Welcome to SmartSwap</h1>
+    <div class="slogan">Where Skills Meet Opportunity.</div>
+      <div class="button-container">
+        <a href="{% url 'core:login' %}" class="neon-btn login-btn">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+        <a href="{% url 'core:register' %}" class="neon-btn register-btn">
+          <i class="fas fa-user-plus"></i> Register
+        </a>
+      </div>
+
+  </div>
+
+  
+  
+</body>
+</html>
