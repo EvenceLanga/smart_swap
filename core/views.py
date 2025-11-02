@@ -84,6 +84,14 @@ def edit_profile(request):
     
     return render(request, 'core/edit_profile.html', {'form': form})
 
+def welcome(request):
+      # If user is logged in, redirect to dashboard instead of index
+    if request.user.is_authenticated:
+        return redirect('core:dashboard')
+    
+    skills = Skill.objects.order_by('-created_at')[:10]
+    return render(request, 'core/welcome.html', {'skills': skills})
+
 def index(request):
     # If user is logged in, redirect to dashboard instead of index
     if request.user.is_authenticated:
