@@ -72,7 +72,23 @@ urlpatterns = [
     path('messages/send/', views.send_message, name='send_message'),
     path('reply_message/', views.reply_message, name='reply_message'),
     path('conversation/<str:username>/', views.conversation, name='conversation'),
+    # Message requests and blocking
+    path('message-requests/', views.message_requests, name='message_requests'),
+    path('message-requests/<int:request_id>/accept/', views.accept_message_request, name='accept_message_request'),
+    path('message-requests/<int:request_id>/decline/', views.decline_message_request, name='decline_message_request'),
     
+    # Blocking and message request URLs
+    path('block-user/<str:username>/', views.block_user, name='block_user'),
+    path('unblock-user/<str:username>/', views.unblock_user, name='unblock_user'),
+    path('accept-message-request/<str:username>/', views.accept_message_request, name='accept_message_request'),
+    path('reject-message-request/<str:username>/', views.reject_message_request, name='reject_message_request'),
+    path('message-requests/<int:request_id>/decline/', views.decline_message_request, name='decline_message_request'),
+    path('report-user/<str:username>/', views.report_user, name='report_user'),
+    path('message-requests/', views.message_requests, name='message_requests'),
+     path('block-user/<str:username>/', views.block_user, name='block_user'),
+     path('unblock-user/<str:username>/', views.unblock_user, name='unblock_user'),
+     path('blocked-users/', views.blocked_users_list, name='blocked_users_list'),
+
     # Modern Chat URLs
     path('chat/', views.chat_dashboard, name='chat_dashboard'),
     path('quick-schedule/<str:username>/', views.quick_schedule, name='quick_schedule'),
@@ -80,6 +96,9 @@ urlpatterns = [
     path('chat/mark-read/<str:username>/', views.mark_messages_read, name='mark_messages_read'),
     path('chat/search-users/', views.search_users, name='search_users'),
     path('chat/<str:username>/', views.chat_room, name='chat_room'),
+    path('debug-userblock/', views.debug_userblock_fields, name='debug_userblock'),
+    path('debug-userblock/', views.debug_userblock, name='debug_userblock'),
+    path('debug-models/', views.debug_models, name='debug_models'),
     
     # Meeting URLs
     path('meetings/', views.my_meetings, name='my_meetings'),

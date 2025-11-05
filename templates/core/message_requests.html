@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Message Requests</h2>
+    
+    {% if pending_requests %}
+        {% for request in pending_requests %}
+        <div class="message-request-card">
+            <div class="request-header">
+                <div class="user-info">
+                    <div class="avatar">{{ request.from_user.username|first|upper }}</div>
+                    <div>
+                        <strong>{{ request.from_user.username }}</strong>
+                        <small>{{ request.created_at|timesince }} ago</small>
+                    </div>
+                </div>
+                <div class="request-actions">
+                    <a href="{% url 'core:accept_message_request' request.id %}" class="btn btn-success">Accept</a>
+                    <a href="{% url 'core:decline_message_request' request.id %}" class="btn btn-danger">Decline</a>
+                    <a href="{% url 'core:block_user' request.from_user.id %}" class="btn btn-warning">Block</a>
+                </div>
+            </div>
+            <div class="request-message">
+                <p>{{ request.message.content }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No pending message requests.</p>
+    {% endif %}
+</div>
+{% endblock %}

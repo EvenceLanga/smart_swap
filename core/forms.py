@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from .models import Skill, StudentProfile, Meeting
 from django.utils import timezone
 from django.contrib.auth.forms import UserCreationForm
+
 class UserRegistrationForm(UserCreationForm):
     first_name = forms.CharField(
         required=True,
@@ -52,10 +53,18 @@ class UserRegistrationForm(UserCreationForm):
         return email
 
 
+from django import forms
+from .models import Skill
+
 class SkillForm(forms.ModelForm):
     class Meta:
         model = Skill
-        fields = ['title','category','description','level','availability']
+        fields = ['title', 'category', 'description', 'level', 'availability']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Enter skill title'}),
+            'description': forms.Textarea(attrs={'placeholder': 'Describe your skill'}),
+        }
+
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:
