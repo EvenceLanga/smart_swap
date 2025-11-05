@@ -197,3 +197,5 @@ EMAIL_HOST_USER = 'techsphere92@gmail.com'
 EMAIL_HOST_PASSWORD = 'parw nyyq afrw hwtk'
 DEFAULT_FROM_EMAIL = 'noreply@skillswap.com'
 
+if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('DJANGO_PRODUCTION'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
