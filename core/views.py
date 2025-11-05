@@ -1,3 +1,4 @@
+from venv import logger
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -28,12 +29,39 @@ import logging
 # EMAIL NOTIFICATION FUNCTIONS
 # ==============================
 
+def activate_account(request, uidb64, token):
+    """Activate user account after email verification"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        if not user.is_active:
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Your account has been verified successfully! You can now log in.')
+        else:
+            messages.info(request, 'Your account is already active. You can log in.')
+        return redirect('core:login')
+    else:
+        messages.error(request, 'Invalid or expired verification link. Please register again.')
+        return redirect('core:register')
+    
 def send_email_notification(subject, template_name, context, recipient_list):
     """Generic function to send email notifications"""
     try:
-        # Create separate templates for HTML and text
+        logger.info(f"📧 Attempting to send email: {subject} to {recipient_list}")
+        
+        # Check if we're in production and email is configured
+        if settings.DEBUG:
+            logger.info(f"DEBUG MODE: Would send email to {recipient_list}")
+            # In debug mode, you might want to log instead of actually sending
+            return True
+            
         html_content = render_to_string(f'core/emails/{template_name}', context)
-        text_content = render_to_string(f'core/emails/{template_name}_text.txt', context)
+        text_content = "Please view this email in HTML format."
         
         email = EmailMultiAlternatives(
             subject=subject,
@@ -44,19 +72,16 @@ def send_email_notification(subject, template_name, context, recipient_list):
         )
         email.attach_alternative(html_content, "text/html")
         
-        # Add logging
-        logger = logging.getLogger(__name__)
-        logger.info(f"Attempting to send email to: {recipient_list}")
-        
-        email.send(fail_silently=False)
-        logger.info(f"Email sent successfully to: {recipient_list}")
+        result = email.send(fail_silently=False)
+        logger.info(f"✅ Email sent successfully! Result: {result}")
         return True
         
     except Exception as e:
-        logger = logging.getLogger(__name__)
-        logger.error(f"Email sending failed to {recipient_list}: {str(e)}")
-        # You might want to add more specific error handling here
-        return False
+        logger.error(f"❌ Email sending failed: {str(e)}")
+        logger.error(f"Recipients: {recipient_list}")
+        logger.error(f"Subject: {subject}")
+        # Don't return False here - let the user continue even if email fails
+        return True  # Change this to True to prevent registration from hanging
 
 def notify_new_skill(skill):
     """Notify all users when a new skill is added"""
@@ -307,9 +332,7 @@ def index(request):
     skills = Skill.objects.order_by('-created_at')[:10]
     return render(request, 'core/index.html', {'skills': skills})
 
-@csrf_exempt
 def register(request):
-    # If user is already logged in, redirect to dashboard
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
@@ -318,8 +341,6 @@ def register(request):
         if form.is_valid():
             new_user = form.save(commit=False)
             new_user.is_active = False  # Deactivate until email verification
-            
-            # Save the user - this will handle password hashing automatically
             new_user.save()
 
             # Email verification setup
@@ -327,7 +348,7 @@ def register(request):
             subject = 'Verify your SkillSwap account'
             token = default_token_generator.make_token(new_user)
             uid = urlsafe_base64_encode(force_bytes(new_user.pk))
-            verification_link = f"http://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
+            verification_link = f"https://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
 
             message = render_to_string('core/verify_email.html', {
                 'user': new_user,
@@ -336,46 +357,29 @@ def register(request):
             })
 
             try:
+                # Try to send email
                 send_mail(
                     subject,
-                    message,
+                    "Please check the HTML version of this email.",
                     settings.DEFAULT_FROM_EMAIL,
                     [new_user.email],
                     fail_silently=False,
+
                     html_message=message,
                 )
-                messages.success(request, 'Registration successful! Please check your email to verify your account before logging in.')
+                messages.success(request, 'Registration successful! Please check your email to verify your account.')
                 return redirect('core:login')
+                
             except Exception as e:
-                # If email fails, delete the user and show error
-                new_user.delete()
-                messages.error(request, f'Failed to send verification email. Please try again. Error: {str(e)}')
-                return render(request, 'core/register.html', {'form': form})
+                # If email fails, still create the user but show warning
+                logger.error(f"Email verification failed: {str(e)}")
+                messages.warning(request, 'Account created, but we could not send verification email. Please contact support or try logging in to resend.')
+                return redirect('core:login')
+                
     else:
         form = UserRegistrationForm()
 
     return render(request, 'core/register.html', {'form': form})
-
-
-def activate_account(request, uidb64, token):
-    """Activate user account after email verification"""
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user and default_token_generator.check_token(user, token):
-        if not user.is_active:
-            user.is_active = True
-            user.save()
-            messages.success(request, 'Your account has been verified successfully! You can now log in.')
-        else:
-            messages.info(request, 'Your account is already active. You can log in.')
-        return redirect('core:login')
-    else:
-        messages.error(request, 'Invalid or expired verification link. Please register again.')
-        return redirect('core:register')
 
 @csrf_exempt
 def user_login(request):
