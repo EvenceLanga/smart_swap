@@ -334,62 +334,46 @@ def index(request):
     skills = Skill.objects.order_by('-created_at')[:10]
     return render(request, 'core/index.html', {'skills': skills})
 
+@csrf_exempt
 def register(request):
-    """User registration with email verification"""
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            try:
-                new_user = form.save(commit=False)
-                # TEMPORARY: Activate users immediately until email is fixed
-                new_user.is_active = True
-                new_user.save()
+            new_user = form.save(commit=False)
+            new_user.is_active = False  # Deactivate until email verification
+            new_user.save()
 
-                # Try to send welcome email (but don't break if it fails)
-                try:
-                    current_site = get_current_site(request)
-                    subject = 'Welcome to SkillSwap!'
-                    html_message = render_to_string('core/emails/welcome_email.html', {
-                        'user': new_user,
-                        'domain': current_site.domain,
-                    })
-                    
-                    text_message = f"""
-                    Welcome to SkillSwap, {new_user.username}!
-                    
-                    Your account has been created successfully.
-                    You can now log in and start sharing skills.
-                    
-                    Thank you,
-                    The SkillSwap Team
-                    """
-                    
-                    send_mail(
-                        subject=subject,
-                        message=text_message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[new_user.email],
-                        html_message=html_message,
-                        fail_silently=True,  # Don't raise errors
-                    )
-                    
-                    messages.success(request, 'Registration successful! Welcome email sent.')
-                    logger.info(f"Welcome email sent to {new_user.email}")
-                    
-                except Exception as e:
-                    logger.error(f"Email sending failed: {str(e)}")
-                    messages.success(request, 'Registration successful! You can now log in.')
-                
+            # Email verification setup
+            current_site = get_current_site(request)
+            subject = 'Verify your SkillSwap account'
+            token = default_token_generator.make_token(new_user)
+            uid = urlsafe_base64_encode(force_bytes(new_user.pk))
+            verification_link = f"http://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
+
+            message = render_to_string('core/verify_email.html', {
+                'user': new_user,
+                'verification_link': verification_link,
+                'domain': current_site.domain,
+            })
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [new_user.email],
+                    fail_silently=False,
+                    html_message=message,
+                )
+                messages.success(request, 'Registration successful! Please check your email to verify your account before logging in.')
                 return redirect('core:login')
-                
             except Exception as e:
-                logger.error(f"Registration error: {str(e)}")
-                messages.error(request, 'An error occurred during registration. Please try again.')
+                new_user.delete()
+                messages.error(request, f'Failed to send verification email. Please try again. Error: {str(e)}')
                 return render(request, 'core/register.html', {'form': form})
-                
     else:
         form = UserRegistrationForm()
 
