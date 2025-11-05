@@ -10,6 +10,8 @@ urlpatterns = [
     # Public & Auth URLs
     path('', views.welcome, name='welcome'),
     path('register/', views.register, name='register'),
+    path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
+    path('resend-verification/', views.resend_verification_email, name='resend_verification'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('index/', views.index, name='index'),
@@ -41,9 +43,6 @@ urlpatterns = [
          ), 
          name='password_reset_complete'),
     
-    # Debug URL
-    path('debug-email/', views.debug_email_test, name='debug_email'),
-
     # User Dashboard & Profile URLs
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),

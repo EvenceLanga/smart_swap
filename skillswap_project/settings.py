@@ -185,18 +185,15 @@ LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGOUT_REDIRECT_URL = 'core:index'     
 SECURE_SSL_REDIRECT = False
 
+# Custom user model
+#AUTH_USER_MODEL = 'core.CustomUser'
 
-# Email Configuration
+# Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'da16.domains.co.za'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True  # Use SSL for port 465
-EMAIL_USE_TLS = False  # Disable TLS when using SSL
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'info@novatechsupplies.co.za'  # Must match EMAIL_HOST_USER
-SERVER_EMAIL = 'info@novatechsupplies.co.za'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'techsphere92@gmail.com'
+EMAIL_HOST_PASSWORD = 'parw nyyq afrw hwtk'
+DEFAULT_FROM_EMAIL = 'noreply@skillswap.com'
 
-# For development - use console backend
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

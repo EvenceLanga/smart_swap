@@ -2,20 +2,55 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Skill, StudentProfile, Meeting
 from django.utils import timezone
-
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Repeat password', widget=forms.PasswordInput)
+from django.contrib.auth.forms import UserCreationForm
+class UserRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Enter your first name',
+            'required': 'required'
+        })
+    )
+    
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Enter your email address',
+            'required': 'required'
+        })
+    )
 
     class Meta:
         model = User
-        fields = ('username','first_name','email')
+        fields = ['username', 'first_name', 'email', 'password1', 'password2']
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Customize the password fields
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Create a password',
+            'required': 'required'
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Confirm your password',
+            'required': 'required'
+        })
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Choose a username',
+            'required': 'required'
+        })
+        
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already registered.")
+        return email
 
-    def clean_password2(self):
-        cd = self.cleaned_data
-        if cd.get('password') != cd.get('password2'):
-            raise forms.ValidationError('Passwords don\'t match.')
-        return cd.get('password2')
 
 class SkillForm(forms.ModelForm):
     class Meta:

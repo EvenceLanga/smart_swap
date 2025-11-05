@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; text-align: center;">
+    <h2>Activation Link Invalid</h2>
+    <p>Sorry, this activation link is invalid or has expired.</p>
+
+    <p>
+        Please <a href="{% url 'core:resend_activation' %}">click here</a> to request a new activation email.
+    </p>
+
+    <p><a href="{% url 'core:login' %}" class="btn btn-primary">Back to Login</a></p>
+</div>
+{% endblock %}

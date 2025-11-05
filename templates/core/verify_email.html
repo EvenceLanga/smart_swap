@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email - SmartSwap</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .header {
+            background: #000;
+            color: #fff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-text {
+            font-size: 18px;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        .verification-box {
+            background: #f2f2f2;
+            border-left: 4px solid #000;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .btn {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #333;
+        }
+        .link-text {
+            background: #f2f2f2;
+            padding: 15px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+            color: #000;
+            margin: 15px 0;
+        }
+        .footer {
+            background: #f2f2f2;
+            padding: 20px;
+            text-align: center;
+            color: #000;
+            font-size: 14px;
+            border-top: 1px solid #ccc;
+        }
+        .expiry-note {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 20px 0;
+            color: #000;
+        }
+        .security-note {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 20px 0;
+            color: #000;
+        }
+        ul {
+            color: #000;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Welcome to SkillSwap!</h1>
+        </div>
+        
+        <div class="content">
+            <p class="welcome-text">Hello <strong>{{ user.username }}</strong>,</p>
+            
+            <p>Thank you for joining SmartSwap! We're excited to have you in our community of learners and teachers.</p>
+            
+            <div class="verification-box">
+                <p style="margin: 0; font-weight: 600;">To complete your registration and start swapping skills, please verify your email address:</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ verification_link }}" class="btn">Verify Email Address</a>
+            </div>
+            
+            <p style="text-align: center; color: #000; margin-bottom: 10px;">Or copy and paste this link in your browser:</p>
+            
+            <div class="link-text">{{ verification_link }}</div>
+            
+            <div class="expiry-note">
+                <strong>Important:</strong> This verification link will expire in 24 hours.
+            </div>
+            
+            <div class="security-note">
+                <strong>Security Note:</strong> If you didn't create an account with SkillSwap, please ignore this email.
+            </div>
+            
+            <p>Once verified, you'll be able to:</p>
+            <ul>
+                <li>Browse and request skills from other students</li>
+                <li>Offer your own skills to teach</li>
+                <li>Schedule learning sessions</li>
+                <li>Join our community discussions</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,<br><strong>The SkillSwap Team</strong></p>
+            <p style="margin-top: 15px; font-size: 12px; color: #000;">
+                Need help? Contact us at support@skillswap.com
+            </p>
+        </div>
+    </div>
+</body>
+</html>

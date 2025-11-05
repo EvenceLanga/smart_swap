@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Review Received</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; padding: 30px 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">⭐ New Review Received!</h1>
+        </div>
+        
+        <div style="padding: 40px 30px;">
+            <p>Hello <strong>{{ skill_owner.username }}</strong>,</p>
+            
+            <p>Great news! You've received a new review for your skill:</p>
+            
+            <div style="background: #f8f9fa; border-left: 4px solid #fbbf24; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                <h3 style="margin: 0 0 10px 0; color: #333;">{{ skill.title }}</h3>
+                <p style="margin: 5px 0; color: #666;"><strong>From:</strong> {{ reviewer.username }}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Rating:</strong> 
+                    <span style="color: #f59e0b;">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                    ({{ review.rating }}/5)
+                </p>
+                {% if review.comment %}
+                <div style="background: white; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <p style="margin: 0; color: #555; font-style: italic;">"{{ review.comment }}"</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0; color: #92400e; font-weight: 600;">🌟 Your Impact Matters</p>
+                <p style="margin: 5px 0 0 0; color: #374151;">Reviews help build your reputation and attract more learners to your skills!</p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="http://{{ site_name }}{% url 'core:skill_detail' skill.id %}" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block;">
+                    View Your Skill
+                </a>
+            </div>
+
+            <p style="color: #666; font-size: 14px; text-align: center;">
+                "The best way to appreciate your job is to imagine yourself without it." - Oscar Wilde
+            </p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; border-top: 1px solid #e9ecef;">
+            <p>Best regards,<br><strong>The {{ site_name }} Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

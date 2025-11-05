@@ -1,4 +1,3 @@
-from gettext import translation
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -6,86 +5,294 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.views import redirect_to_login
-from .forms import UserRegistrationForm, SkillForm
-from .models import StudentProfile, Skill, SkillRequest, Review, Message
+from .forms import UserRegistrationForm, SkillForm, StudentProfileForm, MeetingForm
+from .models import StudentProfile, Skill, SkillRequest, Review, Message, Notification, Meeting, Report
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import Message, Notification
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from .forms import StudentProfileForm
-from core import models
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Avg
-from django.shortcuts import render
-from django.contrib.auth.models import User
-from .models import Skill, SkillRequest, Review, Meeting
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count, Avg, Q
-from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import timedelta, datetime
-from .models import Meeting
-from .forms import MeetingForm
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.conf import settings
+from django.db import transaction
+import logging
 
-@staff_member_required
-def admin_dashboard(request):
-    total_users = User.objects.count()
-    total_skills = Skill.objects.count()
-    total_requests = SkillRequest.objects.count()
-    completed_swaps = SkillRequest.objects.filter(status='COMPLETED').count()
-    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0
-    total_meetings = Meeting.objects.count()
+# ==============================
+# EMAIL NOTIFICATION FUNCTIONS
+# ==============================
 
-    popular_categories = (
-        Skill.objects.values('category')
-        .annotate(total=Count('id'))
-        .order_by('-total')[:5]
-    )
+def send_email_notification(subject, template_name, context, recipient_list):
+    """Generic function to send email notifications"""
+    try:
+        # Create separate templates for HTML and text
+        html_content = render_to_string(f'core/emails/{template_name}', context)
+        text_content = render_to_string(f'core/emails/{template_name}_text.txt', context)
+        
+        email = EmailMultiAlternatives(
+            subject=subject,
+            body=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=recipient_list,
+            reply_to=[settings.DEFAULT_FROM_EMAIL]
+        )
+        email.attach_alternative(html_content, "text/html")
+        
+        # Add logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Attempting to send email to: {recipient_list}")
+        
+        email.send(fail_silently=False)
+        logger.info(f"Email sent successfully to: {recipient_list}")
+        return True
+        
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Email sending failed to {recipient_list}: {str(e)}")
+        # You might want to add more specific error handling here
+        return False
 
-    return render(request, 'core/admin_dashboard.html', {
-        'total_users': total_users,
-        'total_skills': total_skills,
-        'total_requests': total_requests,
-        'completed_swaps': completed_swaps,
-        'avg_rating': round(avg_rating, 2),
-        'total_meetings': total_meetings,
-        'popular_categories': popular_categories,
-    })
+def notify_new_skill(skill):
+    """Notify all users when a new skill is added"""
+    try:
+        users = User.objects.filter(is_active=True).exclude(id=skill.owner.id)
+        
+        subject = f"🎯 New Skill Available: {skill.title}"
+        template_name = 'new_skill_notification.html'
+        
+        for user in users:
+            context = {
+                'user': user,
+                'skill': skill,
+                'skill_owner': skill.owner,
+                'site_name': get_current_site(None).name,
+            }
+            
+            send_email_notification(subject, template_name, context, [user.email])
+            
+            # Also create in-app notification
+            Notification.objects.create(
+                user=user,
+                message=f"New skill available: {skill.title} by {skill.owner.username}",
+                notification_type='new_skill'
+            )
+    except Exception as e:
+        print(f"Error in notify_new_skill: {str(e)}")
 
+def notify_skill_request(skill_request):
+    """Notify skill owner when someone requests their skill"""
+    try:
+        subject = f"📬 New Skill Request: {skill_request.skill.title}"
+        template_name = 'skill_request_notification.html'
+        
+        context = {
+            'skill_owner': skill_request.owner,
+            'requester': skill_request.requester,
+            'skill': skill_request.skill,
+            'request': skill_request,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [skill_request.owner.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=skill_request.owner,
+            message=f"{skill_request.requester.username} requested to learn {skill_request.skill.title}",
+            notification_type='skill_request'
+        )
+    except Exception as e:
+        print(f"Error in notify_skill_request: {str(e)}")
 
+def notify_request_status(skill_request, status):
+    """Notify requester when their skill request is approved/rejected"""
+    try:
+        status_display = "approved" if status == 'APPROVED' else "rejected"
+        subject = f"📝 Skill Request {status_display.capitalize()}: {skill_request.skill.title}"
+        template_name = 'request_status_notification.html'
+        
+        context = {
+            'requester': skill_request.requester,
+            'skill_owner': skill_request.owner,
+            'skill': skill_request.skill,
+            'status': status,
+            'status_display': status_display,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [skill_request.requester.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=skill_request.requester,
+            message=f"Your request for {skill_request.skill.title} has been {status_display}",
+            notification_type='request_status'
+        )
+    except Exception as e:
+        print(f"Error in notify_request_status: {str(e)}")
 
-def view_profile(request, username):
-    profile_user = get_object_or_404(User, username=username)
-    
-    # Use the same relationship name as in models.py
-    profile = getattr(profile_user, "profile", None)  # Changed from "studentprofile" to "profile"
-    
-    reviews = profile_user.reviews_received.all() if hasattr(profile_user, "reviews_received") else []
-    
-    return render(
-        request,
-        'core/view_profile.html',
-        {'profile_user': profile_user, 'profile': profile, 'reviews': reviews}
-    )
+def notify_meeting_invite(meeting, participant):
+    """Notify participants when invited to a meeting"""
+    try:
+        subject = f"📅 Meeting Invitation: {meeting.title}"
+        template_name = 'meeting_invite_notification.html'
+        
+        context = {
+            'participant': participant,
+            'meeting': meeting,
+            'organizer': meeting.organizer,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [participant.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=participant,
+            message=f"{meeting.organizer.username} invited you to a meeting: {meeting.title}",
+            notification_type='meeting_invite'
+        )
+    except Exception as e:
+        print(f"Error in notify_meeting_invite: {str(e)}")
 
-def edit_profile(request):
-    """Allow current user to edit their own profile"""
-    # Get or create profile
-    profile, created = StudentProfile.objects.get_or_create(user=request.user)
-    
-    if request.method == 'POST':
-        form = StudentProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('core:view_profile', username=request.user.username)
-    else:
-        form = StudentProfileForm(instance=profile)
-    
-    return render(request, 'core/edit_profile.html', {'form': form})
+def notify_meeting_update(meeting, participant, update_type):
+    """Notify participants about meeting updates"""
+    try:
+        subject = f"🔄 Meeting Updated: {meeting.title}"
+        template_name = 'meeting_update_notification.html'
+        
+        context = {
+            'participant': participant,
+            'meeting': meeting,
+            'update_type': update_type,
+            'organizer': meeting.organizer,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [participant.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=participant,
+            message=f"Meeting '{meeting.title}' has been {update_type}",
+            notification_type='meeting_update'
+        )
+    except Exception as e:
+        print(f"Error in notify_meeting_update: {str(e)}")
+
+def notify_new_review(review):
+    """Notify skill owner when they receive a new review"""
+    try:
+        subject = f"⭐ New Review for Your Skill: {review.skill.title}"
+        template_name = 'new_review_notification.html'
+        
+        context = {
+            'skill_owner': review.skill.owner,
+            'reviewer': review.reviewer,
+            'review': review,
+            'skill': review.skill,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [review.skill.owner.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=review.skill.owner,
+            message=f"{review.reviewer.username} left a review for {review.skill.title}",
+            notification_type='new_review'
+        )
+    except Exception as e:
+        print(f"Error in notify_new_review: {str(e)}")
+
+def notify_skill_session_start(skill_request):
+    """Notify participants when a skill session starts"""
+    try:
+        subject = f"🚀 Skill Session Started: {skill_request.skill.title}"
+        template_name = 'skill_session_start_notification.html'
+        
+        context = {
+            'participant': skill_request.requester,
+            'skill_owner': skill_request.owner,
+            'skill': skill_request.skill,
+            'skill_request': skill_request,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [skill_request.requester.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=skill_request.requester,
+            message=f"Skill session for {skill_request.skill.title} has started!",
+            notification_type='skill_session'
+        )
+    except Exception as e:
+        print(f"Error in notify_skill_session_start: {str(e)}")
+
+def notify_skill_session_complete(skill_request):
+    """Notify participants when a skill session is completed"""
+    try:
+        subject = f"🎉 Skill Session Completed: {skill_request.skill.title}"
+        template_name = 'skill_session_complete_notification.html'
+        
+        # Notify both parties
+        for user in [skill_request.requester, skill_request.owner]:
+            context = {
+                'user': user,
+                'other_user': skill_request.requester if user == skill_request.owner else skill_request.owner,
+                'skill': skill_request.skill,
+                'skill_request': skill_request,
+                'site_name': get_current_site(None).name,
+            }
+            
+            send_email_notification(subject, template_name, context, [user.email])
+            
+            # In-app notification
+            Notification.objects.create(
+                user=user,
+                message=f"Skill session for {skill_request.skill.title} has been completed!",
+                notification_type='skill_completed'
+            )
+    except Exception as e:
+        print(f"Error in notify_skill_session_complete: {str(e)}")
+
+def notify_new_message(message):
+    """Notify user when they receive a new message"""
+    try:
+        subject = f"💬 New Message from {message.from_user.username}"
+        template_name = 'new_message_notification.html'
+        
+        context = {
+            'recipient': message.to_user,
+            'sender': message.from_user,
+            'message': message,
+            'site_name': get_current_site(None).name,
+        }
+        
+        send_email_notification(subject, template_name, context, [message.to_user.email])
+        
+        # In-app notification
+        Notification.objects.create(
+            user=message.to_user,
+            message=f"New message from {message.from_user.username}",
+            notification_type='message'
+        )
+    except Exception as e:
+        print(f"Error in notify_new_message: {str(e)}")
+
+# ==============================
+# AUTHENTICATION VIEWS
+# ==============================
 
 def welcome(request):
-      # If user is logged in, redirect to dashboard instead of index
+    """Welcome page for non-authenticated users"""
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
@@ -93,7 +300,7 @@ def welcome(request):
     return render(request, 'core/welcome.html', {'skills': skills})
 
 def index(request):
-    # If user is logged in, redirect to dashboard instead of index
+    """Home page for non-authenticated users"""
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
@@ -102,26 +309,77 @@ def index(request):
 
 @csrf_exempt
 def register(request):
+    # If user is already logged in, redirect to dashboard
+    if request.user.is_authenticated:
+        return redirect('core:dashboard')
+    
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             new_user = form.save(commit=False)
-            new_user.set_password(form.cleaned_data['password'])
+            new_user.is_active = False  # Deactivate until email verification
+            
+            # Save the user - this will handle password hashing automatically
             new_user.save()
 
-            # Automatically log in the user after registration
-            login(request, new_user)
+            # Email verification setup
+            current_site = get_current_site(request)
+            subject = 'Verify your SkillSwap account'
+            token = default_token_generator.make_token(new_user)
+            uid = urlsafe_base64_encode(force_bytes(new_user.pk))
+            verification_link = f"http://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
 
-            messages.success(request, 'Registration successful! Please complete your profile.')
-            return redirect('core:edit_profile')
+            message = render_to_string('core/verify_email.html', {
+                'user': new_user,
+                'verification_link': verification_link,
+                'domain': current_site.domain,
+            })
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [new_user.email],
+                    fail_silently=False,
+                    html_message=message,
+                )
+                messages.success(request, 'Registration successful! Please check your email to verify your account before logging in.')
+                return redirect('core:login')
+            except Exception as e:
+                # If email fails, delete the user and show error
+                new_user.delete()
+                messages.error(request, f'Failed to send verification email. Please try again. Error: {str(e)}')
+                return render(request, 'core/register.html', {'form': form})
     else:
         form = UserRegistrationForm()
 
     return render(request, 'core/register.html', {'form': form})
 
+
+def activate_account(request, uidb64, token):
+    """Activate user account after email verification"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        if not user.is_active:
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Your account has been verified successfully! You can now log in.')
+        else:
+            messages.info(request, 'Your account is already active. You can log in.')
+        return redirect('core:login')
+    else:
+        messages.error(request, 'Invalid or expired verification link. Please register again.')
+        return redirect('core:register')
+
 @csrf_exempt
 def user_login(request):
-    # ADD THIS CHECK - If user is already logged in, redirect to dashboard
+    """User login with email verification check"""
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
@@ -129,19 +387,107 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
-            login(request, user)
-            return redirect('core:dashboard')
+            if user.is_active:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.username}!')
+                return redirect('core:dashboard')
+            else:
+                # User exists but account is not active (email not verified)
+                messages.error(request, 'Please verify your email address before logging in. Check your email for the verification link.')
+                return render(request, 'core/login.html', {
+                    'username': username,
+                    'show_resend_verification': True
+                })
         else:
-            messages.error(request, 'Invalid credentials.')
+            messages.error(request, 'Invalid username or password.')
+    
     return render(request, 'core/login.html')
 
+def resend_verification_email(request):
+    """Resend email verification link"""
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            if user.is_active:
+                messages.info(request, 'Your account is already active. You can log in.')
+                return redirect('core:login')
+            
+            # Generate new verification email
+            current_site = get_current_site(request)
+            subject = 'Verify your SkillSwap account'
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            verification_link = f"http://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
+
+            message = render_to_string('core/verify_email.html', {
+                'user': user,
+                'verification_link': verification_link,
+                'domain': current_site.domain,
+            })
+
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, 'Verification email sent! Please check your inbox.')
+            return redirect('core:login')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'No account found with this email address.')
+    
+    return render(request, 'core/resend_verification.html')
+
 def user_logout(request):
+    """User logout"""
     logout(request)
     return redirect('core:index')
 
+# ==============================
+# PROFILE VIEWS
+# ==============================
 
+def view_profile(request, username):
+    """View user profile"""
+    profile_user = get_object_or_404(User, username=username)
+    profile = getattr(profile_user, "profile", None)
+    reviews = profile_user.reviews_received.all() if hasattr(profile_user, "reviews_received") else []
+    
+    return render(
+        request,
+        'core/view_profile.html',
+        {'profile_user': profile_user, 'profile': profile, 'reviews': reviews}
+    )
+
+@login_required
+def edit_profile(request):
+    """Allow current user to edit their own profile"""
+    profile, created = StudentProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        form = StudentProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('core:view_profile', username=request.user.username)
+    else:
+        form = StudentProfileForm(instance=profile)
+    
+    return render(request, 'core/edit_profile.html', {'form': form})
+
+# ==============================
+# DASHBOARD & MAIN VIEWS
+# ==============================
+
+@login_required
 def dashboard(request):
+    """User dashboard"""
     my_skills = request.user.skills.all()
     my_requests = request.user.requests_made.all()
     received = request.user.requests_received.all()
@@ -163,13 +509,10 @@ def dashboard(request):
         'skills_with_stats': skills_with_stats,  
     })
 
-
+@login_required
 def skill_requests(request):
     """View for managing skill requests"""
-    # Requests user has made to others
     requests_made = request.user.requests_made.all()
-    
-    # Requests others have made to user's skills  
     requests_received = request.user.requests_received.all()
     
     return render(request, 'core/skill_requests.html', {
@@ -177,14 +520,12 @@ def skill_requests(request):
         'requests_received': requests_received,
     })
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count, Avg, Q
-from django.utils import timezone
-from datetime import timedelta
-
+# ==============================
+# SKILL MANAGEMENT VIEWS
+# ==============================
 
 def skill_list(request):
-    # Start with all skills
+    """List all skills with filtering and pagination"""
     skills = Skill.objects.all()
     
     # Get filter parameters from request
@@ -214,36 +555,26 @@ def skill_list(request):
     
     # Apply sorting
     if sort_by == 'popular':
-        # Sort by number of requests (most popular first)
         skills = skills.annotate(request_count=Count('requests')).order_by('-request_count', '-created_at')
     elif sort_by == 'rating':
-        # Sort by average rating (highest rated first)
-        skills = skills.annotate(
-            avg_rating=Avg('reviews__rating')
-        ).order_by('-avg_rating', '-created_at')
+        skills = skills.annotate(avg_rating=Avg('reviews__rating')).order_by('-avg_rating', '-created_at')
     elif sort_by == 'recent':
-        # Sort by most recently created
         skills = skills.order_by('-created_at')
     elif sort_by == 'name':
-        # Sort alphabetically by title
         skills = skills.order_by('title')
     else:
-        # Default sorting (most recent)
         skills = skills.order_by('-created_at')
     
     # Add additional context for each skill
     for skill in skills:
-        # Mark as new if created in last 7 days
         skill.is_new = (timezone.now() - skill.created_at).days <= 7
-        # Calculate average rating
         avg_rating = skill.reviews.aggregate(Avg('rating'))['rating__avg']
         skill.average_rating = round(avg_rating, 1) if avg_rating else None
-        # Get request count
         skill.request_count = skill.requests.count()
     
     # Pagination
     page = request.GET.get('page', 1)
-    paginator = Paginator(skills, 12)  # Show 12 skills per page
+    paginator = Paginator(skills, 12)
     
     try:
         skills_page = paginator.page(page)
@@ -254,8 +585,6 @@ def skill_list(request):
     
     # Get unique categories for filter dropdown
     categories = Skill.objects.values_list('category', flat=True).distinct().order_by('category')
-    
-    # Get unique levels for filter dropdown
     levels = Skill.objects.values_list('level', flat=True).distinct().order_by('level')
     
     context = {
@@ -271,23 +600,27 @@ def skill_list(request):
     
     return render(request, 'core/skill_list.html', context)
 
-
-
+@login_required
 def create_skill(request):
+    """Create a new skill"""
     if request.method == 'POST':
         form = SkillForm(request.POST)
         if form.is_valid():
             skill = form.save(commit=False)
             skill.owner = request.user
             skill.save()
-            messages.success(request, 'Skill created.')
+            
+            # Send notification to all users about new skill
+            notify_new_skill(skill)
+            
+            messages.success(request, 'Skill created and notified all users!')
             return redirect('core:skill_list')
     else:
         form = SkillForm()
     return render(request, 'core/create_skill.html', {'form': form})
 
-
 def skill_detail(request, skill_id):
+    """View skill details"""
     skill = get_object_or_404(Skill, id=skill_id)
     reviews = Review.objects.filter(skill=skill).order_by('-created_at')
     
@@ -318,8 +651,9 @@ def skill_detail(request, skill_id):
         'active_sessions': active_sessions,
     })
 
-
+@login_required
 def request_skill(request, skill_id):
+    """Request to learn a skill"""
     skill = get_object_or_404(Skill, id=skill_id)
     
     # Check if user is trying to request their own skill
@@ -354,10 +688,26 @@ def request_skill(request, skill_id):
         owner=skill.owner, 
         status='PENDING'
     )
-    messages.success(request, 'Request sent to skill owner.')
+    
+    # DEBUG: Log the notification attempt
+    logger = logging.getLogger(__name__)
+    logger.info(f"Creating skill request: {req.id}")
+    logger.info(f"Skill owner: {skill.owner.username} ({skill.owner.email})")
+    logger.info(f"Requester: {request.user.username} ({request.user.email})")
+    
+    # Send notification to skill owner
+    try:
+        notify_skill_request(req)
+        logger.info("Skill request notification function called successfully")
+    except Exception as e:
+        logger.error(f"Error in notify_skill_request: {str(e)}")
+        messages.warning(request, 'Request sent, but there was an issue with notifications.')
+    else:
+        messages.success(request, 'Request sent to skill owner.')
+    
     return redirect('core:dashboard')
 
-
+@login_required
 def start_skill_session(request, request_id):
     """Mark a skill request as In Progress"""
     skill_request = get_object_or_404(SkillRequest, id=request_id)
@@ -378,16 +728,12 @@ def start_skill_session(request, request_id):
     skill_request.save()
     
     # Send notification to requester
-    Notification.objects.create(
-        user=skill_request.requester,
-        message=f"Your skill session for '{skill_request.skill.title}' has started!",
-        notification_type='skill_session'
-    )
+    notify_skill_session_start(skill_request)
     
     messages.success(request, f"Skill session with {skill_request.requester.username} started!")
     return redirect('core:dashboard')
 
-
+@login_required
 def complete_skill_session(request, request_id):
     """Mark a skill request as Completed"""
     skill_request = get_object_or_404(SkillRequest, id=request_id)
@@ -407,36 +753,41 @@ def complete_skill_session(request, request_id):
     skill_request.completed_at = timezone.now()
     skill_request.save()
     
-    # Send notification to the other user
-    other_user = skill_request.requester if request.user == skill_request.owner else skill_request.owner
-    Notification.objects.create(
-        user=other_user,
-        message=f"Skill session for '{skill_request.skill.title}' has been completed!",
-        notification_type='skill_completed'
-    )
+    # Send notification to both parties
+    notify_skill_session_complete(skill_request)
     
     messages.success(request, f"Skill session completed successfully!")
     return redirect('core:dashboard')
 
-
-
+@login_required
 def accept_request(request, request_id):
+    """Accept a skill request"""
     req = get_object_or_404(SkillRequest, id=request_id, owner=request.user)
-    req.status = 'ACCEPTED'
+    req.status = 'APPROVED'
     req.save()
+    
+    # Send notification to requester
+    notify_request_status(req, 'APPROVED')
+    
     messages.success(request, 'Request accepted.')
     return redirect('core:dashboard')
 
-
+@login_required
 def reject_request(request, request_id):
+    """Reject a skill request"""
     req = get_object_or_404(SkillRequest, id=request_id, owner=request.user)
     req.status = 'REJECTED'
     req.save()
+    
+    # Send notification to requester
+    notify_request_status(req, 'REJECTED')
+    
     messages.success(request, 'Request rejected.')
     return redirect('core:dashboard')
 
-
+@login_required
 def complete_request(request, request_id):
+    """Mark a request as completed"""
     req = get_object_or_404(SkillRequest, id=request_id)
     if request.user not in [req.requester, req.owner]:
         messages.error(request, 'Not authorized.')
@@ -446,36 +797,13 @@ def complete_request(request, request_id):
     messages.success(request, 'Marked as completed. Please leave a review.')
     return redirect('core:dashboard')
 
+# ==============================
+# REVIEW VIEWS
+# ==============================
 
-def send_message(request):
-    users = User.objects.exclude(id=request.user.id)  # exclude current user
-    preselect = request.GET.get('to')  # ✅ capture preselected user ID
-
-    if request.method == 'POST':
-        recipient_id = request.POST.get('to_user')
-        message_text = request.POST.get('message')
-        recipient = get_object_or_404(User, id=recipient_id)
-
-        Message.objects.create(
-            from_user=request.user,
-            to_user=recipient,
-            content=message_text
-        )
-
-        # Optional: notification
-        Notification.objects.create(
-            user=recipient,
-            message=f"You have a new message from {request.user.username}"
-        )
-
-        messages.success(request, f"Message sent to {recipient.username}.")
-        return redirect('core:inbox')
-
-    # ✅ Include preselect in the context
-    return render(request, 'core/send_message.html', {'users': users, 'preselect': preselect})
-
-
+@login_required
 def add_review(request, skill_id):
+    """Add a review for a skill"""
     skill = get_object_or_404(Skill, id=skill_id)
 
     if request.method == 'POST':
@@ -483,18 +811,24 @@ def add_review(request, skill_id):
         comment = request.POST.get('comment')
 
         # Allow both owner and other users to review/comment
-        Review.objects.create(
+        review = Review.objects.create(
             skill=skill,
             reviewer=request.user,
             rating=rating,
             comment=comment,
             created_at=timezone.now()
         )
+        
+        # Send notification to skill owner about new review
+        if request.user != skill.owner:
+            notify_new_review(review)
+        
         messages.success(request, 'Your review or comment has been submitted.')
         return redirect('core:skill_detail', skill_id=skill_id)
 
-
+@login_required
 def edit_review(request, review_id):
+    """Edit a review"""
     review = get_object_or_404(Review, id=review_id)
 
     # Only the author of the review can edit
@@ -511,9 +845,9 @@ def edit_review(request, review_id):
 
     return render(request, 'core/edit_review.html', {'review': review})
 
-
-
+@login_required
 def delete_review(request, review_id):
+    """Delete a review"""
     review = get_object_or_404(Review, id=review_id)
 
     # Only the author can delete
@@ -529,18 +863,47 @@ def delete_review(request, review_id):
 
     return render(request, 'core/delete_review.html', {'review': review})
 
-from django.db.models import Q
+# ==============================
+# MESSAGING VIEWS
+# ==============================
 
+@login_required
+def send_message(request):
+    """Send a message to another user"""
+    users = User.objects.exclude(id=request.user.id)
+    preselect = request.GET.get('to')
 
+    if request.method == 'POST':
+        recipient_id = request.POST.get('to_user')
+        message_text = request.POST.get('message')
+        recipient = get_object_or_404(User, id=recipient_id)
+
+        message = Message.objects.create(
+            from_user=request.user,
+            to_user=recipient,
+            content=message_text
+        )
+
+        # Send email notification for new message
+        notify_new_message(message)
+
+        messages.success(request, f"Message sent to {recipient.username}.")
+        return redirect('core:inbox')
+
+    return render(request, 'core/send_message.html', {'users': users, 'preselect': preselect})
+
+@login_required
 def inbox(request):
-    # Identify all messages where the user is either sender or receiver
+    """View user's inbox"""
     messages = Message.objects.filter(
         Q(to_user=request.user) | Q(from_user=request.user)
     ).order_by('sent_at')
 
     return render(request, 'core/inbox.html', {'messages': messages})
 
+@login_required
 def reply_message(request):
+    """Reply to a message"""
     if request.method == 'POST':
         to_user_id = request.POST.get('to_user_id')
         content = request.POST.get('content')
@@ -552,16 +915,22 @@ def reply_message(request):
             messages.error(request, "User not found.")
             return redirect('core:inbox')
 
-        Message.objects.create(
+        message = Message.objects.create(
             from_user=request.user,
             to_user=to_user,
             content=content,
             attachment=attachment
         )
+        
+        # Send notification for reply
+        notify_new_message(message)
+        
         messages.success(request, "Reply sent successfully!")
     return redirect('core:inbox')
 
+@login_required
 def chat_room(request, username):
+    """Chat room with specific user"""
     other_user = get_object_or_404(User, username=username)
     room_name = f"chat_{min(request.user.id, other_user.id)}_{max(request.user.id, other_user.id)}"
 
@@ -577,45 +946,15 @@ def chat_room(request, username):
         'messages': chat_messages,
     })
 
-def user_profile(request, user_id):
-    profile_user = get_object_or_404(User, id=user_id)
-    skills = Skill.objects.filter(owner=profile_user)
-    return render(request, 'core/user_profile.html', {'profile_user': profile_user, 'skills': skills})
-
-def search_skills(request):
-    query = request.GET.get('q')
-    if query:
-        results = Skill.objects.filter(title__icontains=query)
-    else:
-        results = Skill.objects.none()
-    return render(request, 'core/search_results.html', {'results': results, 'query': query})
-
-
-def notifications(request):
-    # Placeholder for now — you can later connect to real Notification model
-    return render(request, 'core/notifications.html', {})
-
-
-def conversation(request, username):
-    other_user = get_object_or_404(User, username=username)
-    messages = Message.objects.filter(
-        Q(from_user=request.user, to_user=other_user) |
-        Q(from_user=other_user, to_user=request.user)
-    ).order_by('sent_at')
-    return render(request, 'core/conversation.html', {'messages': messages, 'other_user': other_user})
-
-
-
+@login_required
 def chat_dashboard(request):
     """Main chat dashboard with conversation list and active chat"""
     
     # Get all unique users that the current user has conversed with
-    # Messages where current user is sender
     sent_to_users = Message.objects.filter(
         from_user=request.user
     ).values_list('to_user', flat=True).distinct()
     
-    # Messages where current user is receiver  
     received_from_users = Message.objects.filter(
         to_user=request.user
     ).values_list('from_user', flat=True).distinct()
@@ -674,14 +1013,14 @@ def chat_dashboard(request):
     ).order_by('scheduled_date')[:5]
     
     return render(request, 'core/chat_dashboard.html', {
-        'user_data': user_data,  # Pass the structured data instead of raw users
+        'user_data': user_data,
         'active_user': active_user,
         'active_messages': active_messages,
         'upcoming_meetings': upcoming_meetings,
         'users': User.objects.exclude(id=request.user.id)
     })
 
-
+@login_required
 def send_chat_message(request):
     """Send message from chat interface"""
     if request.method == 'POST':
@@ -691,22 +1030,22 @@ def send_chat_message(request):
         
         if to_user_id and content:
             to_user = get_object_or_404(User, id=to_user_id)
-            Message.objects.create(
+            message = Message.objects.create(
                 from_user=request.user,
                 to_user=to_user,
                 content=content,
                 attachment=attachment
             )
-            messages.success(request, "Message sent!")
             
-            # SIMPLE FIX: Use redirect with URL string
+            # Send notification for new message
+            notify_new_message(message)
+            
+            messages.success(request, "Message sent!")
             return redirect(f'/chat/?user={to_user.username}')
     
-    # If something goes wrong, redirect to chat dashboard
     return redirect('core:chat_dashboard')
 
-
-
+@login_required
 def mark_messages_read(request, username):
     """Mark messages from a user as read"""
     other_user = get_object_or_404(User, username=username)
@@ -716,7 +1055,7 @@ def mark_messages_read(request, username):
     
     return JsonResponse({'status': 'success'})
 
-
+@login_required
 def search_users(request):
     """Search users for starting new conversations"""
     query = request.GET.get('q', '')
@@ -731,25 +1070,21 @@ def search_users(request):
     
     return render(request, 'core/user_search_results.html', {'users': users, 'query': query})
 
-def debug_urls(request):
-    from django.urls import get_resolver
-    resolver = get_resolver()
-    url_list = []
-    
-    for pattern in resolver.url_patterns:
-        if hasattr(pattern, 'pattern'):
-            url_list.append(f"{pattern.pattern} -> {getattr(pattern, 'name', 'No name')}")
-    
-    return HttpResponse('<br>'.join(sorted(url_list)))
+@login_required
+def conversation(request, username):
+    """View conversation with specific user"""
+    other_user = get_object_or_404(User, username=username)
+    messages = Message.objects.filter(
+        Q(from_user=request.user, to_user=other_user) |
+        Q(from_user=other_user, to_user=request.user)
+    ).order_by('sent_at')
+    return render(request, 'core/conversation.html', {'messages': messages, 'other_user': other_user})
 
+# ==============================
+# MEETING VIEWS
+# ==============================
 
-########## MEETING SCHEDULING ############
-from django.utils import timezone
-from datetime import timedelta, datetime
-from .models import Meeting
-from .forms import MeetingForm
-
-
+@login_required
 def schedule_meeting(request):
     """Schedule a new meeting"""
     if request.method == 'POST':
@@ -763,11 +1098,7 @@ def schedule_meeting(request):
             # Send notifications to participants
             for participant in meeting.participants.all():
                 if participant != request.user:
-                    Notification.objects.create(
-                        user=participant,
-                        message=f"{request.user.username} invited you to a meeting: {meeting.title}",
-                        notification_type='meeting_invite'
-                    )
+                    notify_meeting_invite(meeting, participant)
             
             messages.success(request, f"Meeting '{meeting.title}' scheduled successfully!")
             return redirect('core:meeting_detail', meeting_id=meeting.id)
@@ -783,9 +1114,9 @@ def schedule_meeting(request):
     
     return render(request, 'core/schedule_meeting.html', {'form': form})
 
-
+@login_required
 def calendar(request):
-    # Get meetings where user is either organizer or participant
+    """Calendar view of meetings"""
     meetings = Meeting.objects.filter(
         Q(organizer=request.user) | Q(participants=request.user)
     ).distinct().select_related('organizer', 'related_skill')
@@ -795,6 +1126,7 @@ def calendar(request):
     }
     return render(request, 'core/calendar.html', context)
 
+@login_required
 def quick_schedule(request, username):
     """Quick schedule a meeting with a specific user"""
     try:
@@ -816,18 +1148,14 @@ def quick_schedule(request, username):
             
             # Send notification to the participant
             if other_user != request.user:
-                Notification.objects.create(
-                    user=other_user,
-                    message=f"{request.user.get_full_name() or request.user.username} invited you to a meeting: {meeting.title}",
-                    notification_type='meeting_invite'
-                )
+                notify_meeting_invite(meeting, other_user)
             
             messages.success(request, f"Meeting scheduled successfully with {other_user.get_full_name() or other_user.username}!")
-            return redirect('core:chat_dashboard')  # Redirect back to chat
+            return redirect('core:chat_dashboard')
             
     else:
         # Pre-fill with default values and the target user as participant
-        default_time = timezone.now() + timedelta(hours=24)  # Tomorrow same time
+        default_time = timezone.now() + timedelta(hours=24)
         form = MeetingForm(
             initial={
                 'scheduled_date': default_time.strftime('%Y-%m-%dT%H:%M'),
@@ -842,7 +1170,7 @@ def quick_schedule(request, username):
         'other_user': other_user
     })
 
-
+@login_required
 def meeting_detail(request, meeting_id):
     """View meeting details"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
@@ -854,10 +1182,10 @@ def meeting_detail(request, meeting_id):
     
     return render(request, 'core/meeting_detail.html', {
         'meeting': meeting,
-        'now': timezone.now()  # Pass current time to template
+        'now': timezone.now()
     })
 
-
+@login_required
 def my_meetings(request):
     """View user's meetings"""
     now = timezone.now()
@@ -877,7 +1205,7 @@ def my_meetings(request):
         'past_meetings': past_meetings
     })
 
-
+@login_required
 def update_meeting_status(request, meeting_id, status):
     """Update meeting status (confirm, cancel, etc.)"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
@@ -895,21 +1223,17 @@ def update_meeting_status(request, meeting_id, status):
         # Notify other participants
         participants = meeting.participants.exclude(id=request.user.id)
         for participant in participants:
-            Notification.objects.create(
-                user=participant,
-                message=f"Meeting '{meeting.title}' status updated to {status} by {request.user.username}",
-                notification_type='meeting_update'
-            )
+            notify_meeting_update(meeting, participant, status)
         
         messages.success(request, f"Meeting status updated to {status}.")
     
     return redirect('core:meeting_detail', meeting_id=meeting.id)
 
-
+@login_required
 def meeting_calendar(request):
     """Calendar view of meetings"""
     meetings = Meeting.objects.filter(
-        models.Q(organizer=request.user) | models.Q(participants=request.user)
+        Q(organizer=request.user) | Q(participants=request.user)
     ).distinct()
     
     # Format for fullcalendar
@@ -927,145 +1251,50 @@ def meeting_calendar(request):
     
     return render(request, 'core/meeting_calendar.html', {'events': events})
 
+# ==============================
+# ADMIN VIEWS
+# ==============================
 
-def quick_schedule(request, username):
-    """Quick schedule with a specific user"""
-    other_user = get_object_or_404(User, username=username)
-    
-    if request.method == 'POST':
-        form = MeetingForm(request.POST, organizer=request.user)
-        if form.is_valid():
-            meeting = form.save(commit=False)
-            meeting.organizer = request.user
-            meeting.save()
-            meeting.participants.add(other_user)  # Add the specific user
-            
-            messages.success(request, f"Meeting scheduled with {other_user.username}!")
-            return redirect('core:chat_dashboard') + f'?user={username}'
-    else:
-        default_time = timezone.now() + timedelta(hours=24)
-        form = MeetingForm(initial={
-            'scheduled_date': default_time.strftime('%Y-%m-%dT%H:%M'),
-            'title': f"Meeting with {other_user.username}",
-            'participants': [other_user]
-        }, organizer=request.user)
-    
-    return render(request, 'core/quick_schedule.html', {
-        'form': form,
-        'other_user': other_user
-    })
-
-
-from django.contrib.auth.models import User
-from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import Skill, SkillRequest, Review, Report
-from .forms import SkillForm
-
-# ---------- Admin Portal ----------
 @staff_member_required
 def admin_portal(request):
+    """Admin portal dashboard"""
     return render(request, 'core/admin_portal.html')
 
-# ---------- Manage Users ----------
+@staff_member_required
+def admin_dashboard(request):
+    """Admin dashboard with statistics"""
+    total_users = User.objects.count()
+    total_skills = Skill.objects.count()
+    total_requests = SkillRequest.objects.count()
+    completed_swaps = SkillRequest.objects.filter(status='COMPLETED').count()
+    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0
+    total_meetings = Meeting.objects.count()
+
+    popular_categories = (
+        Skill.objects.values('category')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:5]
+    )
+
+    return render(request, 'core/admin_dashboard.html', {
+        'total_users': total_users,
+        'total_skills': total_skills,
+        'total_requests': total_requests,
+        'completed_swaps': completed_swaps,
+        'avg_rating': round(avg_rating, 2),
+        'total_meetings': total_meetings,
+        'popular_categories': popular_categories,
+    })
+
 @staff_member_required
 def manage_users(request):
+    """Manage users (admin only)"""
     users = User.objects.all()
     return render(request, 'core/manage_users.html', {'users': users})
 
 @staff_member_required
-def delete_user(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    user.delete()
-    messages.success(request, 'User deleted successfully.')
-    return redirect('core:manage_users')
-
-# ---------- Manage Skills ----------
-@staff_member_required
-def manage_skills(request):
-    skills = Skill.objects.all()
-    return render(request, 'core/manage_skills.html', {'skills': skills})
-
-@staff_member_required
-def delete_skill(request, skill_id):
-    skill = get_object_or_404(Skill, id=skill_id)
-    skill.delete()
-    messages.success(request, 'Skill deleted successfully.')
-    return redirect('core:manage_skills')
-
-# ---------- Manage Requests ----------
-@staff_member_required
-def approve_request(request, request_id):
-    skill_request = get_object_or_404(SkillRequest, id=request_id)
-    skill_request.status = 'APPROVED'
-    skill_request.save()
-    messages.success(request, f'Skill request #{skill_request.id} has been approved.')
-    return redirect('core:manage_requests')
-
-@staff_member_required
-def reject_request(request, request_id):
-    skill_request = get_object_or_404(SkillRequest, id=request_id)
-    skill_request.status = 'REJECTED'
-    skill_request.save()
-    messages.success(request, f'Skill request #{skill_request.id} has been rejected.')
-    return redirect('core:manage_requests')
-
-@staff_member_required
-def delete_request(request, req_id):
-    req = get_object_or_404(SkillRequest, id=req_id)
-    req.delete()
-    messages.success(request, 'Skill request deleted successfully.')
-    return redirect('core:manage_requests')
-
-@staff_member_required
-def manage_requests(request):
-    status_filter = request.GET.get('status', '')
-    if status_filter:
-        requests = SkillRequest.objects.filter(status=status_filter)
-    else:
-        requests = SkillRequest.objects.all()
-    
-    return render(request, 'core/manage_requests.html', {
-        'requests': requests,  # Make sure this is 'requests' (plural)
-        'current_status': status_filter
-    })
-# ---------- Manage Reviews ----------
-@staff_member_required
-def manage_reviews(request):
-    reviews = Review.objects.all()
-    return render(request, 'core/manage_reviews.html', {'reviews': reviews})
-
-@staff_member_required
-def delete_review(request, review_id):
-    review = get_object_or_404(Review, id=review_id)
-    review.delete()
-    messages.success(request, 'Review deleted successfully.')
-    return redirect('core:manage_reviews')
-
-# ---------- Manage Reports ----------
-@staff_member_required
-def manage_reports(request):
-    reports = Report.objects.all()
-    return render(request, 'core/manage_reports.html', {'reports': reports})
-
-@staff_member_required
-def resolve_report(request, report_id):
-    report = get_object_or_404(Report, id=report_id)
-    report.resolved = True
-    report.save()
-    messages.success(request, 'Report marked as resolved.')
-    return redirect('core:manage_reports')
-
-
-@staff_member_required
-def manage_meetings(request):
-    meetings = Meeting.objects.select_related('organizer')
-    return render(request, 'core/manage_meetings.html', {'meetings': meetings})
-
-# ---------- EDIT USER ----------
-@staff_member_required
 def edit_user(request, user_id):
+    """Edit user (admin only)"""
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         user.username = request.POST.get('username')
@@ -1075,17 +1304,23 @@ def edit_user(request, user_id):
         return redirect('core:manage_users')
     return render(request, 'core/edit_user.html', {'user': user})
 
-# ---------- DELETE USER ----------
 @staff_member_required
 def delete_user(request, user_id):
+    """Delete user (admin only)"""
     user = get_object_or_404(User, id=user_id)
     user.delete()
     messages.success(request, 'User deleted successfully.')
     return redirect('core:manage_users')
 
-# ---------- EDIT SKILL ----------
+@staff_member_required
+def manage_skills(request):
+    """Manage skills (admin only)"""
+    skills = Skill.objects.all()
+    return render(request, 'core/manage_skills.html', {'skills': skills})
+
 @staff_member_required
 def edit_skill(request, skill_id):
+    """Edit skill (admin only)"""
     skill = get_object_or_404(Skill, id=skill_id)
     if request.method == 'POST':
         form = SkillForm(request.POST, instance=skill)
@@ -1097,36 +1332,92 @@ def edit_skill(request, skill_id):
         form = SkillForm(instance=skill)
     return render(request, 'core/edit_skill.html', {'form': form, 'skill': skill})
 
-# ---------- DELETE SKILL ----------
 @staff_member_required
 def delete_skill(request, skill_id):
+    """Delete skill (admin only)"""
     skill = get_object_or_404(Skill, id=skill_id)
     skill.delete()
     messages.success(request, 'Skill deleted successfully.')
     return redirect('core:manage_skills')
 
 @staff_member_required
-def delete_request(request, request_id):
+def manage_requests(request):
+    """Manage skill requests (admin only)"""
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        requests = SkillRequest.objects.filter(status=status_filter)
+    else:
+        requests = SkillRequest.objects.all()
+    
+    return render(request, 'core/manage_requests.html', {
+        'requests': requests,
+        'current_status': status_filter
+    })
+
+@staff_member_required
+def approve_request(request, request_id):
+    """Approve skill request (admin only)"""
     skill_request = get_object_or_404(SkillRequest, id=request_id)
-    skill_request.delete()
+    skill_request.status = 'APPROVED'
+    skill_request.save()
+    messages.success(request, f'Skill request #{skill_request.id} has been approved.')
+    return redirect('core:manage_requests')
+
+@staff_member_required
+def reject_request(request, request_id):
+    """Reject skill request (admin only)"""
+    skill_request = get_object_or_404(SkillRequest, id=request_id)
+    skill_request.status = 'REJECTED'
+    skill_request.save()
+    messages.success(request, f'Skill request #{skill_request.id} has been rejected.')
+    return redirect('core:manage_requests')
+
+@staff_member_required
+def delete_request(request, req_id):
+    """Delete skill request (admin only)"""
+    req = get_object_or_404(SkillRequest, id=req_id)
+    req.delete()
     messages.success(request, 'Skill request deleted successfully.')
     return redirect('core:manage_requests')
 
 @staff_member_required
+def manage_reviews(request):
+    """Manage reviews (admin only)"""
+    reviews = Review.objects.all()
+    return render(request, 'core/manage_reviews.html', {'reviews': reviews})
+
+@staff_member_required
 def delete_review(request, review_id):
+    """Delete review (admin only)"""
     review = get_object_or_404(Review, id=review_id)
     review.delete()
     messages.success(request, 'Review deleted successfully.')
     return redirect('core:manage_reviews')
 
-# ---------- Manage Meetings ----------
+@staff_member_required
+def manage_reports(request):
+    """Manage reports (admin only)"""
+    reports = Report.objects.all()
+    return render(request, 'core/manage_reports.html', {'reports': reports})
+
+@staff_member_required
+def resolve_report(request, report_id):
+    """Resolve report (admin only)"""
+    report = get_object_or_404(Report, id=report_id)
+    report.resolved = True
+    report.save()
+    messages.success(request, 'Report marked as resolved.')
+    return redirect('core:manage_reports')
+
 @staff_member_required
 def manage_meetings(request):
+    """Manage meetings (admin only)"""
     meetings = Meeting.objects.select_related('organizer').prefetch_related('participants')
     return render(request, 'core/manage_meetings.html', {'meetings': meetings})
 
 @staff_member_required
 def edit_meeting(request, meeting_id):
+    """Edit meeting (admin only)"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
     if request.method == 'POST':
         form = MeetingForm(request.POST, instance=meeting, organizer=meeting.organizer)
@@ -1140,20 +1431,24 @@ def edit_meeting(request, meeting_id):
 
 @staff_member_required
 def delete_meeting(request, meeting_id):
+    """Delete meeting (admin only)"""
     meeting = get_object_or_404(Meeting, id=meeting_id)
     meeting.delete()
     messages.success(request, 'Meeting deleted successfully.')
     return redirect('core:manage_meetings')
 
-from django.db import transaction 
+# ==============================
+# UTILITY VIEWS
+# ==============================
 
 @login_required
 def delete_account(request):
+    """Delete user account"""
     if request.method == 'POST':
         try:
             with transaction.atomic():
                 user = request.user
-                print(f"Starting deletion for user: {user.username}")  # Debug
+                print(f"Starting deletion for user: {user.username}")
                 
                 # Get user ID before any operations
                 user_id = user.id
@@ -1172,13 +1467,12 @@ def delete_account(request):
                 
                 # Delete the user - let database cascades handle the rest
                 deletion_result = User.objects.filter(id=user_id).delete()
-                print(f"Deletion result: {deletion_result}")  # Debug
+                print(f"Deletion result: {deletion_result}")
                 
                 messages.success(request, 'Your account has been permanently deleted.')
                 return redirect('core:login')
                 
         except Exception as e:
-            import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Account deletion error for user {request.user.id if request.user.is_authenticated else 'unknown'}: {str(e)}")
             logger.error(f"Full error: {repr(e)}")
@@ -1188,56 +1482,65 @@ def delete_account(request):
     
     return redirect('core:index')
 
-# In views.py
-import smtplib
-from django.core.mail import send_mail, EmailMessage
-from django.http import HttpResponse
-from django.conf import settings
-from django.contrib.auth.models import User
+def user_profile(request, user_id):
+    """View user profile by ID"""
+    profile_user = get_object_or_404(User, id=user_id)
+    skills = Skill.objects.filter(owner=profile_user)
+    return render(request, 'core/user_profile.html', {'profile_user': profile_user, 'skills': skills})
 
-def debug_email_test(request):
-    results = []
+def search_skills(request):
+    """Search skills"""
+    query = request.GET.get('q')
+    if query:
+        results = Skill.objects.filter(title__icontains=query)
+    else:
+        results = Skill.objects.none()
+    return render(request, 'core/search_results.html', {'results': results, 'query': query})
+
+@login_required
+def notifications(request):
+    """View user notifications"""
+    user_notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'core/notifications.html', {'notifications': user_notifications})
+
+def debug_urls(request):
+    """Debug URL patterns"""
+    from django.urls import get_resolver
+    resolver = get_resolver()
+    url_list = []
     
-    try:
-        # Test 1: Basic SMTP connection
-        results.append("=== Testing SMTP Connection ===")
-        server = smtplib.SMTP_SSL(settings.EMAIL_HOST, settings.EMAIL_PORT)
-        server.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        results.append("✓ SMTP Login Successful")
-        server.quit()
-    except Exception as e:
-        results.append(f"✗ SMTP Connection Failed: {str(e)}")
+    for pattern in resolver.url_patterns:
+        if hasattr(pattern, 'pattern'):
+            url_list.append(f"{pattern.pattern} -> {getattr(pattern, 'name', 'No name')}")
     
+    return HttpResponse('<br>'.join(sorted(url_list)))
+
+
+@login_required
+def test_email(request):
+    """Test email functionality"""
     try:
-        # Test 2: Send test email
-        results.append("=== Testing Email Sending ===")
+        # Test basic email
         send_mail(
-            'SkillSwap Test Email',
-            'This is a test email from SkillSwap.',
+            'Test Email from SkillSwap',
+            'This is a test email to verify your email configuration.',
             settings.DEFAULT_FROM_EMAIL,
-            [request.user.email] if request.user.is_authenticated else ['test@example.com'],
+            [request.user.email],
             fail_silently=False,
         )
-        results.append("✓ Test email sent successfully")
-    except Exception as e:
-        results.append(f"✗ Email Sending Failed: {str(e)}")
-    
-    try:
-        # Test 3: Test password reset specifically
-        results.append("=== Testing Password Reset Flow ===")
-        from django.contrib.auth.tokens import default_token_generator
-        from django.utils.encoding import force_bytes
-        from django.utils.http import urlsafe_base64_encode
         
-        user = request.user if request.user.is_authenticated else User.objects.first()
-        if user:
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            results.append(f"✓ Password reset token generated for {user.email}")
-        else:
-            results.append("✗ No user found for testing")
-            
+        # Test notification email
+        test_skill = Skill.objects.first()
+        if test_skill:
+            notify_skill_request(SkillRequest.objects.create(
+                skill=test_skill,
+                requester=request.user,
+                owner=test_skill.owner,
+                status='PENDING'
+            ))
+        
+        messages.success(request, f'Test emails sent to {request.user.email}. Check your inbox and spam folder.')
     except Exception as e:
-        results.append(f"✗ Password Reset Test Failed: {str(e)}")
+        messages.error(request, f'Email test failed: {str(e)}')
     
-    return HttpResponse('<br>'.join(results))
+    return redirect('core:dashboard')

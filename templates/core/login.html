@@ -175,6 +175,17 @@
       </div>
       
     </form>
+    <!-- Add this after the login form -->
+    {% if show_resend_verification %}
+    <div class="alert alert-warning">
+        <p>Your account is not yet verified. Need a new verification email?</p>
+        <form method="post" action="{% url 'core:resend_verification' %}">
+            {% csrf_token %}
+            <input type="hidden" name="email" value="{{ username }}">
+            <button type="submit" class="btn btn-warning btn-sm">Resend Verification Email</button>
+        </form>
+    </div>
+    {% endif %}
   </div>
 </div>
 

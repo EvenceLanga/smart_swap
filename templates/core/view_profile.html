@@ -738,7 +738,7 @@
 <div class="profile-container">
   <!-- Profile Header -->
   <div class="profile-header">
-    <h2>{{ profile_user.get_full_name|default:profile_user.username }}'s Profile</h2>
+    <h2 style="color: aliceblue;">{{ profile_user.get_full_name|default:profile_user.username }}'s Profile</h2>
     <p class="profile-subtitle">
       {% if profile.course %}
         {{ profile.course }} Student

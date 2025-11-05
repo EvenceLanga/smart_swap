@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db.models import Q  # Add this import
 
 
 # ------------------ PROFILE ------------------
@@ -27,7 +28,9 @@ def create_or_update_student_profile(sender, instance, created, **kwargs):
     if created:
         StudentProfile.objects.create(user=instance)
     else:
-        instance.profile.save()
+        # Ensure profile exists before saving
+        if hasattr(instance, 'profile'):
+            instance.profile.save()
 
 
 # ------------------ SKILL ------------------
@@ -94,21 +97,32 @@ class Message(models.Model):
 
 # ------------------ NOTIFICATION ------------------
 class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('message', 'New Message'),
+        ('meeting_invite', 'Meeting Invitation'),
+        ('meeting_update', 'Meeting Update'),
+        ('skill_request', 'Skill Request'),
+        ('review', 'New Review'),
+        ('skill_session', 'Skill Session Started'),
+        ('skill_completed', 'Skill Session Completed'),
+        ('email_verification', 'Email Verification'),  # Added for email verification
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    message = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
+    message = models.TextField()
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='message')
     is_read = models.BooleanField(default=False)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    related_meeting = models.ForeignKey('Meeting', on_delete=models.CASCADE, null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
     def __str__(self):
-        return f"Notification for {self.user.username}: {self.message}"
+        return f"{self.user.username} - {self.message}"
 
 
-# ------------------ CLEANUP FUNCTION ------------------
-def delete_old_notifications(days=30):
-    from datetime import timedelta
-    cutoff = timezone.now() - timedelta(days=days)
-    Notification.objects.filter(created_at__lt=cutoff).delete()
-
+# ------------------ MEETING ------------------
 class Meeting(models.Model):
     MEETING_TYPES = [
         ('skill_swap', 'Skill Swap Session'),
@@ -130,7 +144,7 @@ class Meeting(models.Model):
     participants = models.ManyToManyField(User, related_name='meetings', blank=True)
     meeting_type = models.CharField(max_length=20, choices=MEETING_TYPES, default='general')
     scheduled_date = models.DateTimeField()
-    duration_minutes = models.PositiveIntegerField(default=30)  # Meeting duration in minutes
+    duration_minutes = models.PositiveIntegerField(default=30)
     location = models.CharField(max_length=300, blank=True, help_text="Physical location or meeting link")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -151,29 +165,9 @@ class Meeting(models.Model):
     
     def is_upcoming(self):
         return self.scheduled_date > timezone.now() and self.status in ['scheduled', 'confirmed']
-    
-class Notification(models.Model):
-    NOTIFICATION_TYPES = [
-        ('message', 'New Message'),
-        ('meeting_invite', 'Meeting Invitation'),
-        ('meeting_update', 'Meeting Update'),
-        ('skill_request', 'Skill Request'),
-        ('review', 'New Review'),
-    ]
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    message = models.TextField()
-    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='message')
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    related_meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE, null=True, blank=True)
-    
-    class Meta:
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.message}"
 
+
+# ------------------ REPORT ------------------
 class Report(models.Model):
     reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
     reported_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_received')
@@ -187,24 +181,31 @@ class Report(models.Model):
     def __str__(self):
         return f"Report: {self.reporter.username} → {self.reported_user.username}"
 
-class Report(models.Model):
-    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
-    reported_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_received')
-    reason = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    resolved = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Report: {self.reporter.username} → {self.reported_user.username}"
-
-# In core/models.py
-from django.db.models import Q
-
+# ------------------ MEETING MANAGER ------------------
 class MeetingManager(models.Manager):
     def for_user(self, user):
         return self.filter(
             Q(participants=user) | Q(organizer=user)
         ).distinct()
+
+
+# ------------------ CLEANUP FUNCTION ------------------
+def delete_old_notifications(days=30):
+    cutoff = timezone.now() - timedelta(days=days)
+    Notification.objects.filter(created_at__lt=cutoff).delete()
+
+
+# Optional: Add Email Verification Token Model
+class EmailVerificationToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=64)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+    
+    def is_valid(self):
+        # Token expires after 24 hours
+        return not self.is_used and (timezone.now() - self.created_at) < timedelta(hours=24)
+    
+    def __str__(self):
+        return f"Email verification for {self.user.email}"
