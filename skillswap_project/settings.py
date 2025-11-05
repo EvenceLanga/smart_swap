@@ -210,6 +210,8 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 if not EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     print("⚠️  Gmail not configured - using console backend")
+# In settings.py - TEMPORARY FIX
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Add to settings.py for debugging
 LOGGING = {

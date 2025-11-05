@@ -127,5 +127,6 @@ urlpatterns = [
     
     # Report Management Actions
     path('management/reports/<int:report_id>/resolve/', views.resolve_report, name='resolve_report'),
+    path('debug/', views.debug_info, name='debug'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

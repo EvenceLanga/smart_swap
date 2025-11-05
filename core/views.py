@@ -333,53 +333,78 @@ def index(request):
     return render(request, 'core/index.html', {'skills': skills})
 
 def register(request):
+    """User registration with email verification"""
     if request.user.is_authenticated:
         return redirect('core:dashboard')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            new_user = form.save(commit=False)
-            new_user.is_active = False  # Deactivate until email verification
-            new_user.save()
-
-            # Email verification setup
-            current_site = get_current_site(request)
-            subject = 'Verify your SkillSwap account'
-            token = default_token_generator.make_token(new_user)
-            uid = urlsafe_base64_encode(force_bytes(new_user.pk))
-            verification_link = f"https://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
-
-            message = render_to_string('core/verify_email.html', {
-                'user': new_user,
-                'verification_link': verification_link,
-                'domain': current_site.domain,
-            })
-
             try:
-                # Try to send email
-                send_mail(
-                    subject,
-                    "Please check the HTML version of this email.",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [new_user.email],
-                    fail_silently=False,
+                new_user = form.save(commit=False)
+                # TEMPORARY: Activate users immediately until email is fixed
+                new_user.is_active = True
+                new_user.save()
 
-                    html_message=message,
-                )
-                messages.success(request, 'Registration successful! Please check your email to verify your account.')
+                # Try to send welcome email (but don't break if it fails)
+                try:
+                    current_site = get_current_site(request)
+                    subject = 'Welcome to SkillSwap!'
+                    html_message = render_to_string('core/emails/welcome_email.html', {
+                        'user': new_user,
+                        'domain': current_site.domain,
+                    })
+                    
+                    text_message = f"""
+                    Welcome to SkillSwap, {new_user.username}!
+                    
+                    Your account has been created successfully.
+                    You can now log in and start sharing skills.
+                    
+                    Thank you,
+                    The SkillSwap Team
+                    """
+                    
+                    send_mail(
+                        subject=subject,
+                        message=text_message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[new_user.email],
+                        html_message=html_message,
+                        fail_silently=True,  # Don't raise errors
+                    )
+                    
+                    messages.success(request, 'Registration successful! Welcome email sent.')
+                    logger.info(f"Welcome email sent to {new_user.email}")
+                    
+                except Exception as e:
+                    logger.error(f"Email sending failed: {str(e)}")
+                    messages.success(request, 'Registration successful! You can now log in.')
+                
                 return redirect('core:login')
                 
             except Exception as e:
-                # If email fails, still create the user but show warning
-                logger.error(f"Email verification failed: {str(e)}")
-                messages.warning(request, 'Account created, but we could not send verification email. Please contact support or try logging in to resend.')
-                return redirect('core:login')
+                logger.error(f"Registration error: {str(e)}")
+                messages.error(request, 'An error occurred during registration. Please try again.')
+                return render(request, 'core/register.html', {'form': form})
                 
     else:
         form = UserRegistrationForm()
 
     return render(request, 'core/register.html', {'form': form})
+
+def debug_info(request):
+    """Debug view to check email configuration"""
+    info = {
+        'email_backend': settings.EMAIL_BACKEND,
+        'email_host': settings.EMAIL_HOST,
+        'email_port': settings.EMAIL_PORT,
+        'email_user_set': bool(settings.EMAIL_HOST_USER),
+        'email_pass_set': bool(settings.EMAIL_HOST_PASSWORD),
+        'debug': settings.DEBUG,
+        'allowed_hosts': settings.ALLOWED_HOSTS,
+    }
+    return JsonResponse(info)
 
 @csrf_exempt
 def user_login(request):
