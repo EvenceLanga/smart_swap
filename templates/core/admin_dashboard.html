@@ -116,6 +116,7 @@
   border-radius: 1px;
   padding: 30px;
   animation: fadeInUp 0.8s ease-out 0.7s both;
+  margin-bottom: 30px;
 }
 
 .category-list ul {
@@ -160,6 +161,144 @@
   padding: 40px 20px;
   color: #666666;
   font-style: italic;
+}
+
+/* Blocked and Reported Users Styles */
+.data-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.data-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 1px;
+  padding: 25px;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.data-card h4 {
+  color: #000000;
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px;
+}
+
+.user-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.user-item:hover {
+  background: #fafafa;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.username {
+  font-weight: 500;
+  color: #000000;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.user-details {
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  gap: 15px;
+}
+
+.reason {
+  background: #fff3cd;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #856404;
+  margin-top: 5px;
+}
+
+.resolved-badge {
+  background: #d4edda;
+  color: #155724;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.unresolved-badge {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-resolve {
+  background: #28a745;
+  color: white;
+}
+
+.btn-resolve:hover {
+  background: #218838;
+}
+
+.btn-view {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-view:hover {
+  background: #138496;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c82333;
 }
 
 /* Animations */
@@ -216,6 +355,11 @@
   .admin-dashboard h2 {
     font-size: 2rem;
   }
+  
+  .data-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -235,6 +379,18 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
+  }
+  
+  .user-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .action-buttons {
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 
@@ -289,6 +445,82 @@
     </a>
   </div>
 
+  <!-- Blocked Users and Reported Users Section -->
+  <div class="data-section">
+    <!-- Blocked Users -->
+    <div class="data-card">
+      <h4>Recent Blocks</h4>
+      {% if recent_blocks %}
+        {% for block in recent_blocks %}
+        <div class="user-item">
+          <div class="user-info">
+            <div class="user-main">
+              <span class="username">{{ block.blocker.username }}</span>
+              <span class="timestamp">{{ block.created_at|timesince }} ago</span>
+            </div>
+            <div class="user-details">
+              <span>Blocked: <strong>{{ block.blocked.username }}</strong></span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <a href="{% url 'core:view_profile' block.blocked.id %}" class="btn-small btn-view">View</a>
+            <form method="post" action="{% url 'core:admin_unblock_user' block.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-small btn-resolve" onclick="return confirm('Unblock {{ block.blocked.username }}?')">Unblock</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>No blocks found</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Reported Users -->
+    <div class="data-card">
+      <h4>Recent Reports</h4>
+      {% if recent_reports %}
+        {% for report in recent_reports %}
+        <div class="user-item">
+          <div class="user-info">
+            <div class="user-main">
+              <span class="username">{{ report.reporter.username }}</span>
+              <span class="timestamp">{{ report.created_at|timesince }} ago</span>
+            </div>
+            <div class="user-details">
+              <span>Reported: <strong>{{ report.reported_user.username }}</strong></span>
+              {% if report.resolved %}
+                <span class="resolved-badge">Resolved</span>
+              {% else %}
+                <span class="unresolved-badge">Unresolved</span>
+              {% endif %}
+            </div>
+            <div class="reason">
+              {{ report.reason|truncatewords:10 }}
+            </div>
+          </div>
+          <div class="action-buttons">
+            <a href="{% url 'core:view_profile' report.reported_user.id %}" class="btn-small btn-view">View</a>
+            {% if not report.resolved %}
+            <form method="post" action="{% url 'core:resolve_report' report.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-small btn-resolve">Resolve</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>No reports found</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Top Skill Categories -->
   <h3>Top Skill Categories</h3>
   <div class="category-list">
     {% if popular_categories %}

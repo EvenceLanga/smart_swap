@@ -1425,31 +1425,78 @@ def admin_portal(request):
     """Admin portal dashboard"""
     return render(request, 'core/admin_portal.html')
 
-@staff_member_required
+# views.py
 def admin_dashboard(request):
-    """Admin dashboard with statistics"""
+    if not request.user.is_superuser:
+        return redirect('core:home')
+    
+    # Existing data
     total_users = User.objects.count()
     total_skills = Skill.objects.count()
     total_requests = SkillRequest.objects.count()
     completed_swaps = SkillRequest.objects.filter(status='COMPLETED').count()
-    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0
     total_meetings = Meeting.objects.count()
-
-    popular_categories = (
-        Skill.objects.values('category')
-        .annotate(total=Count('id'))
-        .order_by('-total')[:5]
-    )
-
-    return render(request, 'core/admin_dashboard.html', {
+    
+    # Calculate average rating
+    reviews = Review.objects.all()
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    
+    # Popular categories
+    popular_categories = Skill.objects.values('category').annotate(
+        total=Count('id')
+    ).order_by('-total')[:10]
+    
+    # NEW: Recent blocks and reports
+    recent_blocks = UserBlock.objects.all().order_by('-created_at')[:10]
+    recent_reports = Report.objects.all().order_by('-created_at')[:10]
+    
+    context = {
         'total_users': total_users,
         'total_skills': total_skills,
         'total_requests': total_requests,
         'completed_swaps': completed_swaps,
-        'avg_rating': round(avg_rating, 2),
         'total_meetings': total_meetings,
+        'avg_rating': avg_rating,
         'popular_categories': popular_categories,
-    })
+        'recent_blocks': recent_blocks,  # NEW
+        'recent_reports': recent_reports,  # NEW
+    }
+    
+    return render(request, 'core/admin_dashboard.html', context)
+
+# views.py
+@login_required
+def admin_unblock_user(request, block_id):
+    if not request.user.is_superuser:
+        return redirect('core:home')
+    
+    if request.method == 'POST':
+        try:
+            block = UserBlock.objects.get(id=block_id)
+            blocker_username = block.blocker.username
+            blocked_username = block.blocked.username
+            block.delete()
+            messages.success(request, f'Unblocked {blocked_username} for {blocker_username}')
+        except UserBlock.DoesNotExist:
+            messages.error(request, 'Block relationship not found')
+    
+    return redirect('core:admin_dashboard')
+
+@login_required
+def resolve_report(request, report_id):
+    if not request.user.is_superuser:
+        return redirect('core:home')
+    
+    if request.method == 'POST':
+        try:
+            report = Report.objects.get(id=report_id)
+            report.resolved = True
+            report.save()
+            messages.success(request, f'Report marked as resolved')
+        except Report.DoesNotExist:
+            messages.error(request, 'Report not found')
+    
+    return redirect('core:admin_dashboard')
 
 @staff_member_required
 def manage_users(request):

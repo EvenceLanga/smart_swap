@@ -76,7 +76,9 @@ urlpatterns = [
     path('message-requests/', views.message_requests, name='message_requests'),
     path('message-requests/<int:request_id>/accept/', views.accept_message_request, name='accept_message_request'),
     path('message-requests/<int:request_id>/decline/', views.decline_message_request, name='decline_message_request'),
-    
+    # urls.py
+    path('admin/unblock-user/<int:block_id>/', views.admin_unblock_user, name='admin_unblock_user'),
+    path('admin/resolve-report/<int:report_id>/', views.resolve_report, name='resolve_report'),
     # Blocking and message request URLs
     path('block-user/<str:username>/', views.block_user, name='block_user'),
     path('unblock-user/<str:username>/', views.unblock_user, name='unblock_user'),
