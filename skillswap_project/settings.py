@@ -188,8 +188,6 @@ SECURE_SSL_REDIRECT = False
 # Custom user model
 #AUTH_USER_MODEL = 'core.CustomUser'
 
-
-
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -202,9 +200,6 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 # For security, fallback to console if no email config
 if not EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    print("⚠️  Gmail not configured - using console backend")
-# In settings.py - TEMPORARY FIX
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Add to settings.py for debugging
 LOGGING = {
