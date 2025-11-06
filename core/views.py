@@ -943,11 +943,20 @@ def chat_room(request, username):
         'messages': chat_messages,
     })
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
+from django.utils import timezone
+from datetime import datetime
+
+from .models import Message, UserBlock, MessageRequest, Meeting, User
+
+
 @login_required
 def chat_dashboard(request):
     """Main chat dashboard with conversation list and active chat"""
     
-    # Get all unique users that the current user has conversed with
+    # --- Conversation partners ---
     sent_to_users = Message.objects.filter(
         from_user=request.user
     ).values_list('to_user', flat=True).distinct()
@@ -956,20 +965,17 @@ def chat_dashboard(request):
         to_user=request.user
     ).values_list('from_user', flat=True).distinct()
     
-    # Combine and get unique user IDs
     all_user_ids = set(sent_to_users) | set(received_from_users)
     chat_users = User.objects.filter(id__in=all_user_ids)
     
-    # Get last message and unread count for each user
+    # --- Last message & unread count per user ---
     user_data = []
     for user in chat_users:
-        # Get the last message in this conversation
         last_message = Message.objects.filter(
             Q(from_user=request.user, to_user=user) |
             Q(from_user=user, to_user=request.user)
         ).order_by('-sent_at').first()
         
-        # Get unread message count from this user
         unread_count = Message.objects.filter(
             from_user=user, to_user=request.user, is_read=False
         ).count()
@@ -980,15 +986,17 @@ def chat_dashboard(request):
             'unread_count': unread_count
         })
     
-    # Sort by last message timestamp (most recent first)
-    user_data.sort(key=lambda x: x['last_message'].sent_at if x['last_message'] else timezone.make_aware(datetime.min), reverse=True)
+    user_data.sort(
+        key=lambda x: x['last_message'].sent_at if x['last_message'] else timezone.make_aware(datetime.min),
+        reverse=True
+    )
     
-    # Get messages for active conversation if user is selected
+    # --- Active chat ---
     active_user = None
     active_messages = []
     selected_user = request.GET.get('user')
     
-    # Initialize blocking and message request status with safe defaults
+    # Default values
     is_blocked = False
     has_blocked_you = False
     has_pending_request = False
@@ -996,103 +1004,51 @@ def chat_dashboard(request):
     has_rejected_request = False
     
     if selected_user:
-        active_user = get_object_or_404(User, username=selected_user)
-        active_messages = Message.objects.filter(
-            Q(from_user=request.user, to_user=active_user) |
-            Q(from_user=active_user, to_user=request.user)
-        ).order_by('sent_at')
-        
-        # FLEXIBLE BLOCKING CHECK - Try multiple field name patterns
         try:
-            # Pattern 1: blocker/blocked (your defined model)
+            active_user = User.objects.get(username=selected_user)
+        except User.DoesNotExist:
+            active_user = None
+        
+        if active_user:
+            # Fetch messages
+            active_messages = Message.objects.filter(
+                Q(from_user=request.user, to_user=active_user) |
+                Q(from_user=active_user, to_user=request.user)
+            ).order_by('sent_at')
+            
+            # --- Blocking ---
             is_blocked = UserBlock.objects.filter(
-                blocker=request.user, 
-                blocked=active_user
+                blocker=request.user, blocked=active_user
             ).exists()
             has_blocked_you = UserBlock.objects.filter(
-                blocker=active_user, 
-                blocked=request.user
+                blocker=active_user, blocked=request.user
             ).exists()
-        except Exception as e:
-            try:
-                # Pattern 2: from_user/to_user
-                is_blocked = UserBlock.objects.filter(
-                    from_user=request.user, 
-                    to_user=active_user
-                ).exists()
-                has_blocked_you = UserBlock.objects.filter(
-                    from_user=active_user, 
-                    to_user=request.user
-                ).exists()
-            except Exception as e2:
-                try:
-                    # Pattern 3: user/blocked_user
-                    is_blocked = UserBlock.objects.filter(
-                        user=request.user, 
-                        blocked_user=active_user
-                    ).exists()
-                    has_blocked_you = UserBlock.objects.filter(
-                        user=active_user, 
-                        blocked_user=request.user
-                    ).exists()
-                except Exception as e3:
-                    print(f"DEBUG: All blocking patterns failed: {e}, {e2}, {e3}")
-                    is_blocked = False
-                    has_blocked_you = False
-        
-        # FLEXIBLE MESSAGE REQUEST CHECK - Try multiple field name patterns
-        try:
-            # Pattern 1: sender/receiver
+            
+            # --- Message Requests ---
             has_pending_request = MessageRequest.objects.filter(
-                sender=request.user,
-                receiver=active_user,
-                status='pending'
+                from_user=request.user,
+                to_user=active_user,
+                status='PENDING'
             ).exists()
             
             is_pending_request_receiver = MessageRequest.objects.filter(
-                sender=active_user,
-                receiver=request.user,
-                status='pending'
+                from_user=active_user,
+                to_user=request.user,
+                status='PENDING'
             ).exists()
             
             has_rejected_request = MessageRequest.objects.filter(
-                Q(sender=request.user, receiver=active_user) |
-                Q(sender=active_user, receiver=request.user),
-                status='rejected'
+                Q(from_user=request.user, to_user=active_user) |
+                Q(from_user=active_user, to_user=request.user),
+                status='DECLINED'
             ).exists()
-        except Exception as e:
-            try:
-                # Pattern 2: from_user/to_user
-                has_pending_request = MessageRequest.objects.filter(
-                    from_user=request.user,
-                    to_user=active_user,
-                    status='pending'
-                ).exists()
-                
-                is_pending_request_receiver = MessageRequest.objects.filter(
-                    from_user=active_user,
-                    to_user=request.user,
-                    status='pending'
-                ).exists()
-                
-                has_rejected_request = MessageRequest.objects.filter(
-                    Q(from_user=request.user, to_user=active_user) |
-                    Q(from_user=active_user, to_user=request.user),
-                    status='rejected'
-                ).exists()
-            except Exception as e2:
-                print(f"DEBUG: All message request patterns failed: {e}, {e2}")
-                has_pending_request = False
-                is_pending_request_receiver = False
-                has_rejected_request = False
-        
-        # Mark messages from active user as read when opening conversation
-        if active_user:
+            
+            # Mark messages as read
             Message.objects.filter(
                 from_user=active_user, to_user=request.user, is_read=False
             ).update(is_read=True)
     
-    # Get upcoming meetings
+    # --- Upcoming meetings ---
     now = timezone.now()
     upcoming_meetings = Meeting.objects.filter(
         Q(organizer=request.user) | Q(participants=request.user),
@@ -1114,67 +1070,80 @@ def chat_dashboard(request):
     })
 
 @login_required
+@require_POST
 def send_chat_message(request):
-    """Send message from chat interface"""
-    if request.method == 'POST':
-        to_user_id = request.POST.get('to_user')
-        content = request.POST.get('content')
-        attachment = request.FILES.get('attachment')
-        
-        if to_user_id and content:
-            to_user = get_object_or_404(User, id=to_user_id)
-            
-            # Check if user is blocked
-            if UserBlock.objects.filter(blocker=request.user, blocked=to_user).exists():
-                messages.error(request, 'You have blocked this user.')
-                return redirect(f'/chat/?user={to_user.username}')
-            
-            if UserBlock.objects.filter(blocker=to_user, blocked=request.user).exists():
-                messages.error(request, 'This user has blocked you.')
-                return redirect(f'/chat/?user={to_user.username}')
-            
-            # Check message request status
-            message_request = MessageRequest.objects.filter(
-                Q(sender=request.user, receiver=to_user) |
-                Q(sender=to_user, receiver=request.user)
-            ).first()
-            
-            if message_request:
-                if message_request.status == 'rejected':
-                    messages.error(request, 'Message request was rejected.')
-                    return redirect(f'/chat/?user={to_user.username}')
-                elif message_request.status == 'pending':
-                    messages.error(request, 'Message request is still pending.')
-                    return redirect(f'/chat/?user={to_user.username}')
-            else:
-                # Create a new message request for first-time messaging
-                if not Message.objects.filter(
-                    Q(from_user=request.user, to_user=to_user) |
-                    Q(from_user=to_user, to_user=request.user)
-                ).exists():
-                    MessageRequest.objects.create(
-                        sender=request.user,
-                        receiver=to_user,
-                        message=content
-                    )
-                    messages.success(request, 'Message request sent! The user will need to accept it first.')
-                    return redirect(f'/chat/?user={to_user.username}')
-            
-            # Create the message
-            message = Message.objects.create(
+    """Send a message from the chat interface with request handling and blocking"""
+    to_user_id = request.POST.get('to_user')
+    content = request.POST.get('content')
+    attachment = request.FILES.get('attachment')
+
+    if not to_user_id or not content:
+        messages.error(request, "Recipient and message content are required.")
+        return redirect('core:chat_dashboard')
+
+    to_user = get_object_or_404(User, id=to_user_id)
+
+    # --- BLOCKING CHECKS ---
+    if UserBlock.objects.filter(blocker=request.user, blocked=to_user).exists():
+        messages.error(request, 'You have blocked this user.')
+        return redirect(f'/chat/?user={to_user.username}')
+
+    if UserBlock.objects.filter(blocker=to_user, blocked=request.user).exists():
+        messages.error(request, 'This user has blocked you.')
+        return redirect(f'/chat/?user={to_user.username}')
+
+    # --- MESSAGE REQUEST CHECK ---
+    message_request = MessageRequest.objects.filter(
+        Q(from_user=request.user, to_user=to_user) |
+        Q(from_user=to_user, to_user=request.user)
+    ).first()
+
+    if message_request:
+        if message_request.status == 'rejected':
+            messages.error(request, 'Message request was rejected.')
+            return redirect(f'/chat/?user={to_user.username}')
+        elif message_request.status == 'pending':
+            messages.error(request, 'Message request is still pending.')
+            return redirect(f'/chat/?user={to_user.username}')
+    else:
+        # No prior message request or conversation: create first-time request
+        if not Message.objects.filter(
+            Q(from_user=request.user, to_user=to_user) |
+            Q(from_user=to_user, to_user=request.user)
+        ).exists():
+            # Create a placeholder message instance for the request
+            placeholder_message = Message.objects.create(
                 from_user=request.user,
                 to_user=to_user,
-                content=content,
-                attachment=attachment
+                content=content
             )
-            
-            # Send notification for new message
-            notify_new_message(message)
-            
-            messages.success(request, "Message sent!")
+
+            # Create the actual message request
+            MessageRequest.objects.create(
+                from_user=request.user,
+                to_user=to_user,
+                message=placeholder_message,
+                status='pending'
+            )
+
+            messages.success(request, 'Message request sent! The user will need to accept it first.')
             return redirect(f'/chat/?user={to_user.username}')
-    
-    return redirect('core:chat_dashboard')
+
+    # --- SEND ACTUAL MESSAGE ---
+    message = Message.objects.create(
+        from_user=request.user,
+        to_user=to_user,
+        content=content,
+        attachment=attachment
+    )
+
+    # Send notification for new message
+    notify_new_message(message)
+
+    messages.success(request, "Message sent!")
+    return redirect(f'/chat/?user={to_user.username}')
+
+
 
 @login_required
 def mark_messages_read(request, username):
@@ -1831,24 +1800,31 @@ def unblock_user(request, username):
     # Always redirect back to the blocked users list
     return redirect('core:blocked_users_list')
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+from .models import MessageRequest
+
 @login_required
 @require_POST
 def accept_message_request(request, username):
     """Accept a message request"""
     try:
         sender = User.objects.get(username=username)
-        
-        # Update message request status
+
+        # Correct field names: from_user / to_user
         message_request = MessageRequest.objects.get(
-            sender=sender,
-            receiver=request.user,
+            from_user=sender,
+            to_user=request.user,
             status='pending'
         )
         message_request.status = 'accepted'
         message_request.save()
-        
+
         return JsonResponse({'success': True})
-        
+
     except User.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'User not found'})
     except MessageRequest.DoesNotExist:
@@ -1862,18 +1838,17 @@ def reject_message_request(request, username):
     """Reject a message request"""
     try:
         sender = User.objects.get(username=username)
-        
-        # Update message request status
+
         message_request = MessageRequest.objects.get(
-            sender=sender,
-            receiver=request.user,
+            from_user=sender,
+            to_user=request.user,
             status='pending'
         )
         message_request.status = 'rejected'
         message_request.save()
-        
+
         return JsonResponse({'success': True})
-        
+
     except User.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'User not found'})
     except MessageRequest.DoesNotExist:
@@ -1881,22 +1856,54 @@ def reject_message_request(request, username):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-# ADD THIS MISSING FUNCTION:
 @login_required
 @require_POST
 def decline_message_request(request, request_id):
-    """Decline a message request by ID (alternative approach)"""
+    """Decline a message request by ID"""
     try:
         message_request = get_object_or_404(MessageRequest, id=request_id, to_user=request.user)
-        
+
         if message_request.status == 'pending':
             message_request.status = 'rejected'
             message_request.save()
-            
             return JsonResponse({'success': True})
         else:
             return JsonResponse({'success': False, 'error': 'Message request already processed'})
-        
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+@login_required
+@require_POST
+def process_message_request(request, username, action):
+    """
+    Accept or reject a message request.
+    action = 'accept' or 'reject'
+    """
+    try:
+        sender = User.objects.get(username=username)
+
+        # Get pending request (using filter + first to avoid DoesNotExist)
+        message_request = MessageRequest.objects.filter(
+            from_user=sender,
+            to_user=request.user,
+            status='pending'
+        ).first()
+
+        if not message_request:
+            return JsonResponse({'success': False, 'error': 'Message request not found or already processed'})
+
+        if action == 'accept':
+            message_request.status = 'accepted'
+        elif action == 'reject':
+            message_request.status = 'rejected'
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid action'})
+
+        message_request.save()
+        return JsonResponse({'success': True, 'status': message_request.status})
+
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
