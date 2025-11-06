@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartSwap - Where Skills Meet Opportunity</title>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000000;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      font-family: 'Audiowide', cursive;
+      font-size: 1.8em;
+      text-shadow: 0 0 10px #ffffff;
+      letter-spacing: 2px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-btn {
+      padding: 10px 25px;
+      border: 1px solid #ffffff;
+      background: transparent;
+      color: #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .nav-btn:hover {
+      background: #ffffff;
+      color: #000000;
+      box-shadow: 0 0 20px #ffffff;
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Audiowide', cursive;
+      font-size: 4.5em;
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px #ffffff;
+      margin-bottom: 20px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .hero .tagline {
+      font-size: 1.8em;
+      color: #cccccc;
+      margin-bottom: 40px;
+      animation: fadeInUp 1s ease-out 0.3s both;
+    }
+
+    .hero .description {
+      font-size: 1.2em;
+      color: #aaaaaa;
+      max-width: 700px;
+      line-height: 1.8;
+      margin-bottom: 50px;
+      animation: fadeInUp 1s ease-out 0.6s both;
+    }
+
+    .cta-button {
+      padding: 18px 40px;
+      font-size: 1.2em;
+      background: linear-gradient(45deg, #ffffff, #cccccc);
+      color: #000000;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: fadeInUp 1s ease-out 0.9s both;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 50px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 100px 50px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: 'Audiowide', cursive;
+      font-size: 3em;
+      text-align: center;
+      margin-bottom: 80px;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 3em;
+      margin-bottom: 20px;
+      display: block;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    .feature-card h3 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .feature-card p {
+      color: #cccccc;
+      line-height: 1.8;
+      font-size: 1.1em;
+    }
+
+    /* How It Works */
+    .how-it-works {
+      padding: 100px 50px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .steps {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 60px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .step:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .step-number {
+      font-family: 'Audiowide', cursive;
+      font-size: 5em;
+      color: rgba(255, 255, 255, 0.1);
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      min-width: 150px;
+      text-align: center;
+    }
+
+    .step-content h3 {
+      font-size: 2em;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .step-content p {
+      color: #cccccc;
+      font-size: 1.2em;
+      line-height: 1.8;
+    }
+
+    /* CTA Section */
+    .final-cta {
+      padding: 150px 50px;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-family: 'Audiowide', cursive;
+      font-size: 3.5em;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    .final-cta p {
+      font-size: 1.5em;
+      color: #cccccc;
+      margin-bottom: 50px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .neon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px 40px;
+      border: 2px solid #ffffff;
+      border-radius: 12px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #fff;
+      background: transparent;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      transition: 0.3s ease;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .neon-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+      transform: translateY(-3px);
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.5em;
+      }
+
+      .hero .tagline {
+        font-size: 1.3em;
+      }
+
+      .section-title {
+        font-size: 2em;
+      }
+
+      .step {
+        flex-direction: column !important;
+      }
+
+      .step-number {
+        font-size: 3em;
+      }
+
+      nav {
+        padding: 15px 20px;
+      }
+
+      .logo {
+        font-size: 1.3em;
+      }
+
+      .nav-buttons {
+        gap: 10px;
+      }
+
+      .nav-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <nav>
+    <div class="logo">SmartSwap</div>
+    <div class="nav-buttons">
+      <a href="#" class="nav-btn">Login</a>
+      <a href="#" class="nav-btn">Register</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>SmartSwap</h1>
+    <div class="tagline">Where Skills Meet Opportunity</div>
+    <p class="description">
+      Connect with talented individuals, exchange skills, and grow together. 
+      SmartSwap is the modern platform for skill-sharing and collaboration.
+    </p>
+    <a href="#features" class="cta-button">Discover More</a>
+  </section>
+
+  <section id="features" class="features">
+    <h2 class="section-title">Why Choose SmartSwap?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <i class="fas fa-users feature-icon" style="color: #00d4ff;"></i>
+        <h3>Connect & Collaborate</h3>
+        <p>Find skilled professionals and enthusiasts who share your passion. Build meaningful connections that last.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-exchange-alt feature-icon" style="color: #ff00ff;"></i>
+        <h3>Skill Exchange</h3>
+        <p>Trade your expertise for new skills. Learn photography, coding, design, languages, and more—all through exchange.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-shield-alt feature-icon" style="color: #00ff88;"></i>
+        <h3>Safe & Secure</h3>
+        <p>Our platform ensures verified users and secure transactions. Your safety and privacy are our top priorities.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-clock feature-icon" style="color: #ffaa00;"></i>
+        <h3>Flexible Schedule</h3>
+        <p>Learn and teach at your own pace. Schedule sessions that fit your lifestyle and commitments.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-certificate feature-icon" style="color: #ff4444;"></i>
+        <h3>Skill Verification</h3>
+        <p>Showcase your expertise with verified skills and ratings from the community.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-globe feature-icon" style="color: #4444ff;"></i>
+        <h3>Global Network</h3>
+        <p>Connect with skilled individuals from around the world. Break barriers and learn without limits.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <h3>Create Your Profile</h3>
+          <p>Sign up and showcase your skills. Tell the community what you're great at and what you want to learn.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <h3>Find Your Match</h3>
+          <p>Browse through profiles and find someone whose skills complement yours. Connect and start the conversation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <h3>Exchange & Learn</h3>
+          <p>Schedule sessions, exchange knowledge, and grow together. Build your skillset while helping others build theirs.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <h3>Rate & Review</h3>
+          <p>Leave feedback and build your reputation. Help the community thrive by sharing your experience.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <h2>Ready to Start Your Journey?</h2>
+    <p>Join thousands of skill-sharers today and unlock your potential</p>
+    <div class="cta-buttons">
+      <a href="#" class="neon-btn">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+      <a href="#" class="neon-btn">
+        <i class="fas fa-user-plus"></i> Register
+      </a>
+    </div>
+  </section>
+
+  <script>
+    // Particle Animation
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = document.body.scrollHeight;
+
+    const particles = [];
+    const particleCount = 100;
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 2 + 1;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+
+      draw() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      // Draw connections
+      particles.forEach((p1, i) => {
+        particles.slice(i + 1).forEach(p2 => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 150) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 150)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = document.body.scrollHeight;
+    });
+
+    // Update canvas height on scroll
+    window.addEventListener('scroll', () => {
+      if (canvas.height < document.body.scrollHeight) {
+        canvas.height = document.body.scrollHeight;
+      }
+    });
+
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

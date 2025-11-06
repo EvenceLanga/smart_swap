@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to SmartSwap</title>
-  <!-- Futuristic Font: Audiowide -->
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
   <style>
     body {
@@ -32,6 +31,7 @@
     }
 
     h1 {
+      font-family: 'Audiowide', cursive;
       font-size: 4em;
       letter-spacing: 4px;
       text-shadow: 0 0 9px #ffffff;
@@ -64,6 +64,8 @@
       opacity: 0;
       animation: fadeInUp 1.5s ease-out forwards;
       animation-delay: 1.6s;
+      text-decoration: none;
+      display: inline-block;
     }
 
     .glow-button:hover {
@@ -90,73 +92,6 @@
     @keyframes blink {
       50% { border-color: transparent }
     }
-
-    .button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px; /* space between buttons */
-  margin-top: 20px;
-}
-
-.neon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 30px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-decoration: none;
-  color: #fff;
-  background: transparent;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: 0.3s ease;
-  position: relative;
-}
-
-.neon-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 8px;
-  padding: 2px;
-  background: linear-gradient(45deg, #ffffff, #ffffff);
-  -webkit-mask: 
-    linear-gradient(#000 0 0) content-box, 
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-}
-
-.login-btn {
-  box-shadow: 0 0 20px #e2e5e7, 0 0 40px #e9ecee;
-  color: #ffffff;
-}
-
-.login-btn:hover {
-  background: rgba(0, 170, 255, 0.2);
-  box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
-}
-
-.register-btn {
-  box-shadow: 0 0 20px #dde4e0, 0 0 40px #ffffff;
-  color: #ffffff;
-}
-
-.register-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 30px #ffffff, 0 0 60px #ffffff;
-}
-
-.neon-btn i {
-  font-size: 1rem;
-}
-
   </style>
 </head>
 <body>
@@ -164,18 +99,82 @@
   <div class="container">
     <h1>Welcome to SmartSwap</h1>
     <div class="slogan">Where Skills Meet Opportunity.</div>
-      <div class="button-container">
-        <a href="{% url 'core:login' %}" class="neon-btn login-btn">
-          <i class="fas fa-sign-in-alt"></i> Login
-        </a>
-        <a href="{% url 'core:register' %}" class="neon-btn register-btn">
-          <i class="fas fa-user-plus"></i> Register
-        </a>
-      </div>
-
+    <a href="landing.html" class="glow-button">Enter Platform</a>
   </div>
 
-  
-  
+  <script>
+    // Particle Animation
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const particleCount = 100;
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 2 + 1;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+
+      draw() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      particles.forEach((p1, i) => {
+        particles.slice(i + 1).forEach(p2 => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 150) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 150)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>

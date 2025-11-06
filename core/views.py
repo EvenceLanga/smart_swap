@@ -334,6 +334,14 @@ def index(request):
     skills = Skill.objects.order_by('-created_at')[:10]
     return render(request, 'core/index.html', {'skills': skills})
 
+def landing(request):
+    """Welcome page for non-authenticated users"""
+    if request.user.is_authenticated:
+        return redirect('core:dashboard')
+    
+    skills = Skill.objects.order_by('-created_at')[:10]
+    return render(request, 'core/landing.html', {'skills': skills})
+
 @csrf_exempt
 def register(request):
     if request.user.is_authenticated:
