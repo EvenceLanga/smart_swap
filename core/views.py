@@ -343,15 +343,42 @@ def register(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             new_user = form.save(commit=False)
-            new_user.is_active = True  # Activate immediately since no verification
+            new_user.is_active = False  # Deactivate until email verification
             new_user.save()
 
-            messages.success(request, 'Registration successful! You can now log in.')
-            return redirect('core:login')
+            # Email verification setup
+            current_site = get_current_site(request)
+            subject = 'Verify your SkillSwap account'
+            token = default_token_generator.make_token(new_user)
+            uid = urlsafe_base64_encode(force_bytes(new_user.pk))
+            verification_link = f"http://{current_site.domain}{reverse('core:activate', args=[uid, token])}"
+
+            message = render_to_string('core/verify_email.html', {
+                'user': new_user,
+                'verification_link': verification_link,
+                'domain': current_site.domain,
+            })
+
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [new_user.email],
+                    fail_silently=False,
+                    html_message=message,
+                )
+                messages.success(request, 'Registration successful! Please check your email to verify your account before logging in.')
+                return redirect('core:login')
+            except Exception as e:
+                new_user.delete()
+                messages.error(request, f'Failed to send verification email. Please try again. Error: {str(e)}')
+                return render(request, 'core/register.html', {'form': form})
     else:
         form = UserRegistrationForm()
 
     return render(request, 'core/register.html', {'form': form})
+
 
 def debug_info(request):
     """Debug view to check email configuration"""
